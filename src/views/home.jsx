@@ -58,7 +58,7 @@ const Home = () => (
                                         </li>
                                         <li>
                                             <a href="/afficherAffaire">
-                                                <span className="sub-item">Afficher les Affaire</span>
+                                                <span className="sub-item">La liste des affaires</span>
                                             </a>
                                         </li>
                                     </ul>

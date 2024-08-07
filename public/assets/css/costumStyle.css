@@ -1,0 +1,35 @@
+
+.table-text {
+    font-size:larger;
+}
+/* In your CSS file or <style> tag */
+.col-code-affaire {
+    width: 5%;
+}
+
+.col-libelle-affaire {
+    width: 30%;
+}
+
+.col-pole {
+    width: 15%;
+}
+
+.col-division {
+    width: 15%;
+}
+
+.col-client {
+    width: 15%;
+}
+
+.col-chef-de-projet {
+    width: 15%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+/* In your CSS file or <style> tag */
+
