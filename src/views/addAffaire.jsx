@@ -68,7 +68,7 @@ const addAffire = () => (
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="components/buttons.html">
+                                            <a href="/afficherAffaire">
                                                 <span className="sub-item">Afficher les Affaire</span>
                                             </a>
                                         </li>
