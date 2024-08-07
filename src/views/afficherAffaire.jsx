@@ -117,7 +117,7 @@ const addAffire = () => (
                             </nav>
                             <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
                                 <li className="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
-                                    <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="." role="button" aria-expanded="false" aria-haspopup="true">
+                                    <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" aria-haspopup="true">
                                         <i className="fa fa-search" />
                                     </a>
                                     <ul className="dropdown-menu dropdown-search animated fadeIn">
@@ -129,179 +129,63 @@ const addAffire = () => (
                                     </ul>
                                 </li>
                                 <li className="nav-item topbar-icon dropdown hidden-caret">
-                                    <a className="nav-link dropdown-toggle" href="." id="messageDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i className="fa fa-envelope" />
-                                    </a>
-                                    <ul className="dropdown-menu messages-notif-box animated fadeIn" aria-labelledby="messageDropdown">
-                                        <li>
-                                            <div className="dropdown-title d-flex justify-content-between align-items-center">
-                                                Messages
-                                                <a href="." className="small">Mark all as read</a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="message-notif-scroll scrollbar-outer">
-                                                <div className="notif-center">
-                                                    <a href=".">
-                                                        <div className="notif-img">
-                                                            <img src="assets/img/jm_denis.jpg" alt="Img Profile" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="subject">Jimmy Denis</span>
-                                                            <span className="block"> How are you ? </span>
-                                                            <span className="time">5 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-img">
-                                                            <img src="assets/img/chadengle.jpg" alt="Img Profile" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="subject">Chad</span>
-                                                            <span className="block"> Ok, Thanks ! </span>
-                                                            <span className="time">12 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-img">
-                                                            <img src="assets/img/mlane.jpg" alt="Img Profile" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="subject">Jhon Doe</span>
-                                                            <span className="block">
-                                                                Ready for the meeting today...
-                                                            </span>
-                                                            <span className="time">12 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-img">
-                                                            <img src="assets/img/talha.jpg" alt="Img Profile" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="subject">Talha</span>
-                                                            <span className="block"> Hi, Apa Kabar ? </span>
-                                                            <span className="time">17 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <a className="see-all" href="javascript:void(0);">See all messages<i className="fa fa-angle-right" />
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li className="nav-item topbar-icon dropdown hidden-caret">
-                                    <a className="nav-link dropdown-toggle" href="." id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i className="fa fa-bell" />
-                                        <span className="notification">4</span>
-                                    </a>
-                                    <ul className="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
-                                        <li>
-                                            <div className="dropdown-title">
-                                                You have 4 new notification
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="notif-scroll scrollbar-outer">
-                                                <div className="notif-center">
-                                                    <a href=".">
-                                                        <div className="notif-icon notif-primary">
-                                                            <i className="fa fa-user-plus" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="block"> New user registered </span>
-                                                            <span className="time">5 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-icon notif-success">
-                                                            <i className="fa fa-comment" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="block">
-                                                                Rahmad commented on Admin
-                                                            </span>
-                                                            <span className="time">12 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-img">
-                                                            <img src="assets/img/mlane.jpg" alt="Img Profile" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="subject">Jhon Doe</span>
-                                                            <span className="block">
-                                                                Ready for the meeting today...
-                                                            </span>
-                                                            <span className="time">12 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href=".">
-                                                        <div className="notif-icon notif-danger">
-                                                            <i className="fa fa-heart" />
-                                                        </div>
-                                                        <div className="notif-content">
-                                                            <span className="block">Ariel liked Admin </span>
-                                                            <span className="time">17 minutes ago</span>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <a className="see-all" href="javascript:void(0);">See all notifications<i className="fa fa-angle-right" /></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li className="nav-item topbar-icon dropdown hidden-caret">
-                                    <a className="nav-link" data-bs-toggle="dropdown" href="." aria-expanded="false">
+                                    <a className="nav-link" data-bs-toggle="dropdown" href="#" aria-expanded="false">
                                         <i className="fas fa-layer-group" />
                                     </a>
-                                    <div className="dropdown-menu quick-actions quick-actions-info animated fadeIn">
+                                    <div className="dropdown-menu quick-actions animated fadeIn">
                                         <div className="quick-actions-header">
                                             <span className="title mb-1">Quick Actions</span>
-                                            <span className="subtitle op-8">Shortcuts</span>
+                                            <span className="subtitle op-7">Shortcuts</span>
                                         </div>
                                         <div className="quick-actions-scroll scrollbar-outer">
                                             <div className="quick-actions-items">
                                                 <div className="row m-0">
-                                                    <a className="col-6 col-md-4 p-0" href="components/avatars.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fas fa-file" />
-                                                            <span className="text">Generated Report</span>
+                                                            <div className="avatar-item bg-danger rounded-circle">
+                                                                <i className="far fa-calendar-alt" />
+                                                            </div>
+                                                            <span className="text">Calendar</span>
                                                         </div>
                                                     </a>
-                                                    <a className="col-6 col-md-4 p-0" href="components/buttons.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fa fa-file-excel" />
-                                                            <span className="text">Create New</span>
+                                                            <div className="avatar-item bg-warning rounded-circle">
+                                                                <i className="fas fa-map" />
+                                                            </div>
+                                                            <span className="text">Maps</span>
                                                         </div>
                                                     </a>
-                                                    <a className="col-6 col-md-4 p-0" href="components/buttons.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fa fa-file-pdf" />
-                                                            <span className="text">Completed</span>
+                                                            <div className="avatar-item bg-info rounded-circle">
+                                                                <i className="fas fa-file-excel" />
+                                                            </div>
+                                                            <span className="text">Reports</span>
                                                         </div>
                                                     </a>
-                                                    <a className="col-6 col-md-4 p-0" href="components/buttons.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fa fa-file-word" />
-                                                            <span className="text">Price Quote</span>
+                                                            <div className="avatar-item bg-success rounded-circle">
+                                                                <i className="fas fa-envelope" />
+                                                            </div>
+                                                            <span className="text">Emails</span>
                                                         </div>
                                                     </a>
-                                                    <a className="col-6 col-md-4 p-0" href="components/buttons.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fa fa-file-excel" />
-                                                            <span className="text">New Invoice</span>
+                                                            <div className="avatar-item bg-primary rounded-circle">
+                                                                <i className="fas fa-file-invoice-dollar" />
+                                                            </div>
+                                                            <span className="text">Invoice</span>
                                                         </div>
                                                     </a>
-                                                    <a className="col-6 col-md-4 p-0" href="components/buttons.html">
+                                                    <a className="col-6 col-md-4 p-0" href="#">
                                                         <div className="quick-actions-item">
-                                                            <i className="fa fa-chart-line" />
-                                                            <span className="text">Analytics</span>
+                                                            <div className="avatar-item bg-secondary rounded-circle">
+                                                                <i className="fas fa-credit-card" />
+                                                            </div>
+                                                            <span className="text">Payments</span>
                                                         </div>
                                                     </a>
                                                 </div>
@@ -309,40 +193,42 @@ const addAffire = () => (
                                         </div>
                                     </div>
                                 </li>
-                                <li className="nav-item topbar-icon">
-                                    <a className="nav-link" href="." data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i className="fas fa-user-circle" />
+                                <li className="nav-item topbar-user dropdown hidden-caret">
+                                    <a className="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                                        <div className="avatar-sm">
+                                            <img src="../assets/img/alyae.jpg" alt="..." className="avatar-img rounded-circle" />
+                                        </div>
+                                        <span className="profile-username">
+                                            <span className="op-7">Hi,</span>
+                                            <span className="fw-bold">Alyae</span>
+                                        </span>
                                     </a>
-                                    <div className="dropdown-menu quick-actions quick-actions-info animated fadeIn">
-                                        <div className="quick-actions-header">
-                                            <span className="title mb-1">Profile</span>
-                                            <span className="subtitle op-8">User</span>
-                                        </div>
-                                        <div className="quick-actions-scroll scrollbar-outer">
-                                            <div className="quick-actions-items">
-                                                <div className="row m-0">
-                                                    <a className="col-6 col-md-4 p-0" href="profile.html">
-                                                        <div className="quick-actions-item">
-                                                            <i className="fas fa-id-card" />
-                                                            <span className="text">My Profile</span>
-                                                        </div>
-                                                    </a>
-                                                    <a className="col-6 col-md-4 p-0" href="settings.html">
-                                                        <div className="quick-actions-item">
-                                                            <i className="fas fa-cog" />
-                                                            <span className="text">Settings</span>
-                                                        </div>
-                                                    </a>
-                                                    <a className="col-6 col-md-4 p-0" href="logout.html">
-                                                        <div className="quick-actions-item">
-                                                            <i className="fas fa-sign-out-alt" />
-                                                            <span className="text">Logout</span>
-                                                        </div>
-                                                    </a>
+                                    <ul className="dropdown-menu dropdown-user animated fadeIn">
+                                        <div className="dropdown-user-scroll scrollbar-outer">
+                                            <li>
+                                                <div className="user-box">
+                                                    <div className="avatar-lg">
+                                                        <img src="../assets/img/alyae.jpg" alt="image profile" className="avatar-img rounded" />
+                                                    </div>
+                                                    <div className="u-text">
+                                                        <h4>Alyae</h4>
+                                                        <p className="text-muted">Alyae@gmail.com</p>
+                                                        <a href="profile.html" className="btn btn-xs btn-secondary btn-sm">View Profile</a>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </li>
+                                            <li>
+                                                <div className="dropdown-divider" />
+                                                <a className="dropdown-item" href="#">My Profile</a>
+                                                <a className="dropdown-item" href="#">My Balance</a>
+                                                <a className="dropdown-item" href="#">Inbox</a>
+                                                <div className="dropdown-divider" />
+                                                <a className="dropdown-item" href="#">Account Setting</a>
+                                                <div className="dropdown-divider" />
+                                                <a className="dropdown-item" href="#">Logout</a>
+                                            </li>
                                         </div>
-                                    </div>
+                                    </ul>
                                 </li>
                             </ul>
                         </div>
@@ -385,52 +271,244 @@ const addAffire = () => (
                                             </a>
                                         </div>
                                     </div>
-                                    <div className="card-body" style={{ textAlign: 'left', display: 'block' }}>
+                                    <div className="card-body" >
 
-                                        <div className="table-responsive" style={{ textAlign: 'left', display: 'block' }}>
+                                        <div className="table-responsive">
                                             <table id="add-row" className="display table table-striped table-hover" >
                                                 <thead>
-                                                    <tr className="table-text">
-                                                        <th className="col-code-affaire">Code Affaire</th>
-                                                        <th className="col-libelle-affaire">Libelle Affaire</th>
-                                                        <th className="col-pole">Pole</th>
-                                                        <th className="col-division">Division</th>
-                                                        <th className="col-client">Client</th>
-                                                        <th className="col-chef-de-projet">Chef de projet</th>
-                                                        <th className="col-action">Action</th>
+                                                    <tr >
+                                                        <th >Code Affaire</th>
+                                                        <th >Libelle Affaire</th>
+                                                        <th >Pole</th>
+                                                        <th >Division</th>
+                                                        <th >Client</th>
+                                                        <th >Chef de projet</th>
+                                                        <th >Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tfoot>
-                                                    <tr className="table-text">
-                                                        <th className="col-code-affaire">Code Affaire</th>
-                                                        <th className="col-libelle-affaire">Libelle Affaire</th>
-                                                        <th className="col-pole">Pole</th>
-                                                        <th className="col-division">Division</th>
-                                                        <th className="col-client">Client</th>
-                                                        <th className="col-chef-de-projet">Chef de projet</th>
-                                                        <th className="col-action">Action</th>
+                                                    <tr >
+                                                        <th>Code Affaire</th>
+                                                        <th>Libelle Affaire</th>
+                                                        <th >Pole</th>
+                                                        <th >Division</th>
+                                                        <th >Client</th>
+                                                        <th >Chef de projet</th>
+                                                        <th >Action</th>
                                                     </tr>
                                                 </tfoot>
-                                                <tbody>
-                                                    <tr className="table-text">
-                                                        <td className="col-code-affaire">202100890</td>
-                                                        <td className="col-libelle-affaire">ETUDE D’EXECUTION DE LA CONSTRUCTION DU BARRAGE TAMRI DANS LA PROVINCE D'AGADIR</td>
-                                                        <td className="col-pole">AMENAGEMENTS HYDRAULIQUES ET RESSOURCES EN EAU</td>
-                                                        <td className="col-division">G AH</td>
-                                                        <td className="col-client">DIRECTION DES AMENAGEMENTS HYDRAULIQUES</td>
-                                                        <td className="col-chef-de-projet">AMMARI_YOUSRA</td>
-                                                        <td className="col-action">
+                                                <tbody >
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100890</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude d’execution de la construction du barrage Tamri dans la province d'Agadir</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction des amenagements hydrauliques</td>
+                                                        <td style={{ textAlign: 'left' }}>Ammari_Yousra</td>
+                                                        <td style={{ textAlign: 'left' }}>
                                                             <div className="form-button-action">
-                                                                <button type="button" data-bs-toggle="tooltip" title className="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
                                                                     <i className="fa fa-edit" />
                                                                 </button>
-                                                                <button type="button" data-bs-toggle="tooltip" title className="btn btn-link btn-danger" data-original-title="Remove">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
                                                                     <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
                                                                 </button>
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100891</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude de la rehabilitation du canal de distribution</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction des infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>Elidrissi_Mohamed</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100892</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude d’impact environnemental de l’extension de la zone industrielle</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Rahimi_Nour</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100893</td>
+                                                        <td style={{ textAlign: 'left' }}>Construction de la station d’epuration des eaux usees</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Bouziane_Samira</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100894</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagement des infrastructures routieres</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'equipement</td>
+                                                        <td style={{ textAlign: 'left' }}>Benjelloun_Yassir</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100895</td>
+                                                        <td style={{ textAlign: 'left' }}>Rehabilitation du reseau d'assainissement</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'eau</td>
+                                                        <td style={{ textAlign: 'left' }}>El Hammouchi_Noura</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100896</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude technique pour l'extension de la zone industrielle</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'industrie</td>
+                                                        <td style={{ textAlign: 'left' }}>El Ouardighi_Anas</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100897</td>
+                                                        <td style={{ textAlign: 'left' }}>Projet de developpement durable des ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'eau</td>
+                                                        <td style={{ textAlign: 'left' }}>Jabir_Salima</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100898</td>
+                                                        <td style={{ textAlign: 'left' }}>Construction d'une nouvelle usine de traitement des dechets</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Rahmani_Fatima</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100899</td>
+                                                        <td style={{ textAlign: 'left' }}>Projet de renovation des infrastructures scolaires</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'education</td>
+                                                        <td style={{ textAlign: 'left' }}>Habibi_Soufiane</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
                                                 </tbody>
                                             </table>
                                         </div>
