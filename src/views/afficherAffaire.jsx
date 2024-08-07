@@ -385,52 +385,244 @@ const addAffire = () => (
                                             </a>
                                         </div>
                                     </div>
-                                    <div className="card-body" style={{ textAlign: 'left', display: 'block' }}>
+                                    <div className="card-body" >
 
-                                        <div className="table-responsive" style={{ textAlign: 'left', display: 'block' }}>
+                                        <div className="table-responsive">
                                             <table id="add-row" className="display table table-striped table-hover" >
                                                 <thead>
-                                                    <tr className="table-text">
-                                                        <th className="col-code-affaire">Code Affaire</th>
-                                                        <th className="col-libelle-affaire">Libelle Affaire</th>
-                                                        <th className="col-pole">Pole</th>
-                                                        <th className="col-division">Division</th>
-                                                        <th className="col-client">Client</th>
-                                                        <th className="col-chef-de-projet">Chef de projet</th>
-                                                        <th className="col-action">Action</th>
+                                                    <tr >
+                                                        <th >Code Affaire</th>
+                                                        <th >Libelle Affaire</th>
+                                                        <th >Pole</th>
+                                                        <th >Division</th>
+                                                        <th >Client</th>
+                                                        <th >Chef de projet</th>
+                                                        <th >Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tfoot>
-                                                    <tr className="table-text">
-                                                        <th className="col-code-affaire">Code Affaire</th>
-                                                        <th className="col-libelle-affaire">Libelle Affaire</th>
-                                                        <th className="col-pole">Pole</th>
-                                                        <th className="col-division">Division</th>
-                                                        <th className="col-client">Client</th>
-                                                        <th className="col-chef-de-projet">Chef de projet</th>
-                                                        <th className="col-action">Action</th>
+                                                    <tr >
+                                                        <th>Code Affaire</th>
+                                                        <th>Libelle Affaire</th>
+                                                        <th >Pole</th>
+                                                        <th >Division</th>
+                                                        <th >Client</th>
+                                                        <th >Chef de projet</th>
+                                                        <th >Action</th>
                                                     </tr>
                                                 </tfoot>
-                                                <tbody>
-                                                    <tr className="table-text">
-                                                        <td className="col-code-affaire">202100890</td>
-                                                        <td className="col-libelle-affaire">ETUDE D’EXECUTION DE LA CONSTRUCTION DU BARRAGE TAMRI DANS LA PROVINCE D'AGADIR</td>
-                                                        <td className="col-pole">AMENAGEMENTS HYDRAULIQUES ET RESSOURCES EN EAU</td>
-                                                        <td className="col-division">G AH</td>
-                                                        <td className="col-client">DIRECTION DES AMENAGEMENTS HYDRAULIQUES</td>
-                                                        <td className="col-chef-de-projet">AMMARI_YOUSRA</td>
-                                                        <td className="col-action">
+                                                <tbody >
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100890</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude d’execution de la construction du barrage Tamri dans la province d'Agadir</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction des amenagements hydrauliques</td>
+                                                        <td style={{ textAlign: 'left' }}>Ammari_Yousra</td>
+                                                        <td style={{ textAlign: 'left' }}>
                                                             <div className="form-button-action">
-                                                                <button type="button" data-bs-toggle="tooltip" title className="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
                                                                     <i className="fa fa-edit" />
                                                                 </button>
-                                                                <button type="button" data-bs-toggle="tooltip" title className="btn btn-link btn-danger" data-original-title="Remove">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
                                                                     <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
                                                                 </button>
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100891</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude de la rehabilitation du canal de distribution</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction des infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>Elidrissi_Mohamed</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100892</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude d’impact environnemental de l’extension de la zone industrielle</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Direction de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Rahimi_Nour</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100893</td>
+                                                        <td style={{ textAlign: 'left' }}>Construction de la station d’epuration des eaux usees</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Bouziane_Samira</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100894</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagement des infrastructures routieres</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'equipement</td>
+                                                        <td style={{ textAlign: 'left' }}>Benjelloun_Yassir</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100895</td>
+                                                        <td style={{ textAlign: 'left' }}>Rehabilitation du reseau d'assainissement</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'eau</td>
+                                                        <td style={{ textAlign: 'left' }}>El Hammouchi_Noura</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100896</td>
+                                                        <td style={{ textAlign: 'left' }}>Etude technique pour l'extension de la zone industrielle</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'industrie</td>
+                                                        <td style={{ textAlign: 'left' }}>El Ouardighi_Anas</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100897</td>
+                                                        <td style={{ textAlign: 'left' }}>Projet de developpement durable des ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>Amenagements hydrauliques et ressources en eau</td>
+                                                        <td style={{ textAlign: 'left' }}>G ah</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'eau</td>
+                                                        <td style={{ textAlign: 'left' }}>Jabir_Salima</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100898</td>
+                                                        <td style={{ textAlign: 'left' }}>Construction d'une nouvelle usine de traitement des dechets</td>
+                                                        <td style={{ textAlign: 'left' }}>Environnement et developpement durable</td>
+                                                        <td style={{ textAlign: 'left' }}>G edd</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'environnement</td>
+                                                        <td style={{ textAlign: 'left' }}>Rahmani_Fatima</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ textAlign: 'left' }}>202100899</td>
+                                                        <td style={{ textAlign: 'left' }}>Projet de renovation des infrastructures scolaires</td>
+                                                        <td style={{ textAlign: 'left' }}>Infrastructures urbaines</td>
+                                                        <td style={{ textAlign: 'left' }}>G iu</td>
+                                                        <td style={{ textAlign: 'left' }}>Ministere de l'education</td>
+                                                        <td style={{ textAlign: 'left' }}>Habibi_Soufiane</td>
+                                                        <td style={{ textAlign: 'left' }}>
+                                                            <div className="form-button-action">
+                                                                <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary btn-lg" data-original-title="Edit Affaire">
+                                                                    <i className="fa fa-edit" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger" data-original-title="Remove Affaire">
+                                                                    <i className="fa fa-times" />
+                                                                </button>
+                                                                <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info" data-original-title="Details Affaire">
+                                                                    <i className="fa fa-info-circle" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
                                                 </tbody>
                                             </table>
                                         </div>
