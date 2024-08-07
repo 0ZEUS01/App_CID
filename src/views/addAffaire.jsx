@@ -5,17 +5,6 @@ import React from 'react';
 
 const addAffire = () => (
     <div>
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <title>Forms - Kaiadmin Bootstrap 5 Admin Dashboard</title>
-        <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-        <link rel="icon" href="../assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
-        {/* Fonts and icons */}
-        {/* CSS Files */}
-        <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="../assets/css/plugins.min.css" />
-        <link rel="stylesheet" href="../assets/css/kaiadmin.min.css" />
-        {/* CSS Just for demo purpose, don't include it in your project */}
-        <link rel="stylesheet" href="../assets/css/demo.css" />
         <div className="wrapper">
             {/* Sidebar */}
             <div className="sidebar" data-background-color="dark">
@@ -400,6 +389,24 @@ const addAffire = () => (
                                                 />
                                             </div>
                                             <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="pole" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Pole</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="pole"
+                                                    placeholder="Entrer le nom de pole"
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="division" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Division</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="division"
+                                                    placeholder="Entrer le nom de division"
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
                                                 <label htmlFor="PrixAffaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Mantant total de CID (HT)</label>
                                                 <input
                                                     type="text"
@@ -408,32 +415,7 @@ const addAffire = () => (
                                                     placeholder="Entrer le Mantant total de CID en DH"
                                                 />
                                             </div>
-                                            <div className="mb-3 col-md-6 form-group">
-                                                <label htmlFor="PourcentageAssurance" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Pourcentage d'assurance</label>
-                                                <div style={{ marginTop: '15px', textAlign: 'left', display: 'block' }}>
-                                                    <input
-                                                        type="range"
-                                                        id="PourcentageAssuranceRange"
-                                                        name="PourcentageAssuranceRange"
-                                                        min="0"
-                                                        max="100"
-                                                        step="1"
-                                                        onInput={(e) => document.getElementById('PourcentageAssuranceInput').value = e.target.value}
-                                                        style={{ width: '250px', marginRight: '10px' }}
-                                                    />
-                                                    <input
-                                                        type="number"
-                                                        id="PourcentageAssuranceInput"
-                                                        name="PourcentageAssuranceInput"
-                                                        min="0"
-                                                        max="100"
-                                                        step="1"
-                                                        defaultValue="50"
-                                                        onInput={(e) => document.getElementById('PourcentageAssuranceRange').value = e.target.value}
-                                                        style={{ marginRight: '10px' }}
-                                                    />%
-                                                </div>
-                                            </div>
+                                            
                                             <div className="mb-3 col-md-6 form-group">
                                                 <label htmlFor="typeAffaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Type d'affaire</label>
                                                 <select
@@ -481,25 +463,115 @@ const addAffire = () => (
                                                 </div>
                                             </div>
                                             <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="groupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Groupment</label>
-                                                    <select
-                                                        class="form-select form-control"
-                                                        id="groupment"
-                                                    >
-                                                        <option value={1}>Group 1</option>
-                                                        <option value={2}>Group 2</option>
-                                                    </select>
-                                                </div>
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="typegroupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Type de groupment</label>
-                                                    <select
-                                                        class="form-select form-control"
-                                                        id="typegroupment"
-                                                    >
-                                                        <option value={1}>Type groupment 1</option>
-                                                        <option value={2}>type groupment 2</option>
-                                                    </select>
-                                                </div>
+                                                <label htmlFor="groupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Groupment</label>
+                                                <select
+                                                    class="form-select form-control"
+                                                    id="groupment"
+                                                >
+                                                    <option value={1}>Oui</option>
+                                                    <option value={2}>Non</option>
+                                                </select>
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="typegroupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Type de groupment</label>
+                                                <select
+                                                    class="form-select form-control"
+                                                    id="typegroupment"
+                                                >
+                                                    <option value={1}>Type groupment 1</option>
+                                                    <option value={2}>type groupment 2</option>
+                                                </select>
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="dateSignatureConventionGroupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Date de signature de convention de groupment</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    id="dateSignatureConventionGroupment"
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="nomMandataireGroupment" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Nom de mandataire de groupment</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="nomMandataireGroupment"
+                                                    placeholder='Entrer le nom de mandataire de groupment'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="partTotaleMarche" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Part totale de marché (HT)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="partTotaleMarche"
+                                                    placeholder='Entrer la part totale de marché en DH'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="partTotaleMarcheDevise" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Part totale de marché de devise (TTC)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="partTotaleMarcheDevise"
+                                                    placeholder='Entrer la part totale de marché de devise'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="partCID" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Part de CID (HT)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="partCID"
+                                                    placeholder='Entrer la part de CID en DH'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="partCIDDevise" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Part de CID de devise (TCC)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="partCIDDevise"
+                                                    placeholder='Entrer la part de CID de devise en DH'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="retenueSource" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Retenue source (TCC)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="retenueSource"
+                                                    placeholder='Entrer le Retenue source en DH'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="retenueGarantie" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Retenue garantie (TCC)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="retenueGarantie"
+                                                    placeholder='Entrer le Retenue garantie en DH'
+                                                />
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="statut" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Statut</label>
+                                                <select
+                                                    class="form-select form-control"
+                                                    id="statut"
+                                                >
+                                                    <option value={1}>statut 1</option>
+                                                    <option value={2}>statut 2</option>
+                                                </select>
+                                            </div>
+                                            <div className="mb-3 col-md-6 form-group">
+                                                <label htmlFor="risqueSolvabilite" className="form-label" style={{ textAlign: 'left', display: 'block' }}> Risque solvabilite </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="risqueSolvabilite"
+                                                    placeholder='Entrer le Risque solvabilite'
+                                                />
+                                            </div>
                                             <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
                                                 <button className="btn btn-info">Ajouter</button>
                                                 <button className="btn btn-black btn-border">Annuler</button>
