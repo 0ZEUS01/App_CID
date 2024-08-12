@@ -3,13 +3,9 @@
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useMemo } from 'react';
-import { Modal, Button } from 'react-bootstrap';
 
 const AfficherAffaire = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState('');
-    const [selectedAffaire, setSelectedAffaire] = useState(null);
 
     const data = [
         { code: '202100890', libelle: "Etude d’execution de la construction du barrage Tamri dans la province d'Agadir", division: 'G ah', client: 'Direction des amenagements hydrauliques', chef: 'Ammari Yousra' },
@@ -54,24 +50,6 @@ const AfficherAffaire = () => {
         }
         return sortConfig.key === name ? sortConfig.direction : undefined;
     };
-    const handleShowModal = (type, affaire) => {
-        setModalType(type);
-        setSelectedAffaire(affaire);
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => setShowModal(false);
-
-    const handleDelete = () => {
-        // Perform delete action
-        handleCloseModal();
-    };
-
-    const handleEdit = (e) => {
-        e.preventDefault();
-        // Perform edit action
-        handleCloseModal();
-    };
 
     return (
         <div>
@@ -82,7 +60,7 @@ const AfficherAffaire = () => {
                         {/* Logo Header */}
                         <div className="logo-header" data-background-color="dark">
                             <a href="/" className="logo">
-                                <img src="assets/img/logo.png" alt="navbar brand" className="navbar-brand" height={65} />
+                                <img src="assets/img/logo.svg" alt="navbar brand" className="navbar-brand" height={150} />
                             </a>
                             <div className="nav-toggle">
                                 <button className="btn btn-toggle toggle-sidebar">
@@ -145,7 +123,7 @@ const AfficherAffaire = () => {
                             {/* Logo Header */}
                             <div className="logo-header" data-background-color="dark">
                                 <a href="index.html" className="logo">
-                                    <img src="assets/img/logo.png" alt="navbar brand" className="navbar-brand" height={65} />
+                                    <img src="assets/img/logo.svg" alt="navbar brand" className="navbar-brand" height={150} />
                                 </a>
                                 <div className="nav-toggle">
                                     <button className="btn btn-toggle toggle-sidebar">
@@ -297,7 +275,7 @@ const AfficherAffaire = () => {
                     <div className="container">
                         <div className="page-inner">
                             <div className="page-header">
-                                <h3 className="fw-bold mb-3">Gestion des Affaire</h3>
+                                <h3 className="fw-bold mb-3">Gestion des Affaires</h3>
                                 <ul className="breadcrumbs mb-3">
                                     <li className="nav-home">
                                         <a href="#">
@@ -308,13 +286,13 @@ const AfficherAffaire = () => {
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="#">Gestion des Affaire</a>
+                                        <a href="#">Gestion des Affaires</a>
                                     </li>
                                     <li className="separator">
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="#">Ajouter une nouvelle Affaire</a>
+                                        <a href="#">Liste des affaires</a>
                                     </li>
                                 </ul>
                             </div>
@@ -363,13 +341,13 @@ const AfficherAffaire = () => {
                                                                 <td style={{ textAlign: 'left' }}>{item.chef}</td>
                                                                 <td style={{ textAlign: 'left' }}>
                                                                     <div className="form-button-action">
-                                                                        <button type="button" onClick={() => handleShowModal('info', item)} className="btn btn-link btn-info">
+                                                                        <button type="button" data-bs-toggle="tooltip" title="Details Affaire" className="btn btn-link btn-info " data-original-title="Details Affaire">
                                                                             <i className="fa icon-information" />
                                                                         </button>
-                                                                        <button type="button" onClick={() => handleShowModal('edit', item)} className="btn btn-link btn-primary">
+                                                                        <button type="button" data-bs-toggle="tooltip" title="Edit Affaire" className="btn btn-link btn-primary " data-original-title="Edit Affaire">
                                                                             <i className="fa fa-edit" />
                                                                         </button>
-                                                                        <button type="button" onClick={() => handleShowModal('delete', item)} className="btn btn-link btn-danger">
+                                                                        <button type="button" data-bs-toggle="tooltip" title="Remove Affaire" className="btn btn-link btn-danger " data-original-title="Remove Affaire">
                                                                             <i className="fa fa-times" />
                                                                         </button>
                                                                     </div>
@@ -379,80 +357,7 @@ const AfficherAffaire = () => {
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <Modal show={showModal} onHide={handleCloseModal} centered>
-                                                <Modal.Header closeButton>
-                                                    <Modal.Title>
-                                                        {modalType === 'delete' && 'Delete Affaire'}
-                                                        {modalType === 'edit' && 'Edit Affaire'}
-                                                        {modalType === 'info' && 'Details of Affaire'}
-                                                    </Modal.Title>
-                                                </Modal.Header>
-                                                <Modal.Body>
-                                                    {modalType === 'delete' && (
-                                                        <p>Are you sure you want to delete the affair "{selectedAffaire?.libelle}"?</p>
-                                                    )}
-                                                    {modalType === 'edit' && selectedAffaire && (
-                                                        <form onSubmit={handleEdit}>
-                                                            <div className="mb-3">
-                                                                <label>Code</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.code} />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <label>Libelle</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.libelle} />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <label>Division</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.division} />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <label>Client</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.client} />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <label>Chef de projet</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.chef} />
-                                                            </div>
-                                                            <Button variant="primary" type="submit">
-                                                                Save Changes
-                                                            </Button>
-                                                        </form>
-                                                    )}
-                                                    {modalType === 'info' && selectedAffaire && (
-                                                        <div>
-                                                            <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                                                            <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
-                                                            <p><strong>Division:</strong> {selectedAffaire.division}</p>
-                                                            <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                                                            <p><strong>Chef de projet:</strong> {selectedAffaire.chef}</p>
-                                                        </div>
-                                                    )}
-                                                </Modal.Body>
-                                                <Modal.Footer>
-                                                    {modalType === 'delete' && (
-                                                        <>
-                                                            <Button variant="secondary" onClick={handleCloseModal}>
-                                                                Cancel
-                                                            </Button>
-                                                            <Button variant="danger" onClick={handleDelete}>
-                                                                Delete
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                    {modalType === 'edit' && (
-                                                        <>
-                                                            <Button variant="secondary" onClick={handleCloseModal}>
-                                                                Cancel
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                    {modalType === 'info' && (
-                                                        <Button variant="secondary" onClick={handleCloseModal}>
-                                                            Close
-                                                        </Button>
-                                                    )}
-                                                </Modal.Footer>
-                                            </Modal>
+
                                         </div>
                                     </div>
                                 </div>
