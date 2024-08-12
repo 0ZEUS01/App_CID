@@ -1,9 +1,10 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageMeta from './PageMeta';
-import Home from './views/home.jsx';
-import AddAffire from './views/addAffaire.jsx';
-import AfficherAffaire from './views/afficherAffaire.jsx'
+import Home from './CadreAdmin/homeCA.jsx';
+import AddAffire from './CadreAdmin/addAffaireCA.jsx';
+import AfficherAffaire from './CadreAdmin/afficherAffaireCA.jsx';
+import AddMission from './CadreAdmin/addMissionCA.jsx'
 
 function App() {
   return (
@@ -34,6 +35,15 @@ function App() {
             <>
               <PageMeta title="Afficher les Affaires | CID" />
               <AfficherAffaire />
+            </>
+          }
+        />
+        <Route
+          path="/AddMission"
+          element={
+            <>
+              <PageMeta title="Ajouter les Mission | CID" />
+              <AddMission />
             </>
           }
         />
