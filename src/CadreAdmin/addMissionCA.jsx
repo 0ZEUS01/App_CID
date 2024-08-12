@@ -135,7 +135,7 @@ const AddAffaire = () => {
                                             </li>
                                             <li>
                                                 <a href="/afficherAffaire">
-                                                    <span className="sub-item">La liste des affaires</span>
+                                                    <span className="sub-item">Liste des affaires</span>
                                                 </a>
                                             </li>
                                         </ul>

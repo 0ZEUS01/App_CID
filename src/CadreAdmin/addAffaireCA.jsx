@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 
-const addAffire = () => (
+const addAffaire = () => (
     <div>
         <div className="wrapper">
             {/* Sidebar */}
@@ -58,7 +58,7 @@ const addAffire = () => (
                                         </li>
                                         <li>
                                             <a href="/afficherAffaire">
-                                                <span className="sub-item">La liste des affaires</span>
+                                                <span className="sub-item">Liste des affaires</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -375,4 +375,4 @@ const addAffire = () => (
     </div>
 );
 
-export default addAffire;
+export default addAffaire;
