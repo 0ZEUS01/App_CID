@@ -11,6 +11,7 @@ import HomeCP from './ChefPole/homeCP.jsx';
 import AfficherAffaireCP from './ChefPole/afficherAffaireCP.jsx';
 import HomeCD from './ChefDiv/homeCD.jsx';
 import AfficherAffaireCD from './ChefDiv/afficherAffaireCD.jsx';
+import AddMissionCD from './ChefDiv/addMissionCD.jsx';
 import HomeCDP from './ChefProjet/homeCDP.jsx';
 import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP.jsx';
 
@@ -112,6 +113,15 @@ function App() {
               <>
                 <PageMeta title="Afficher les Affaires | CID" />
                 <AfficherAffaireCD />
+              </>
+            }
+          />
+          <Route
+            path="/AddMissionCD"
+            element={
+              <>
+                <PageMeta title="Afficher les Mission | CID" />
+                <AddMissionCD />
               </>
             }
           />

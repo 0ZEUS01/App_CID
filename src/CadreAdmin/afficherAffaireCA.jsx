@@ -347,9 +347,6 @@ const AfficherAffaire = () => {
                                                             <th style={{ textAlign: 'left' }} onClick={() => requestSort('client')} className={getClassNamesFor('client')}>
                                                                 Client <i className={getClassNamesFor('client') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
                                                             </th>
-                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('chef')} className={getClassNamesFor('chef')}>
-                                                                Chef de projet <i className={getClassNamesFor('chef') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
-                                                            </th>
                                                             <th></th>
                                                         </tr>
                                                     </thead>
@@ -360,7 +357,6 @@ const AfficherAffaire = () => {
                                                                 <td style={{ textAlign: 'left' }}>{item.libelle}</td>
                                                                 <td style={{ textAlign: 'left' }}>{item.division}</td>
                                                                 <td style={{ textAlign: 'left' }}>{item.client}</td>
-                                                                <td style={{ textAlign: 'left' }}>{item.chef}</td>
                                                                 <td style={{ textAlign: 'left' }}>
                                                                     <div className="form-button-action">
                                                                         <button type="button" onClick={() => handleShowModal('info', item)} className="btn btn-link btn-info">
@@ -409,10 +405,6 @@ const AfficherAffaire = () => {
                                                                 <label>Client</label>
                                                                 <input type="text" className="form-control" defaultValue={selectedAffaire.client} />
                                                             </div>
-                                                            <div className="mb-3">
-                                                                <label>Chef de projet</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.chef} />
-                                                            </div>
                                                             <Button variant="primary" type="submit">
                                                                 Save Changes
                                                             </Button>
@@ -424,7 +416,6 @@ const AfficherAffaire = () => {
                                                             <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
                                                             <p><strong>Division:</strong> {selectedAffaire.division}</p>
                                                             <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                                                            <p><strong>Chef de projet:</strong> {selectedAffaire.chef}</p>
                                                         </div>
                                                     )}
                                                 </Modal.Body>
