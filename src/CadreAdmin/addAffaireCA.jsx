@@ -52,12 +52,12 @@ const addAffaire = () => (
                                 <div className="collapse" id="base">
                                     <ul className="nav nav-collapse">
                                         <li>
-                                            <a href="/AddAffaire">
+                                            <a href="/AddAffaireCA">
                                                 <span className="sub-item">Ajouter une nouvelle Affaire</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="/afficherAffaire">
+                                            <a href="/afficherAffaireCA">
                                                 <span className="sub-item">Liste des affaires</span>
                                             </a>
                                         </li>
@@ -339,7 +339,7 @@ const addAffaire = () => (
                                                 />
                                             </div>
                                             <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
-                                                <a className="btn btn-primary" href='/AddMission'>Suivant</a>
+                                                <a className="btn btn-primary" href='/AddMissionCA'>Suivant</a>
                                                 <button className="btn btn-black btn-border">Annuler</button>
                                             </div>
                                         </div>
