@@ -6,6 +6,7 @@ import HomeCA from './CadreAdmin/homeCA.jsx';
 import AddAffireCA from './CadreAdmin/addAffaireCA.jsx';
 import AfficherAffaireCA from './CadreAdmin/afficherAffaireCA.jsx';
 import AddMissionCA from './CadreAdmin/addMissionCA.jsx';
+import AfficherMissionCA from './CadreAdmin/afficherMissionCA.jsx';
 import HomeCP from './ChefPole/homeCP.jsx';
 import AfficherAffaireCP from './ChefPole/afficherAffaireCP.jsx';
 import HomeCD from './ChefDiv/homeCD.jsx';
@@ -62,6 +63,15 @@ function App() {
               <>
                 <PageMeta title="Ajouter les Mission | CID" />
                 <AddMissionCA />
+              </>
+            }
+          />
+          <Route
+            path="/AfficherMissionCA"
+            element={
+              <>
+                <PageMeta title="Afficher les Mission | CID" />
+                <AfficherMissionCA />
               </>
             }
           />

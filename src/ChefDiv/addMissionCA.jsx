@@ -4,18 +4,32 @@
 import React, { useState } from 'react';
 
 const AddAffaire = () => {
-    const [forfait, setForfait] = useState(1); 
+    const [forfait, setForfait] = useState(1); // Default to "Oui"
     const [quantite, setQuantite] = useState('');
     const [prixUnitaire, setPrixUnitaire] = useState('');
     const [prixTotal, setPrixTotal] = useState('');
+    const [principalPercentage, setPrincipalPercentage] = useState('');
+    const [secondaryPercentages, setSecondaryPercentages] = useState([]);
+    const [selectedDivisions, setSelectedDivisions] = useState([]);
+    const [error, setError] = useState('');
+
+    const divisions = [
+        { value: 1, label: 'AUTOROUTES' },
+        { value: 2, label: 'RAILS' },
+        { value: 3, label: 'ROUTES' },
+        { value: 4, label: 'OUVRAGES D’ART' },
+        { value: 5, label: 'ASSISTANCE TECHNIQUE' },
+        { value: 6, label: 'PLANIFICATION ET MOBILITE' },
+        { value: 7, label: 'GRANDS BARRAGES' }
+    ];
 
     const handleForfaitChange = (e) => {
         const value = parseInt(e.target.value, 10);
         setForfait(value);
-        if (value === 1) {
+        if (value === 1) { // "Oui" selected
             setQuantite('');
             setPrixUnitaire('');
-        } else {
+        } else { // "Non" selected
             setPrixTotal('');
         }
     };
@@ -31,6 +45,40 @@ const AddAffaire = () => {
         setPrixUnitaire(value);
         setPrixTotal(quantite * value);
     };
+
+    const handlePrincipalChange = (e) => {
+        const value = parseInt(e.target.value);
+        if (value > 100) {
+            setError("Le pourcentage ne peut pas dépasser 100%");
+        } else {
+            setError('');
+            setPrincipalPercentage(value);
+        }
+    };
+
+    const handleSecondaryChange = (index, value) => {
+        const updatedPercentages = [...secondaryPercentages];
+        updatedPercentages[index] = value;
+        const totalPercentage = principalPercentage + updatedPercentages.reduce((sum, val) => sum + val, 0);
+
+        if (totalPercentage > 100) {
+            setError("Le pourcentage total ne peut pas dépasser 100%");
+        } else {
+            setError('');
+            setSecondaryPercentages(updatedPercentages);
+        }
+    };
+
+    const handleDivisionSelect = (e) => {
+        const selectedValue = parseInt(e.target.value);
+        const selectedDivision = divisions.find(division => division.value === selectedValue);
+        if (selectedDivision && !selectedDivisions.includes(selectedDivision)) {
+            setSelectedDivisions([...selectedDivisions, selectedDivision]);
+            setSecondaryPercentages([...secondaryPercentages, 0]); // Add a new percentage input
+        }
+    };
+
+    const remainingPercentage = 100 - (principalPercentage + secondaryPercentages.reduce((sum, val) => sum + val, 0));
 
     return (
         <div>
@@ -318,17 +366,6 @@ const AddAffaire = () => {
                                                 {forfait === 2 && (
                                                     <>
                                                         <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="unite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="unite"
-                                                                placeholder="Entrer l'unite (ex: Km)"
-                                                                value={quantite}
-                                                                onChange={handleQuantiteChange}
-                                                            />
-                                                        </div>
-                                                        <div className="mb-3 col-md-6 form-group">
                                                             <label htmlFor="prixUnitaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix unitaire</label>
                                                             <input
                                                                 type="text"
@@ -364,6 +401,58 @@ const AddAffaire = () => {
                                                         readOnly={forfait === 2}
                                                     />
                                                 </div>
+                                                <div className="mb-3 col-md-6 form-group">
+                                                    <label htmlFor="PourcentageDivPrincipale" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Pourcentage de division principale</label>
+                                                    <div className="input-group mb-3">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Pourcentage de division principale"
+                                                            value={principalPercentage}
+                                                            onChange={handlePrincipalChange}
+                                                            aria-describedby="basic-addon2"
+                                                        />
+                                                        <span className="input-group-text" id="basic-addon2">%</span>
+                                                    </div>
+                                                </div>
+
+                                                {remainingPercentage < 100 && remainingPercentage > 0 && (
+                                                    <div className="mb-3 col-md-6 form-group">
+                                                        <label htmlFor="AddDiv" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Nouveau division</label>
+                                                        <select
+                                                            className="form-select form-control"
+                                                            id="AddDiv"
+                                                            onChange={handleDivisionSelect}
+                                                        >
+                                                            {divisions
+                                                                .filter(division => !selectedDivisions.includes(division))
+                                                                .map(division => (
+                                                                    <option key={division.value} value={division.value}>
+                                                                        {division.label}
+                                                                    </option>
+                                                                ))}
+                                                        </select>
+                                                    </div>
+                                                )}
+
+                                                {secondaryPercentages.map((percentage, index) => (
+                                                    <div className="mb-3 col-md-6 form-group" key={index}>
+                                                        <label htmlFor={`PourcentageDivSecondaire${index}`} className="form-label" style={{ textAlign: 'left', display: 'block' }}>Pourcentage de division {selectedDivisions[index].label}</label>
+                                                        <div className="input-group">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder={`Pourcentage de division ${selectedDivisions[index].label}`}
+                                                                value={percentage}
+                                                                onChange={(e) => handleSecondaryChange(index, parseInt(e.target.value))}
+                                                                aria-describedby="basic-addon2"
+                                                            />
+                                                            <span className="input-group-text" id="basic-addon2">%</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {error && <div className="alert alert-danger" role="alert">{error}</div>}
 
                                                 <div className=' form-group' style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                                                     <button className="btn btn-primary">Ajouter</button>
@@ -376,12 +465,28 @@ const AddAffaire = () => {
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
                                                                     <h5><b>Gare LGV Casa Voyageurs</b></h5>
-                                                                    <p className="text-muted">Forfait : Oui</p>
+                                                                    <p className="text-muted">Forfait</p>
 
                                                                 </div>
                                                                 <h3 className="text-info fw-bold">456,000.00 DH</h3>
                                                             </div>
-
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-75" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <p className="text-muted mb-0">Div: Routes</p>
+                                                                <p className="text-muted mb-0">342,000.00 DH</p>
+                                                                <p className="text-muted mb-0">75%</p>
+                                                            </div>
+                                                            <br />
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-25" role="progressbar" aria-valuenow={25} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <p className="text-muted mb-0">Div: AT RAF</p>
+                                                                <p className="text-muted mb-0">114,000.00 DH</p>
+                                                                <p className="text-muted mb-0">25%</p>
+                                                            </div>
                                                             <div className="d-flex justify-content-end mt-2">
                                                                 <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
                                                                 <i className='fas fa-trash-alt text-danger'> Supprimer</i>
@@ -395,17 +500,22 @@ const AddAffaire = () => {
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
                                                                     <h5><b>Gare LGV Rabat Agdal</b></h5>
-                                                                    <p className="text-muted">Forfait : Non</p>
+                                                                    <p className="text-muted">Forfait</p>
 
                                                                 </div>
                                                                 <h3 className="text-info fw-bold">342,000.00 DH</h3>
                                                             </div>
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-100" role="progressbar" aria-valuenow={100} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
                                                             <div className="d-flex justify-content-between mt-2">
-                                                                <p className="text-muted">Quantite : 20 Km &nbsp;&nbsp;&nbsp; Prix Unitaire : 17100.00 DH</p>
-                                                                <div>
-                                                                    <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
-                                                                    <i className='fas fa-trash-alt text-danger'> Supprimer</i>
-                                                                </div>
+                                                                <p className="text-muted mb-0">Div: Routes</p>
+                                                                <p className="text-muted mb-0">342,000.00 DH</p>
+                                                                <p className="text-muted mb-0">100%</p>
+                                                            </div>
+                                                            <div className="d-flex justify-content-end mt-2">
+                                                                <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
+                                                                <i className='fas fa-trash-alt text-danger'> Supprimer</i>
                                                             </div>
                                                         </div>
                                                     </div>

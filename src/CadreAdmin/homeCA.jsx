@@ -52,12 +52,12 @@ const Home = () => (
                                 <div className="collapse" id="base">
                                     <ul className="nav nav-collapse">
                                         <li>
-                                            <a href="/AddAffaire">
+                                            <a href="/AddAffaireCA">
                                                 <span className="sub-item">Ajouter une nouvelle Affaire</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="/afficherAffaire">
+                                            <a href="/afficherAffaireCA">
                                                 <span className="sub-item">Liste des affaires</span>
                                             </a>
                                         </li>

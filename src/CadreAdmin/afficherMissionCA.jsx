@@ -5,23 +5,17 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const AfficherAffaire = () => {
+const AfficherMission = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
-    const [selectedAffaire, setSelectedAffaire] = useState(null);
+    const [selectedMission, setSelectedMission] = useState(null);
 
     const data = [
-        { code: '202100890', libelle: "Etude d’execution de la construction du barrage Tamri dans la province d'Agadir", division: 'G ah', client: 'Direction des amenagements hydrauliques', chef: 'Ammari Yousra' },
-        { code: '202100891', libelle: 'Etude de la rehabilitation du canal de distribution', division: 'G iu', client: 'Direction des infrastructures urbaines', chef: 'Elidrissi Mohamed' },
-        { code: '202100892', libelle: 'Etude d’impact environnemental de l’extension de la zone industrielle', division: 'G edd', client: "Direction de l'environnement", chef: 'Rahimi Nour' },
-        { code: '202100893', libelle: "Construction de la station d’epuration des eaux usees", division: 'G edd', client: "Ministere de l'environnement", chef: 'Bouziane Samira' },
-        { code: '202100894', libelle: 'Amenagement des infrastructures routieres', division: 'G iu', client: "Ministere de l'equipement", chef: 'Benjelloun Yassir' },
-        { code: '202100895', libelle: "Rehabilitation du reseau d'assainissement", division: 'G ah', client: "Ministere de l'eau", chef: 'El Hammouchi Noura' },
-        { code: '202100896', libelle: "Etude technique pour l'extension de la zone industrielle", division: 'G edd', client: "Ministere de l'industrie", chef: 'El Ouardighi Anas' },
-        { code: '202100897', libelle: 'Projet de developpement durable des ressources en eau', division: 'G ah', client: "Ministere de l'eau", chef: 'Jabir Salima' },
-        { code: '202100898', libelle: "Construction d'une nouvelle usine de traitement des dechets", division: 'G edd', client: "Ministere de l'environnement", chef: 'Rahmani Fatima' },
-        { code: '202100899', libelle: 'Projet de renovation des infrastructures scolaires', division: 'G iu', client: "Ministere de l'education", chef: 'Habibi Soufiane' },
+        { libelle: "Gare LGV Casa Voyageurs", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '70 %' },
+        { libelle: "Gare LGV Rabat Agdal", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '100 %' },
+        { libelle: "Gare LGV Kénitra", prix: '405,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '90 %' },
+        { libelle: "Gare LGV Tanger", prix: '378,000.00', forfait: 'Non', division: 'ET', Pourcentage: '100 %' }
     ];
 
     const sortedData = useMemo(() => {
@@ -54,9 +48,9 @@ const AfficherAffaire = () => {
         }
         return sortConfig.key === name ? sortConfig.direction : undefined;
     };
-    const handleShowModal = (type, affaire) => {
+    const handleShowModal = (type, mission) => {
         setModalType(type);
-        setSelectedAffaire(affaire);
+        setSelectedMission(mission);
         setShowModal(true);
     };
 
@@ -314,7 +308,7 @@ const AfficherAffaire = () => {
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="#">List des affaire</a>
+                                        <a href="#">List des Mission</a>
                                     </li>
                                 </ul>
                             </div>
@@ -323,10 +317,10 @@ const AfficherAffaire = () => {
                                     <div className="card">
                                         <div className="card-header">
                                             <div className="d-flex align-items-center">
-                                                <h4 className="card-title">Liste des affaires de pole Batiment, VRD </h4>
-                                                <a href="/AddAffaire" className="btn btn-primary btn-round ms-auto">
+                                                <h4 className="card-title">Liste des missiom de l'affaire " Réalisation des études de circulation 4 "</h4>
+                                                <a href="/AddMissionCA" className="btn btn-primary btn-round ms-auto">
                                                     <i className="fa fa-plus" />
-                                                    &nbsp;&nbsp;Ajouter une affaire
+                                                    &nbsp;&nbsp;Ajouter une mission
                                                 </a>
                                             </div>
                                         </div>
@@ -335,20 +329,20 @@ const AfficherAffaire = () => {
                                                 <table className="table table-striped table-hover mt-3">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('code')} className={getClassNamesFor('code')}>
-                                                                Code Affaire <i className={getClassNamesFor('code') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
-                                                            </th>
                                                             <th style={{ textAlign: 'left' }} onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
-                                                                Libelle Affaire <i className={getClassNamesFor('libelle') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                                Libelle Mission <i className={getClassNamesFor('libelle') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('prix')} className={getClassNamesFor('prix')}>
+                                                                Prix Total <i className={getClassNamesFor('prix') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('forfait')} className={getClassNamesFor('forfait')}>
+                                                                Forfait <i className={getClassNamesFor('forfait') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
                                                             </th>
                                                             <th style={{ textAlign: 'left' }} onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
-                                                                Division <i className={getClassNamesFor('division') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                                Division Principale<i className={getClassNamesFor('division') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
                                                             </th>
-                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('client')} className={getClassNamesFor('client')}>
-                                                                Client <i className={getClassNamesFor('client') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
-                                                            </th>
-                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('chef')} className={getClassNamesFor('chef')}>
-                                                                Chef de projet <i className={getClassNamesFor('chef') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('Pourcentage')} className={getClassNamesFor('Pourcentage')}>
+                                                                Pourcentage de Division Principale <i className={getClassNamesFor('Pourcentage') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
                                                             </th>
                                                             <th></th>
                                                         </tr>
@@ -356,11 +350,11 @@ const AfficherAffaire = () => {
                                                     <tbody>
                                                         {sortedData.map((item, index) => (
                                                             <tr key={index}>
-                                                                <td style={{ textAlign: 'left' }}>{item.code}</td>
                                                                 <td style={{ textAlign: 'left' }}>{item.libelle}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.prix}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.forfait}</td>
                                                                 <td style={{ textAlign: 'left' }}>{item.division}</td>
-                                                                <td style={{ textAlign: 'left' }}>{item.client}</td>
-                                                                <td style={{ textAlign: 'left' }}>{item.chef}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.Pourcentage}</td>
                                                                 <td style={{ textAlign: 'left' }}>
                                                                     <div className="form-button-action">
                                                                         <button type="button" onClick={() => handleShowModal('info', item)} className="btn btn-link btn-info">
@@ -382,49 +376,56 @@ const AfficherAffaire = () => {
                                             <Modal show={showModal} onHide={handleCloseModal} centered>
                                                 <Modal.Header closeButton>
                                                     <Modal.Title>
-                                                        {modalType === 'delete' && 'Delete Affaire'}
-                                                        {modalType === 'edit' && 'Edit Affaire'}
-                                                        {modalType === 'info' && 'Details of Affaire'}
+                                                        {modalType === 'delete' && 'Delete Mission'}
+                                                        {modalType === 'edit' && 'Edit Mission'}
+                                                        {modalType === 'info' && 'Details of Mission'}
                                                     </Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
                                                     {modalType === 'delete' && (
-                                                        <p>Etes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle}"?</p>
+                                                        <p>Etes-vous sûr de vouloir supprimer cette mission : "{selectedMission?.libelle}"?</p>
                                                     )}
-                                                    {modalType === 'edit' && selectedAffaire && (
+                                                    {modalType === 'edit' && selectedMission && (
                                                         <form onSubmit={handleEdit}>
                                                             <div className="mb-3">
-                                                                <label>Code</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.code} />
+                                                                <label>Libelle</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.libelle} />
                                                             </div>
                                                             <div className="mb-3">
-                                                                <label>Libelle</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.libelle} />
+                                                                <label>Prix</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.prix} />
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <label>Forfait</label>
+                                                                <select
+                                                                    className="form-select form-control"
+                                                                    id="forfait"
+                                                                    defaultValue={selectedMission.forfait}
+                                                                >
+                                                                    <option value={'Oui'}>Oui</option>
+                                                                    <option value={'Non'}>Non</option>
+                                                                </select>
                                                             </div>
                                                             <div className="mb-3">
                                                                 <label>Division</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.division} />
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.division} />
                                                             </div>
                                                             <div className="mb-3">
-                                                                <label>Client</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.client} />
-                                                            </div>
-                                                            <div className="mb-3">
-                                                                <label>Chef de projet</label>
-                                                                <input type="text" className="form-control" defaultValue={selectedAffaire.chef} />
+                                                                <label>Pourcentage</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.Pourcentage} />
                                                             </div>
                                                             <Button variant="primary" type="submit">
                                                                 Save Changes
                                                             </Button>
                                                         </form>
                                                     )}
-                                                    {modalType === 'info' && selectedAffaire && (
+                                                    {modalType === 'info' && selectedMission && (
                                                         <div>
-                                                            <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                                                            <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
-                                                            <p><strong>Division:</strong> {selectedAffaire.division}</p>
-                                                            <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                                                            <p><strong>Chef de projet:</strong> {selectedAffaire.chef}</p>
+                                                            <p><strong>Libelle:</strong> {selectedMission.libelle}</p>
+                                                            <p><strong>Prix:</strong> {selectedMission.prix}</p>
+                                                            <p><strong>Forfait:</strong> {selectedMission.forfait}</p>
+                                                            <p><strong>Division:</strong> {selectedMission.division}</p>
+                                                            <p><strong>Pourcentage:</strong> {selectedMission.Pourcentage}</p>
                                                         </div>
                                                     )}
                                                 </Modal.Body>
@@ -486,4 +487,4 @@ const AfficherAffaire = () => {
         </div>
     );
 };
-export default AfficherAffaire;
+export default AfficherMission;
