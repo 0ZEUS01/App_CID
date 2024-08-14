@@ -333,6 +333,67 @@ const AddAffaire = () => {
                                         </div>
                                         <div className="card-body">
                                             <div className="row">
+                                                <div className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                                    <div className="card">
+                                                        <div className="card-body">
+                                                            <div className="d-flex justify-content-between">
+                                                                <div>
+                                                                    <h5><b>Gare LGV Casa Voyageurs</b></h5>
+                                                                    <p className="text-muted">Forfait</p>
+
+                                                                </div>
+                                                                <h3 className="text-info fw-bold">456,000.00 DH</h3>
+                                                            </div>
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-75" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <p className="text-muted mb-0">Div: Routes</p>
+                                                                <p className="text-muted mb-0">342,000.00 DH</p>
+                                                                <p className="text-muted mb-0">75%</p>
+                                                            </div>
+                                                            <br />
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-25" role="progressbar" aria-valuenow={25} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <p className="text-muted mb-0">Div: AT RAF</p>
+                                                                <p className="text-muted mb-0">114,000.00 DH</p>
+                                                                <p className="text-muted mb-0">25%</p>
+                                                            </div>
+                                                            <div className="d-flex justify-content-end mt-2">
+                                                                <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
+                                                                <i className='fas fa-trash-alt text-danger'> Supprimer</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                                    <div className="card">
+                                                        <div className="card-body">
+                                                            <div className="d-flex justify-content-between">
+                                                                <div>
+                                                                    <h5><b>Gare LGV Rabat Agdal</b></h5>
+                                                                    <p className="text-muted">Forfait</p>
+
+                                                                </div>
+                                                                <h3 className="text-info fw-bold">342,000.00 DH</h3>
+                                                            </div>
+                                                            <div className="progress progress-sm">
+                                                                <div className="progress-bar bg-info w-100" role="progressbar" aria-valuenow={100} aria-valuemin={0} aria-valuemax={100} />
+                                                            </div>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <p className="text-muted mb-0">Div: Routes</p>
+                                                                <p className="text-muted mb-0">342,000.00 DH</p>
+                                                                <p className="text-muted mb-0">100%</p>
+                                                            </div>
+                                                            <div className="d-flex justify-content-end mt-2">
+                                                                <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
+                                                                <i className='fas fa-trash-alt text-danger'> Supprimer</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-3 col-md-6 form-group">
                                                     <label htmlFor="libelleMission" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Libelle de Mission</label>
                                                     <input
@@ -459,67 +520,6 @@ const AddAffaire = () => {
                                                     <button className="btn btn-black btn-border">Vider</button>
                                                 </div>
 
-                                                <div className="col-12 col-sm-6 col-md-6 col-xl-12">
-                                                    <div className="card">
-                                                        <div className="card-body">
-                                                            <div className="d-flex justify-content-between">
-                                                                <div>
-                                                                    <h5><b>Gare LGV Casa Voyageurs</b></h5>
-                                                                    <p className="text-muted">Forfait</p>
-
-                                                                </div>
-                                                                <h3 className="text-info fw-bold">456,000.00 DH</h3>
-                                                            </div>
-                                                            <div className="progress progress-sm">
-                                                                <div className="progress-bar bg-info w-75" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between mt-2">
-                                                                <p className="text-muted mb-0">Div: Routes</p>
-                                                                <p className="text-muted mb-0">342,000.00 DH</p>
-                                                                <p className="text-muted mb-0">75%</p>
-                                                            </div>
-                                                            <br />
-                                                            <div className="progress progress-sm">
-                                                                <div className="progress-bar bg-info w-25" role="progressbar" aria-valuenow={25} aria-valuemin={0} aria-valuemax={100} />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between mt-2">
-                                                                <p className="text-muted mb-0">Div: AT RAF</p>
-                                                                <p className="text-muted mb-0">114,000.00 DH</p>
-                                                                <p className="text-muted mb-0">25%</p>
-                                                            </div>
-                                                            <div className="d-flex justify-content-end mt-2">
-                                                                <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
-                                                                <i className='fas fa-trash-alt text-danger'> Supprimer</i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-6 col-md-6 col-xl-12">
-                                                    <div className="card">
-                                                        <div className="card-body">
-                                                            <div className="d-flex justify-content-between">
-                                                                <div>
-                                                                    <h5><b>Gare LGV Rabat Agdal</b></h5>
-                                                                    <p className="text-muted">Forfait</p>
-
-                                                                </div>
-                                                                <h3 className="text-info fw-bold">342,000.00 DH</h3>
-                                                            </div>
-                                                            <div className="progress progress-sm">
-                                                                <div className="progress-bar bg-info w-100" role="progressbar" aria-valuenow={100} aria-valuemin={0} aria-valuemax={100} />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between mt-2">
-                                                                <p className="text-muted mb-0">Div: Routes</p>
-                                                                <p className="text-muted mb-0">342,000.00 DH</p>
-                                                                <p className="text-muted mb-0">100%</p>
-                                                            </div>
-                                                            <div className="d-flex justify-content-end mt-2">
-                                                                <i className='fas fa-edit text-primary'> Modifier</i>&nbsp;&nbsp;
-                                                                <i className='fas fa-trash-alt text-danger'> Supprimer</i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
                                                     <button className="btn btn-primary">Appliquer</button>
                                                     <button className="btn btn-black btn-border">Annuler</button>
