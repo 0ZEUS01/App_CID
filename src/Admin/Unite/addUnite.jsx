@@ -1,35 +1,8 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from 'react';
+import React from 'react';
 
 const AddAffaire = () => {
-    const [addQuantite, setAddQuantite] = useState('');
-    const [addUnite, setAddUnite] = useState('1');
-    const [addPrixUnitaire, setAddPrixUnitaire] = useState('');
-    const [addPrixTotal, setAddPrixTotal] = useState('');
-
-    const handleForfaitChangeAdd = (e) => {
-        const value = e.target.value;
-        setAddUnite(value);
-
-        // Reset related fields when unit changes
-        setAddQuantite('');
-        setAddPrixUnitaire('');
-        setAddPrixTotal('');
-    };
-
-    const handleAddQuantiteChange = (e) => {
-        const value = e.target.value;
-        setAddQuantite(value);
-        setAddPrixTotal(value * addPrixUnitaire);
-    };
-
-    const handleAddPrixUnitaireChange = (e) => {
-        const value = e.target.value;
-        setAddPrixUnitaire(value);
-        setAddPrixTotal(addQuantite * value);
-    };
-
     return (
         <div>
             <div className="wrapper">
@@ -254,7 +227,7 @@ const AddAffaire = () => {
                     <div className="container">
                         <div className="page-inner">
                             <div className="page-header">
-                                <h3 className="fw-bold mb-3">Gestion des Affaire</h3>
+                                <h3 className="fw-bold mb-3">Parametrage</h3>
                                 <ul className="breadcrumbs mb-3">
                                     <li className="nav-home">
                                         <a href="#">
@@ -265,13 +238,13 @@ const AddAffaire = () => {
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="#">Gestion des Affaire</a>
+                                        <a href="#">Parametrage</a>
                                     </li>
                                     <li className="separator">
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="/AddAffaire">Ajouter une nouvelle Affaire</a>
+                                        <a href="/AddAffaire">Ajouter une unite</a>
                                     </li>
                                 </ul>
                             </div>
@@ -279,91 +252,22 @@ const AddAffaire = () => {
                                 <div className="col-md-12">
                                     <div className="card">
                                         <div className="card-header">
-                                            <div className="card-title">Ajouter les Mission</div>
+                                            <div className="card-title">Ajouter une unite</div>
                                         </div>
                                         <div className="card-body">
                                             <div className="row">
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="libelleMission" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Libelle de Mission</label>
+                                                <div className="mb-3 col-md-12 form-group">
+                                                    <label htmlFor="unite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        id="libelleMission"
-                                                        placeholder="Entrer le libelle de Mission"
-                                                    />
-                                                </div>
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="prixGlobal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix global (TTC) </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="prixGlobal"
-                                                        placeholder="Entrer le prix global"
+                                                        id="unite"
+                                                        placeholder="Entrer la nouvelle unite"
                                                     />
                                                 </div>
 
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="addUnite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
-                                                    <select
-                                                        className="form-select form-control"
-                                                        id="addUnite"
-                                                        value={addUnite}
-                                                        onChange={handleForfaitChangeAdd}
-                                                    >
-                                                        <option value="1">F</option>
-                                                        <option value="2">KM</option>
-                                                        <option value="3">M</option>
-                                                        <option value="4">M2</option>
-                                                    </select>
-                                                </div>
-
-                                                {addUnite !== '1' && (
-                                                    <>
-                                                        <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="addQuantite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Quantite</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="addQuantite"
-                                                                placeholder="Entrer la quantite"
-                                                                value={addQuantite}
-                                                                onChange={handleAddQuantiteChange}
-                                                            />
-                                                        </div>
-                                                        <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="addPrixUnitaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix unitaire</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="addPrixUnitaire"
-                                                                placeholder="Entrer le prix unitaire"
-                                                                value={addPrixUnitaire}
-                                                                onChange={handleAddPrixUnitaireChange}
-                                                            />
-                                                        </div>
-                                                    </>
-                                                )}
-
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="addPrixTotal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix total</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="addPrixTotal"
-                                                        placeholder="Entrer le prix total"
-                                                        value={addPrixTotal}
-                                                        disabled={addUnite !== '1'}
-                                                        readOnly={addUnite !== '1'}
-                                                        onChange={(e) => setAddPrixTotal(e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <div className='form-group' style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                                    <button className="btn btn-primary">Ajouter</button>
-                                                    <button className="btn btn-black btn-border">Vider</button>
-                                                </div>
                                                 <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
-                                                    <button className="btn btn-primary">Appliquer</button>
+                                                    <button className="btn btn-primary">Ajouter</button>
                                                     <button className="btn btn-black btn-border">Annuler</button>
                                                 </div>
                                             </div>

@@ -1,21 +1,95 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
 const AddAffaire = () => {
+    // State variables for Add modal
     const [addQuantite, setAddQuantite] = useState('');
-    const [addUnite, setAddUnite] = useState('1');
+    const [addUnite, setAddUnite] = useState('');
     const [addPrixUnitaire, setAddPrixUnitaire] = useState('');
     const [addPrixTotal, setAddPrixTotal] = useState('');
+    const [forfaitAdd, setForfaitAdd] = useState(1);
+
+    // State variables for Edit modal
+    const [editQuantite, setEditQuantite] = useState('');
+    const [editUnite, setEditUnite] = useState('');
+    const [editPrixUnitaire, setEditPrixUnitaire] = useState('');
+    const [editPrixTotal, setEditPrixTotal] = useState('');
+    const [forfaitUpdate, setForfaitUpdate] = useState(1);
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedMission, setSelectedMission] = useState({});
+    const [missions, setMissions] = useState([
+
+        {
+            id: 1,
+            name: "Gare LGV Casa Voyageurs",
+            forfait: "Oui",
+            prixGlobal: 456000.00,
+            prixTotal: 342000.00,
+            quantite: null,
+            prixUnitaire: null
+        },
+        {
+            id: 2,
+            name: "Gare LGV Rabat Agdal",
+            forfait: "Non",
+            prixGlobal: 456000.00,
+            prixTotal: 342000.00,
+            quantite: 20,
+            unite: "KM",
+            prixUnitaire: 17100.00
+        }
+    ]);
+
+    const handleDelete = (mission) => {
+        setSelectedMission(mission);
+        setShowDeleteModal(true);
+    };
+
+    const handleEdit = (mission) => {
+        setSelectedMission(mission);
+        setForfaitUpdate(mission.forfait === "Oui" ? 1 : 2);
+        setEditQuantite(mission.quantite || '');
+        setEditUnite(mission.unite || ''); // Set the unite value here
+        setEditPrixUnitaire(mission.prixUnitaire || '');
+        setEditPrixTotal(mission.forfait === "Non" && mission.quantite && mission.prixUnitaire ? mission.quantite * mission.prixUnitaire : mission.prixGlobal);
+        setShowEditModal(true);
+    };
+
+    const confirmDelete = () => {
+        setMissions(missions.filter(m => m.id !== selectedMission.id));
+        setShowDeleteModal(false);
+    };
+
+    const handleEditSave = () => {
+        if (parseFloat(selectedMission.prixGlobal) >= parseFloat(editPrixTotal)) {
+            const updatedMissions = missions.map(mission =>
+                mission.id === selectedMission.id
+                    ? { ...selectedMission, quantite: editQuantite, unite: editUnite, prixUnitaire: editPrixUnitaire, prixTotal: editPrixTotal }
+                    : mission
+            );
+            setMissions(updatedMissions);
+            setShowEditModal(false);
+        } else {
+            alert('Prix Global should be higher than or equal to Prix Total');
+        }
+    };
 
     const handleForfaitChangeAdd = (e) => {
-        const value = e.target.value;
-        setAddUnite(value);
+        setForfaitAdd(parseInt(e.target.value));
+    };
 
-        // Reset related fields when unit changes
-        setAddQuantite('');
-        setAddPrixUnitaire('');
-        setAddPrixTotal('');
+    // Handlers for the Update Modal
+    const handleForfaitChangeUpdate = (e) => {
+        setForfaitUpdate(parseInt(e.target.value));
+        if (parseInt(e.target.value) === 1) {
+            setEditQuantite('');
+            setEditUnite('');
+            setEditPrixUnitaire('');
+        }
     };
 
     const handleAddQuantiteChange = (e) => {
@@ -28,6 +102,28 @@ const AddAffaire = () => {
         const value = e.target.value;
         setAddPrixUnitaire(value);
         setAddPrixTotal(addQuantite * value);
+    };
+
+    const handleEditQuantiteChange = (e) => {
+        const value = e.target.value;
+        setEditQuantite(value);
+        setEditPrixTotal(value * editPrixUnitaire);
+    };
+
+    const handleEditPrixUnitaireChange = (e) => {
+        const value = e.target.value;
+        setEditPrixUnitaire(value);
+        setEditPrixTotal(editQuantite * value);
+    };
+
+    const handleEditPrixGlobalChange = (e) => {
+        const value = e.target.value;
+        setSelectedMission({ ...selectedMission, prixGlobal: value });
+    };
+
+    const handleEditPrixTotalChange = (e) => {
+        const value = e.target.value;
+        setEditPrixTotal(value);
     };
 
     return (
@@ -301,33 +397,29 @@ const AddAffaire = () => {
                                                         placeholder="Entrer le prix global"
                                                     />
                                                 </div>
-
                                                 <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="addUnite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
+                                                    <label htmlFor="forfaitAdd" className="form-label">Forfait</label>
                                                     <select
                                                         className="form-select form-control"
-                                                        id="addUnite"
-                                                        value={addUnite}
+                                                        id="forfaitAdd"
+                                                        value={forfaitAdd}
                                                         onChange={handleForfaitChangeAdd}
                                                     >
-                                                        <option value="1">F</option>
-                                                        <option value="2">KM</option>
-                                                        <option value="3">M</option>
-                                                        <option value="4">M2</option>
+                                                        <option value={1}>Oui</option>
+                                                        <option value={2}>Non</option>
                                                     </select>
                                                 </div>
-
-                                                {addUnite !== '1' && (
+                                                {forfaitAdd === 2 && (
                                                     <>
                                                         <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="addQuantite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Quantite</label>
+                                                            <label htmlFor="addUnite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
-                                                                id="addQuantite"
-                                                                placeholder="Entrer la quantite"
-                                                                value={addQuantite}
-                                                                onChange={handleAddQuantiteChange}
+                                                                id="addUnite"
+                                                                placeholder="Entrer l'unite (ex: Km)"
+                                                                value={addUnite}
+                                                                onChange={(e) => setAddUnite(e.target.value)}
                                                             />
                                                         </div>
                                                         <div className="mb-3 col-md-6 form-group">
@@ -341,9 +433,19 @@ const AddAffaire = () => {
                                                                 onChange={handleAddPrixUnitaireChange}
                                                             />
                                                         </div>
+                                                        <div className="mb-3 col-md-6 form-group">
+                                                            <label htmlFor="addQuantite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Quantite</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                id="addQuantite"
+                                                                placeholder="Entrer la quantite"
+                                                                value={addQuantite}
+                                                                onChange={handleAddQuantiteChange}
+                                                            />
+                                                        </div>
                                                     </>
                                                 )}
-
                                                 <div className="mb-3 col-md-6 form-group">
                                                     <label htmlFor="addPrixTotal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix total</label>
                                                     <input
@@ -352,16 +454,168 @@ const AddAffaire = () => {
                                                         id="addPrixTotal"
                                                         placeholder="Entrer le prix total"
                                                         value={addPrixTotal}
-                                                        disabled={addUnite !== '1'}
-                                                        readOnly={addUnite !== '1'}
-                                                        onChange={(e) => setAddPrixTotal(e.target.value)}
+                                                        disabled={forfaitAdd === 2}
+                                                        readOnly={forfaitAdd === 2}
                                                     />
                                                 </div>
 
-                                                <div className='form-group' style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                                                <div className=' form-group' style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                                                     <button className="btn btn-primary">Ajouter</button>
                                                     <button className="btn btn-black btn-border">Vider</button>
                                                 </div>
+
+                                                {/* Mission Cards */}
+                                                {missions.map((mission) => (
+                                                    <div key={mission.id} className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                                        <div className="card">
+                                                            <div className="card-body">
+                                                                <div className="d-flex justify-content-between">
+                                                                    <div>
+                                                                        <h5><b>{mission.name}</b></h5>
+                                                                        <p className="text-muted">Forfait : {mission.forfait}</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="text-info fw-bold">{mission.prixGlobal.toLocaleString()} DH</h3>
+                                                                        <p>Part CID : {mission.prixTotal.toLocaleString()} DH</p>
+                                                                    </div>
+                                                                    
+                                                                </div>
+
+                                                                <div className="d-flex justify-content-between mt-2">
+                                                                    <div>
+                                                                        {/* Conditionally show quantite and prixUnitaire if they are not null */}
+                                                                        {mission.quantite && mission.prixUnitaire && (
+                                                                            <p className="text-muted">
+                                                                                Quantite : {mission.quantite} {mission.unite} &nbsp;&nbsp;&nbsp; Prix Unitaire : {mission.prixUnitaire.toLocaleString()} DH
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                    <div>
+                                                                        <button className="btn" onClick={() => handleEdit(mission)}><i className='fas fa-edit text-primary' > Modifier</i></button>
+                                                                        <button className="btn" onClick={() => handleDelete(mission)}><i className='fas fa-trash-alt text-danger' > Supprimer</i></button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Delete Confirmation Modal */}
+                                                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title>Confirmation de Suppression</Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body>
+                                                        Êtes-vous sûr de vouloir supprimer cette mission : <b>{selectedMission.name}</b> ?
+                                                    </Modal.Body>
+                                                    <Modal.Footer>
+                                                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                                                            Annuler
+                                                        </Button>
+                                                        <Button variant="danger" onClick={confirmDelete}>
+                                                            Supprimer
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
+
+                                                {/* Edit Modal */}
+                                                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title>Modifier la Mission</Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body>
+                                                        <div className="mb-3 col-md-12 form-group">
+                                                            <label htmlFor="libelleMission" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Libelle de Mission</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                id="libelleMission"
+                                                                value={selectedMission.name || ''}
+                                                                onChange={(e) => setSelectedMission({ ...selectedMission, name: e.target.value })}
+                                                                placeholder="Entrer le libelle de Mission"
+                                                            />
+                                                        </div>
+                                                        <div className="mb-3 col-md-12 form-group">
+                                                            <label htmlFor="prixGlobal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix global (TTC)</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                id="prixGlobal"
+                                                                value={selectedMission.prixGlobal || ''}
+                                                                onChange={handleEditPrixGlobalChange}
+                                                                disabled={forfaitUpdate === 2}
+                                                            />
+                                                        </div>
+                                                        <div className="mb-3 col-md-12 form-group">
+                                                            <label htmlFor="forfaitUpdate" className="form-label">Forfait</label>
+                                                            <select
+                                                                className="form-select form-control"
+                                                                id="forfaitUpdate"
+                                                                value={forfaitUpdate}
+                                                                onChange={handleForfaitChangeUpdate}
+                                                            >
+                                                                <option value={1}>Oui</option>
+                                                                <option value={2}>Non</option>
+                                                            </select>
+                                                        </div>
+                                                        {forfaitUpdate === 2 && (
+                                                            <>
+                                                                <div className="mb-3 col-md-12 form-group">
+                                                                    <label htmlFor="editUnite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        id="editUnite"
+                                                                        placeholder="Entrer l'unite (ex: Km)"
+                                                                        value={editUnite}
+                                                                        onChange={(e) => setEditUnite(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                                <div className="mb-3 col-md-12 form-group">
+                                                                    <label htmlFor="editPrixUnitaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix unitaire</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        id="editPrixUnitaire"
+                                                                        placeholder="Entrer le prix unitaire"
+                                                                        value={editPrixUnitaire}
+                                                                        onChange={handleEditPrixUnitaireChange}
+                                                                    />
+                                                                </div>
+                                                                <div className="mb-3 col-md-12 form-group">
+                                                                    <label htmlFor="editQuantite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Quantite</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        id="editQuantite"
+                                                                        placeholder="Entrer la quantite"
+                                                                        value={editQuantite}
+                                                                        onChange={handleEditQuantiteChange}
+                                                                    />
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                        <div className="mb-3 col-md-12 form-group">
+                                                            <label htmlFor="editPrixTotal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix total</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                id="editPrixTotal"
+                                                                value={editPrixTotal}
+                                                                onChange={handleEditPrixTotalChange}
+                                                            />
+                                                        </div>
+                                                    </Modal.Body>
+
+                                                    <Modal.Footer>
+                                                        <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                                                            Annuler
+                                                        </Button>
+                                                        <Button variant="primary" onClick={handleEditSave}>
+                                                            Enregistrer
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
                                                 <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
                                                     <button className="btn btn-primary">Appliquer</button>
                                                     <button className="btn btn-black btn-border">Annuler</button>

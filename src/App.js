@@ -14,6 +14,7 @@ import AfficherAffaireCD from './ChefDiv/afficherAffaireCD.jsx';
 import AddMissionCD from './ChefDiv/addMissionCD.jsx';
 import HomeCDP from './ChefProjet/homeCDP.jsx';
 import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP.jsx';
+import AddUnite from './Admin/Unite/addUnite.jsx';
 
 function App() {
   return (
@@ -136,6 +137,27 @@ function App() {
               </>
             }
           />
+          <Route
+            path="/afficherAffaireCDP"
+            element={
+              <>
+                <PageMeta title="Afficher les Affaires | CID" />
+                <AfficherAffaireCDP />
+              </>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path="/addUnite"
+            element={
+              <>
+                <PageMeta title="Ajouter une nouvelle unite | CID" />
+                <AddUnite />
+              </>
+            }
+          />
+
           <Route
             path="/afficherAffaireCDP"
             element={
