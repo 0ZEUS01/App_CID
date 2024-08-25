@@ -12,6 +12,7 @@ import AfficherAffaireCP from './ChefPole/afficherAffaireCP.jsx';
 import HomeCD from './ChefDiv/homeCD.jsx';
 import AfficherAffaireCD from './ChefDiv/afficherAffaireCD.jsx';
 import AddMissionCD from './ChefDiv/addMissionCD.jsx';
+import AfficherMissionCD from './ChefDiv/afficherMissionCD.jsx';
 import HomeCDP from './ChefProjet/homeCDP.jsx';
 import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP.jsx';
 import AddUnite from './Admin/Unite/addUnite.jsx';
@@ -123,6 +124,16 @@ function App() {
               <>
                 <PageMeta title="Afficher les Mission | CID" />
                 <AddMissionCD />
+              </>
+            }
+          />
+
+          <Route
+            path="/afficherMissionCD"
+            element={
+              <>
+                <PageMeta title="Afficher les missions | CID" />
+                <AfficherMissionCD />
               </>
             }
           />

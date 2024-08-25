@@ -1,31 +1,70 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
+/* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
-const AddMission = () => {
-    const [addQuantite, setAddQuantite] = useState('');
-    const [addUnite, setAddUnite] = useState('1');
-    const [addPrixUnitaire, setAddPrixUnitaire] = useState('');
-    const [addPrixTotal, setAddPrixTotal] = useState('');
+const AfficherMission = () => {
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState('');
+    const [selectedMission, setSelectedMission] = useState(null);
 
-    const handleForfaitChangeAdd = (e) => {
-        const value = e.target.value;
-        setAddUnite(value);
-        setAddQuantite('');
-        setAddPrixUnitaire('');
-        setAddPrixTotal('');
+    const data = [
+        { libelle: "Gare LGV Casa Voyageurs", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '70 %' },
+        { libelle: "Gare LGV Rabat Agdal", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '100 %' },
+        { libelle: "Gare LGV Kénitra", prix: '405,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '90 %' },
+        { libelle: "Gare LGV Tanger", prix: '378,000.00', forfait: 'Non', division: 'ET' }
+    ];
+
+    const sortedData = useMemo(() => {
+        let sortableData = [...data];
+        if (sortConfig !== null) {
+            sortableData.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableData;
+    }, [data, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
     };
 
-    const handleAddQuantiteChange = (e) => {
-        const value = e.target.value;
-        setAddQuantite(value);
-        setAddPrixTotal(value * addPrixUnitaire);
+    const getClassNamesFor = (name) => {
+        if (!sortConfig) {
+            return;
+        }
+        return sortConfig.key === name ? sortConfig.direction : undefined;
+    };
+    const handleShowModal = (type, mission) => {
+        setModalType(type);
+        setSelectedMission(mission);
+        setShowModal(true);
     };
 
-    const handleAddPrixUnitaireChange = (e) => {
-        const value = e.target.value;
-        setAddPrixUnitaire(value);
-        setAddPrixTotal(addQuantite * value);
+    const handleCloseModal = () => setShowModal(false);
+
+    const handleDelete = () => {
+        // Perform delete action
+        handleCloseModal();
+    };
+
+    const handleEdit = (e) => {
+        e.preventDefault();
+        // Perform edit action
+        handleCloseModal();
     };
 
     return (
@@ -269,7 +308,7 @@ const AddMission = () => {
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="/AddAffaire">Ajouter une nouvelle Affaire</a>
+                                        <a href="#">List des Mission</a>
                                     </li>
                                 </ul>
                             </div>
@@ -277,98 +316,154 @@ const AddMission = () => {
                                 <div className="col-md-12">
                                     <div className="card">
                                         <div className="card-header">
-                                            <div className="card-title">Ajouter les Mission</div>
-                                        </div>
-                                        <div className="card-body">
-                                            <div className="row">
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="libelleMission" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Libelle de Mission</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="libelleMission"
-                                                        placeholder="Entrer le libelle de Mission"
-                                                    />
-                                                </div>
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="prixGlobal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix global (TTC) </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="prixGlobal"
-                                                        placeholder="Entrer le prix global"
-                                                    />
-                                                </div>
-
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="addUnite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Unite</label>
-                                                    <select
-                                                        className="form-select form-control"
-                                                        id="addUnite"
-                                                        value={addUnite}
-                                                        onChange={handleForfaitChangeAdd}
-                                                    >
-                                                        <option value="1">Forfait</option>
-                                                        <option value="2">Kilomètre</option>
-                                                        <option value="3">Mètre</option>
-                                                        <option value="4">Mètre cube</option>
-                                                        <option value="4">Mètre carré</option>
-                                                    </select>
-                                                </div>
-
-                                                {addUnite !== '1' && (
-                                                    <>
-                                                        <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="addQuantite" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Quantite</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="addQuantite"
-                                                                placeholder="Entrer la quantite"
-                                                                value={addQuantite}
-                                                                onChange={handleAddQuantiteChange}
-                                                            />
-                                                        </div>
-                                                        <div className="mb-3 col-md-6 form-group">
-                                                            <label htmlFor="addPrixUnitaire" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix unitaire</label>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="addPrixUnitaire"
-                                                                placeholder="Entrer le prix unitaire"
-                                                                value={addPrixUnitaire}
-                                                                onChange={handleAddPrixUnitaireChange}
-                                                            />
-                                                        </div>
-                                                    </>
-                                                )}
-
-                                                <div className="mb-3 col-md-6 form-group">
-                                                    <label htmlFor="addPrixTotal" className="form-label" style={{ textAlign: 'left', display: 'block' }}>Prix total</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="addPrixTotal"
-                                                        placeholder="Entrer le prix total"
-                                                        value={addPrixTotal}
-                                                        disabled={addUnite !== '1'}
-                                                        readOnly={addUnite !== '1'}
-                                                        onChange={(e) => setAddPrixTotal(e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <div className='form-group' style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                                    <button className="btn btn-primary">Ajouter</button>
-                                                    <button className="btn btn-black btn-border">Vider</button>
-                                                </div>
-                                                <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
-                                                    <button className="btn btn-primary">Appliquer</button>
-                                                    <button className="btn btn-black btn-border">Annuler</button>
-                                                </div>
+                                            <div className="d-flex align-items-center">
+                                                <h4 className="card-title">Liste des missiom de l'affaire " Réalisation des études de circulation 4 "</h4>
+                                                <a href="/AddMissionCD" className="btn btn-primary btn-round ms-auto">
+                                                    <i className="fa fa-plus" />
+                                                    &nbsp;&nbsp;Ajouter une mission
+                                                </a>
                                             </div>
+                                        </div>
+                                        <div className="card-body" >
+                                            <div className="table-striped">
+                                                <table className="table table-striped table-hover mt-3">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
+                                                                Libelle Mission <i className={getClassNamesFor('libelle') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('prix')} className={getClassNamesFor('prix')}>
+                                                                Prix Total <i className={getClassNamesFor('prix') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('forfait')} className={getClassNamesFor('forfait')}>
+                                                                Forfait <i className={getClassNamesFor('forfait') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
+                                                                Division Principale<i className={getClassNamesFor('division') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th style={{ textAlign: 'left' }} onClick={() => requestSort('Pourcentage')} className={getClassNamesFor('Pourcentage')}>
+                                                                Pourcentage de Division Principale <i className={getClassNamesFor('Pourcentage') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                            </th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {sortedData.map((item, index) => (
+                                                            <tr key={index}>
+                                                                <td style={{ textAlign: 'left' }}>{item.libelle}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.prix}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.forfait}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.division}</td>
+                                                                <td style={{ textAlign: 'left' }}>{item.Pourcentage}</td>
+                                                                <td style={{ textAlign: 'left' }}>
+                                                                    <div className="form-button-action">
+                                                                        <button type="button" onClick={() => handleShowModal('info', item)} className="btn btn-link btn-info">
+                                                                            <i className="fa icon-information" />
+                                                                        </button>
+                                                                        <button type="button" onClick={() => handleShowModal('edit', item)} className="btn btn-link btn-primary">
+                                                                            <i className="fa fa-edit" />
+                                                                        </button>
+                                                                        <button type="button" onClick={() => handleShowModal('delete', item)} className="btn btn-link btn-danger">
+                                                                            <i className="fa fa-times" />
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <Modal show={showModal} onHide={handleCloseModal} centered>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>
+                                                        {modalType === 'delete' && 'Delete Mission'}
+                                                        {modalType === 'edit' && 'Edit Mission'}
+                                                        {modalType === 'info' && 'Details of Mission'}
+                                                    </Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>
+                                                    {modalType === 'delete' && (
+                                                        <p>Etes-vous sûr de vouloir supprimer cette mission : "{selectedMission?.libelle}"?</p>
+                                                    )}
+                                                    {modalType === 'edit' && selectedMission && (
+                                                        <form onSubmit={handleEdit}>
+                                                            <div className="mb-3">
+                                                                <label>Libelle</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.libelle} />
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <label>Prix</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.prix} />
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <label>Forfait</label>
+                                                                <select
+                                                                    className="form-select form-control"
+                                                                    id="forfait"
+                                                                    defaultValue={selectedMission.forfait}
+                                                                >
+                                                                    <option value={'Oui'}>Oui</option>
+                                                                    <option value={'Non'}>Non</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <label>Division</label>
+                                                                <input type="text" className="form-control" defaultValue={selectedMission.division} />
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <label>Pourcentage</label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    defaultValue={selectedMission.Pourcentage}
+                                                                    placeholder={selectedMission.Pourcentage ? '' : 'Percentage not set yet'}
+                                                                />
+                                                            </div>
+                                                            <Button variant="primary" type="submit">
+                                                                Save Changes
+                                                            </Button>
+                                                        </form>
+                                                    )}
+
+                                                    {modalType === 'info' && selectedMission && (
+                                                        <div>
+                                                            <p><strong>Libelle:</strong> {selectedMission.libelle}</p>
+                                                            <p><strong>Prix:</strong> {selectedMission.prix}</p>
+                                                            <p><strong>Forfait:</strong> {selectedMission.forfait}</p>
+                                                            <p><strong>Division:</strong> {selectedMission.division}</p>
+                                                            <p><strong>Pourcentage:</strong> {selectedMission.Pourcentage ? selectedMission.Pourcentage : 'Pourcentage non encore défini'}</p>
+                                                        </div>
+                                                    )}
+                                                </Modal.Body>
+                                                <Modal.Footer>
+                                                    {modalType === 'delete' && (
+                                                        <>
+                                                            <Button variant="secondary" onClick={handleCloseModal}>
+                                                                Cancel
+                                                            </Button>
+                                                            <Button variant="danger" onClick={handleDelete}>
+                                                                Delete
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    {modalType === 'edit' && (
+                                                        <>
+                                                            <Button variant="secondary" onClick={handleCloseModal}>
+                                                                Cancel
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    {modalType === 'info' && (
+                                                        <Button variant="secondary" onClick={handleCloseModal}>
+                                                            Close
+                                                        </Button>
+                                                    )}
+                                                </Modal.Footer>
+                                            </Modal>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -398,5 +493,4 @@ const AddMission = () => {
         </div>
     );
 };
-
-export default AddMission;
+export default AfficherMission;

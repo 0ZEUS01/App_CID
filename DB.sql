@@ -24,7 +24,9 @@ CREATE TABLE Utilisateur (
     adresse VARCHAR(255) NOT NULL,
     isAdmin BOOLEAN DEFAULT FALSE,
     isDeleted BOOLEAN DEFAULT FALSE,
-    id_pays INT REFERENCES Pays(id_pays) ON DELETE SET NULL
+    pole INT REFERENCES Pole(id_pole) ON DELETE CASCADE,
+    division INT REFERENCES Division(id_division) ON DELETE CASCADE,
+    pays INT REFERENCES Pays(id_pays) ON DELETE SET NULL
 );
 
 -- Table: User_Role
@@ -70,6 +72,10 @@ CREATE TABLE Affaire (
     prix_global DOUBLE PRECISION CHECK (prix_global >= 0),
     status_affaire VARCHAR(100) NOT NULL,
     num_marche INT REFERENCES Marche(id_marche) ON DELETE SET NULL,
+    date_debut DATE NOT NULL,
+    date_fin DATE NOT NULL,
+    date_arret DATE,
+    date_recommencement DATE,
     pourcentage_assurance DOUBLE PRECISION CHECK (pourcentage_assurance >= 0 AND pourcentage_assurance <= 100),
 );
 
@@ -85,8 +91,9 @@ CREATE TABLE Mission (
     isSousTraiter BOOLEAN DEFAULT FALSE,
     isMultiDivision BOOLEAN DEFAULT FALSE,
     compte_client DOUBLE PRECISION CHECK (compte_client >= 0),
-    division_principale VARCHAR(255) NOT NULL,
-    id_affaire INT REFERENCES Affaire(id_affaire) ON DELETE SET NULL,
+    part_division_principale DOUBLE PRECISION CHECK (part_division_principale >= 0)
+    division_principale INT REFERENCES Division(id_division) ON DELETE CASCADE,
+    affaire INT REFERENCES Affaire(id_affaire) ON DELETE SET NULL,
 );
 
 -- Table: Facturation
@@ -105,20 +112,22 @@ CREATE TABLE Encaissement (
     id_mission INT REFERENCES Mission(id_mission) ON DELETE CASCADE
 );
 
--- Table: Rapport
-CREATE TABLE Rapport (
-    id_rapport SERIAL PRIMARY KEY,
-    rapport TEXT NOT NULL,
-    status_rapport DOUBLE PRECISION CHECK (status_rapport >= 0 AND status_rapport <= 100),
-    total DOUBLE PRECISION CHECK (total >= 0),
-    id_mission INT REFERENCES Mission(id_mission) ON DELETE CASCADE
+-- Table: Avancement_Division
+CREATE TABLE Avancement_Division (
+    id_mission INT,
+    id_division INT,
+    rapport TEXT,
+    montant_obtenu DOUBLE PRECISION CHECK (montant_obtenu >= 0),
+    PRIMARY KEY (id_mission, id_division),
+    FOREIGN KEY (id_mission, id_division) REFERENCES Mission_Division(id_mission, id_division) ON DELETE CASCADE
 );
 
 -- Table: Mission_Division
 CREATE TABLE Mission_Division (
     id_mission INT REFERENCES Mission(id_mission) ON DELETE CASCADE,
     id_division INT REFERENCES Division(id_division) ON DELETE CASCADE,
-    PRIMARY KEY (id_mission, id_division)
+    part_division DOUBLE PRECISION CHECK (part_division >= 0),
+    CONSTRAINT pk_mission_division PRIMARY KEY (id_mission, id_division)
 );
 
 -- Table: Partenaire
@@ -132,7 +141,17 @@ CREATE TABLE Mission_Partenaire (
     id_mission INT REFERENCES Mission(id_mission) ON DELETE CASCADE,
     id_partenaire INT REFERENCES Partenaire(id_partenaire) ON DELETE CASCADE,
     part_partenaire DOUBLE PRECISION CHECK (part_partenaire >= 0 AND part_partenaire <= 100),
-    PRIMARY KEY (id_marche, id_partenaire)
+    PRIMARY KEY (id_mission, id_partenaire)
+);
+
+-- Table: Avancement_Partenaire
+CREATE TABLE Avancement_Partenaire (
+    id_mission INT,
+    id_partenaire INT,
+    rapport TEXT,
+    montant_obtenu DOUBLE PRECISION CHECK (montant_obtenu >= 0),
+    PRIMARY KEY (id_mission, id_partenaire),
+    FOREIGN KEY (id_mission, id_partenaire) REFERENCES Mission_Partenaire(id_mission, id_partenaire) ON DELETE CASCADE
 );
 
 -- Table: Sous_Traitant
@@ -147,4 +166,14 @@ CREATE TABLE Mission_ST (
     id_soustrait INT REFERENCES Sous_Traitant(id_soustrait) ON DELETE CASCADE,
     prix_mission_st DOUBLE PRECISION CHECK (prix_mission_st >= 0),
     PRIMARY KEY (id_mission, id_soustrait)
+);
+
+-- Table: Avancement_ST
+CREATE TABLE Avancement_ST (
+    id_mission INT,
+    id_soustrait INT,
+    rapport TEXT,
+    montant_obtenu DOUBLE PRECISION CHECK (montant_obtenu >= 0),
+    PRIMARY KEY (id_mission, id_soustrait),
+    FOREIGN KEY (id_mission, id_soustrait) REFERENCES Mission_ST(id_mission, id_soustrait) ON DELETE CASCADE
 );
