@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 
-const AddMission = () => {
+const AddDivisions = () => {
     const [addQuantite, setAddQuantite] = useState('');
     const [addUnite, setAddUnite] = useState('1');
     const [addPrixUnitaire, setAddPrixUnitaire] = useState('');
@@ -38,7 +38,7 @@ const AddMission = () => {
                     <MainHeader />
                     <div className="container">
                         <div className="page-inner">
-                            <div className="page-header">
+                        <div className="page-header">
                                 <h3 className="fw-bold mb-3">Gestion des Affaire</h3>
                                 <ul className="breadcrumbs mb-3">
                                     <li className="nav-home">
@@ -56,7 +56,7 @@ const AddMission = () => {
                                         <i className="icon-arrow-right" />
                                     </li>
                                     <li className="nav-item">
-                                        <a href="/AddAffaire">Ajouter une nouvelle Affaire</a>
+                                        <a href="#">List des Mission</a>
                                     </li>
                                 </ul>
                             </div>
@@ -64,7 +64,7 @@ const AddMission = () => {
                                 <div className="col-md-12">
                                     <div className="card">
                                         <div className="card-header">
-                                            <div className="card-title">Ajouter les Mission</div>
+                                            <div className="card-title" style={{ textAlign: 'left' }}>Ajouter les Mission</div>
                                         </div>
                                         <div className="card-body">
                                             <div className="row">
@@ -186,4 +186,4 @@ const AddMission = () => {
     );
 };
 
-export default AddMission;
+export default AddDivisions;
