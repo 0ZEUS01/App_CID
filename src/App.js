@@ -26,7 +26,7 @@ function App() {
             path="/"
             element={
               <>
-                <PageMeta title="Home | CID" />
+                <PageMeta title="Accueil | CID" />
                 <Home />
               </>
             }
@@ -37,7 +37,7 @@ function App() {
               path="/HomeCA"
               element={
                 <>
-                  <PageMeta title="Home | CID" />
+                  <PageMeta title="Accueil | CID" />
                   <HomeCA />
                 </>
               }
@@ -84,7 +84,7 @@ function App() {
               path="/HomeCP"
               element={
                 <>
-                  <PageMeta title="Home | CID" />
+                  <PageMeta title="Accueil | CID" />
                   <HomeCP />
                 </>
               }
@@ -104,7 +104,7 @@ function App() {
               path="/HomeCD"
               element={
                 <>
-                  <PageMeta title="Home | CID" />
+                  <PageMeta title="Accueil | CID" />
                   <HomeCD />
                 </>
               }
@@ -143,7 +143,7 @@ function App() {
               path="/HomeCDP"
               element={
                 <>
-                  <PageMeta title="Home | CID" />
+                  <PageMeta title="Accueil | CID" />
                   <HomeCDP />
                 </>
               }

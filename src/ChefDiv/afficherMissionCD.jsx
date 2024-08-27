@@ -215,7 +215,7 @@ const AfficherMission = () => {
                                                             <Button
                                                                 variant="secondary"
                                                                 onClick={() => window.location.href = '/addDivisionsCD'}>
-                                                                Modifier
+                                                                Répartition des tâches
                                                             </Button>
                                                         </div>
                                                     )}

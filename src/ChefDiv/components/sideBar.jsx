@@ -3,10 +3,9 @@ import React from 'react';
 const Sidebar = () => (
     <div className="sidebar" data-background-color="dark">
         <div className="sidebar-logo">
-            {/* Logo Header */}
             <div className="logo-header" data-background-color="dark">
                 <a href="/HomeCD" className="logo">
-                    <img src="assets/img/logo.png" alt="navbar brand" className="navbar-brand" height={65} />
+                    <img src="assets/img/logo.png" alt="navbar brand" className="navbar-brand" height={60} />
                 </a>
                 <div className="nav-toggle">
                     <button className="btn btn-toggle toggle-sidebar">
@@ -20,13 +19,12 @@ const Sidebar = () => (
                     <i className="gg-more-vertical-alt" />
                 </button>
             </div>
-            {/* End Logo Header */}
         </div>
         <div className="sidebar-wrapper scrollbar scrollbar-inner">
             <div className="sidebar-content">
                 <ul className="nav nav-secondary">
                     <li className="nav-item active">
-                        <a data-bs-toggle="collapse" href="/HomeCD" className="collapsed" aria-expanded="false">
+                        <a href="/HomeCD" className="collapsed" aria-expanded="false">
                             <i className="fas fa-home" />
                             <p>Accueil</p>
                         </a>

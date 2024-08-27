@@ -24,7 +24,7 @@ const Sidebar = () => (
             <div className="sidebar-content">
                 <ul className="nav nav-secondary">
                     <li className="nav-item active">
-                        <a data-bs-toggle="collapse" href="/HomeCA" className="collapsed" aria-expanded="false">
+                        <a href="/HomeCA" className="collapsed" aria-expanded="false">
                             <i className="fas fa-home" />
                             <p>Accueil</p>
                         </a>
