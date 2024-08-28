@@ -159,6 +159,7 @@ const AddDivisions = () => {
                                                 availableDivisions={getAvailableDivisions(divisions.map(d => d.divisionId), index)}
                                                 totalMontant={totalMontant}
                                                 globalMontant={globalMontant}
+                                                isLast={index === visibleDivisions.length - 1}
                                             />
                                         ))}
                                     </div>
@@ -181,6 +182,7 @@ const AddDivisions = () => {
                                                 handleSuggestion={handleSuggestion}
                                                 totalMontant={totalMontant}
                                                 globalMontant={globalMontant}
+                                                isLast={index === visibleSousTraitants.length - 1}
                                             />
                                         ))}
                                         <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
@@ -198,7 +200,7 @@ const AddDivisions = () => {
     );
 };
 
-const DivisionRow = ({ division, index, handleDivisionChange, handleSuggestion, availableDivisions, totalMontant, globalMontant }) => (
+const DivisionRow = ({ division, index, handleDivisionChange, handleSuggestion, availableDivisions, totalMontant, globalMontant, isLast }) => (
     <div className="row">
         <div className="mb-3 col-md-6 form-group">
             <label htmlFor={`Division-${index}`} className="form-label" style={{ textAlign: 'left', display: 'block' }}>Division</label>
@@ -226,7 +228,7 @@ const DivisionRow = ({ division, index, handleDivisionChange, handleSuggestion, 
                 onChange={(e) => handleDivisionChange(index, 'montant', e.target.value)}
                 placeholder="Entrer la part de cette division"
             />
-            {totalMontant < globalMontant && (
+            {isLast && totalMontant < globalMontant && (
                 <small
                     className="form-text text-muted"
                     onClick={() => handleSuggestion(index)}
@@ -239,7 +241,7 @@ const DivisionRow = ({ division, index, handleDivisionChange, handleSuggestion, 
     </div>
 );
 
-const SousTraitantRow = ({ sousTraitant, index, handleSousTraitantChange, handleSuggestion, totalMontant, globalMontant }) => (
+const SousTraitantRow = ({ sousTraitant, index, handleSousTraitantChange, handleSuggestion, totalMontant, globalMontant, isLast }) => (
     <div className="row">
         <div className="mb-3 col-md-6 form-group">
             <label htmlFor={`NomST-${index}`} className="form-label" style={{ textAlign: 'left', display: 'block' }}>Nom de sous traitant</label>
@@ -262,7 +264,7 @@ const SousTraitantRow = ({ sousTraitant, index, handleSousTraitantChange, handle
                 onChange={(e) => handleSousTraitantChange(index, 'montant', e.target.value)}
                 placeholder="Entrer la part de sous traitant"
             />
-            {totalMontant < globalMontant && (
+            {isLast && totalMontant < globalMontant && (
                 <small
                     className="form-text text-muted"
                     onClick={() => handleSuggestion(index, true)}

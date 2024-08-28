@@ -1,187 +1,50 @@
-import './App.css';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import PageMeta from './PageMeta';
-import Home from './views/home.jsx';
-import HomeCA from './CadreAdmin/homeCA.jsx';
-import AddAffireCA from './CadreAdmin/addAffaireCA.jsx';
-import AfficherAffaireCA from './CadreAdmin/afficherAffaireCA.jsx';
-import AddMissionCA from './CadreAdmin/addMissionCA.jsx';
-import AfficherMissionCA from './CadreAdmin/afficherMissionCA.jsx';
-import HomeCP from './ChefPole/homeCP.jsx';
-import AfficherAffaireCP from './ChefPole/afficherAffaireCP.jsx';
-import HomeCD from './ChefDiv/homeCD.jsx';
-import AfficherAffaireCD from './ChefDiv/afficherAffaireCD.jsx';
-import AddDivisionsCD from './ChefDiv/addDivisionsCD.jsx';
-import AfficherMissionCD from './ChefDiv/afficherMissionCD.jsx';
-import HomeCDP from './ChefProjet/homeCDP.jsx';
-import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP.jsx';
-import AddUnite from './Admin/Unite/addUnite.jsx';
+
+// Import views
+import Home from './views/home';
+import HomeCA from './CadreAdmin/homeCA';
+import AddAffaireCA from './CadreAdmin/addAffaireCA';
+import AfficherAffaireCA from './CadreAdmin/afficherAffaireCA';
+import AddMissionCA from './CadreAdmin/addMissionCA';
+import AfficherMissionCA from './CadreAdmin/afficherMissionCA';
+import HomeCP from './ChefPole/homeCP';
+import AfficherAffaireCP from './ChefPole/afficherAffaireCP';
+import HomeCD from './ChefDiv/homeCD';
+import AfficherAffaireCD from './ChefDiv/afficherAffaireCD';
+import AddDivisionsCD from './ChefDiv/addDivisionsCD';
+import AfficherMissionCD from './ChefDiv/afficherMissionCD';
+import HomeCDP from './ChefProjet/homeCDP';
+import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP';
+import AddUnite from './Admin/Unite/addUnite';
+
+// Define routes
+const routes = [
+  { path: '/', element: Home },
+  { path: '/HomeCA', element: HomeCA },
+  { path: '/addAffaireCA', element: AddAffaireCA },
+  { path: '/afficherAffaireCA', element: AfficherAffaireCA },
+  { path: '/AddMissionCA', element: AddMissionCA },
+  { path: '/AfficherMissionCA', element: AfficherMissionCA },
+  { path: '/HomeCP', element: HomeCP },
+  { path: '/afficherAffaireCP', element: AfficherAffaireCP },
+  { path: '/HomeCD', element: HomeCD },
+  { path: '/afficherAffaireCD', element: AfficherAffaireCD },
+  { path: '/AddDivisionsCD', element: AddDivisionsCD },
+  { path: '/afficherMissionCD', element: AfficherMissionCD },
+  { path: '/HomeCDP', element: HomeCDP },
+  { path: '/afficherAffaireCDP', element: AfficherAffaireCDP },
+  { path: '/addUnite', element: AddUnite },
+];
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <PageMeta title="Accueil | CID" />
-                <Home />
-              </>
-            }
-          />
-
-          {/* Cadre Administrative */}<>
-            <Route
-              path="/HomeCA"
-              element={
-                <>
-                  <PageMeta title="Accueil | CID" />
-                  <HomeCA />
-                </>
-              }
-            />
-            <Route
-              path="/addAffaireCA"
-              element={
-                <>
-                  <PageMeta title="Ajouter une Affaire | CID" />
-                  <AddAffireCA />
-                </>
-              }
-            />
-            <Route
-              path="/afficherAffaireCA"
-              element={
-                <>
-                  <PageMeta title="Afficher les Affaires | CID" />
-                  <AfficherAffaireCA />
-                </>
-              }
-            />
-            <Route
-              path="/AddMissionCA"
-              element={
-                <>
-                  <PageMeta title="Ajouter les Mission | CID" />
-                  <AddMissionCA />
-                </>
-              }
-            />
-            <Route
-              path="/AfficherMissionCA"
-              element={
-                <>
-                  <PageMeta title="Afficher les Mission | CID" />
-                  <AfficherMissionCA />
-                </>
-              }
-            />
-          </>
-          {/* Chef de Pole */}<>
-            <Route
-              path="/HomeCP"
-              element={
-                <>
-                  <PageMeta title="Accueil | CID" />
-                  <HomeCP />
-                </>
-              }
-            />
-            <Route
-              path="/afficherAffaireCP"
-              element={
-                <>
-                  <PageMeta title="Afficher les Affaires | CID" />
-                  <AfficherAffaireCP />
-                </>
-              }
-            />
-          </>
-          {/* Chef de Division */}<>
-            <Route
-              path="/HomeCD"
-              element={
-                <>
-                  <PageMeta title="Accueil | CID" />
-                  <HomeCD />
-                </>
-              }
-            />
-            <Route
-              path="/afficherAffaireCD"
-              element={
-                <>
-                  <PageMeta title="Afficher les Affaires | CID" />
-                  <AfficherAffaireCD />
-                </>
-              }
-            />
-            <Route
-              path="/AddDivisionsCD"
-              element={
-                <>
-                  <PageMeta title="Afficher les Mission | CID" />
-                  <AddDivisionsCD />
-                </>
-              }
-            />
-
-            <Route
-              path="/afficherMissionCD"
-              element={
-                <>
-                  <PageMeta title="Afficher les missions | CID" />
-                  <AfficherMissionCD />
-                </>
-              }
-            />
-          </>
-          {/* Chef de Projet */}<>
-            <Route
-              path="/HomeCDP"
-              element={
-                <>
-                  <PageMeta title="Accueil | CID" />
-                  <HomeCDP />
-                </>
-              }
-            />
-            <Route
-              path="/afficherAffaireCDP"
-              element={
-                <>
-                  <PageMeta title="Afficher les Affaires | CID" />
-                  <AfficherAffaireCDP />
-                </>
-              }
-            />
-          </>
-          {/* Admin */}<>
-            <Route
-              path="/addUnite"
-              element={
-                <>
-                  <PageMeta title="Ajouter une nouvelle unite | CID" />
-                  <AddUnite />
-                </>
-              }
-            />
-
-            <Route
-              path="/afficherAffaireCDP"
-              element={
-                <>
-                  <PageMeta title="Afficher les Affaires | CID" />
-                  <AfficherAffaireCDP />
-                </>
-              }
-            />
-          </>
-
-        </Routes>
-      </div>
+      <Routes>
+        {routes.map(({ path, element: Element }) => (
+          <Route key={path} path={path} element={<Element />} />
+        ))}
+      </Routes>
     </Router>
   );
 }
