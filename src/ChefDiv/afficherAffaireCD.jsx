@@ -7,6 +7,15 @@ import { Modal, Button } from 'react-bootstrap';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+    faHome, 
+    faArrowRight, 
+    faInfo, 
+    faEdit, 
+    faSortUp, 
+    faSortDown 
+} from '@fortawesome/free-solid-svg-icons';
 
 const AfficherAffaire = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -65,11 +74,6 @@ const AfficherAffaire = () => {
 
     const handleCloseModal = () => setShowModal(false);
 
-    const handleDelete = () => {
-        // Perform delete action
-        handleCloseModal();
-    };
-
     const handleEdit = (e) => {
         e.preventDefault();
         // Perform edit action
@@ -89,24 +93,24 @@ const AfficherAffaire = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h3 className="fw-bold mb-3">Gestion des Affaire</h3>
+                            <h3 className="fw-bold mb-3">Gestion des Affaires</h3>
                             <ul className="breadcrumbs mb-3">
                                 <li className="nav-home">
                                     <a href="#">
-                                        <i className="icon-home" />
+                                        <FontAwesomeIcon icon={faHome} />
                                     </a>
                                 </li>
                                 <li className="separator">
-                                    <i className="icon-arrow-right" />
+                                    <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <a href="#">Gestion des Affaire</a>
+                                    <a href="#">Gestion des Affaires</a>
                                 </li>
                                 <li className="separator">
-                                    <i className="icon-arrow-right" />
+                                    <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <a href="#">List des affaire</a>
+                                    <a href="#">Liste des affaires</a>
                                 </li>
                             </ul>
                         </div>
@@ -115,48 +119,106 @@ const AfficherAffaire = () => {
                                 <div className="card">
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
-                                            <h4 className="card-title">Liste des affaires de pole Batiment, VRD </h4>
+                                            <h4 className="card-title">Liste des affaires de Division " ROUTES " </h4>
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        <div className="table-striped">
+                                        <div className="table-responsive">
                                             <table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th style={{ textAlign: 'left' }} onClick={() => requestSort('code')} className={getClassNamesFor('code')}>
-                                                            Code Affaire <i className={getClassNamesFor('code') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                        <th onClick={() => requestSort('code')} className={getClassNamesFor('code')}>
+                                                            Code Affaire <FontAwesomeIcon icon={getClassNamesFor('code') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th style={{ textAlign: 'left' }} onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
-                                                            Libelle Affaire <i className={getClassNamesFor('libelle') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                        <th onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
+                                                            Libellé Affaire <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th style={{ textAlign: 'left' }} onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
-                                                            Division <i className={getClassNamesFor('division') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                        <th onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
+                                                            Division <FontAwesomeIcon icon={getClassNamesFor('division') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th style={{ textAlign: 'left' }} onClick={() => requestSort('client')} className={getClassNamesFor('client')}>
-                                                            Client <i className={getClassNamesFor('client') === 'ascending' ? 'fa fa-sort-up' : 'fa fa-sort-down'} />
+                                                        <th onClick={() => requestSort('client')} className={getClassNamesFor('client')}>
+                                                            Client <FontAwesomeIcon icon={getClassNamesFor('client') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th></th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {visibleData.map((item, index) => (
-                                                        <AffaireRow
-                                                            key={index}
-                                                            item={item}
-                                                            handleShowModal={handleShowModal}
-                                                        />
+                                                        <tr key={index}>
+                                                            <td>{item.code}</td>
+                                                            <td>{item.libelle}</td>
+                                                            <td>{item.division}</td>
+                                                            <td>{item.client}</td>
+                                                            <td>
+                                                                <div className="d-flex">
+                                                                    <Button variant="link" onClick={() => handleShowModal('info', item)}>
+                                                                        <FontAwesomeIcon icon={faInfo} />
+                                                                    </Button>
+                                                                    <Button variant="link" onClick={() => handleShowModal('edit', item)}>
+                                                                        <FontAwesomeIcon icon={faEdit} />
+                                                                    </Button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <AffaireModal
-                                            showModal={showModal}
-                                            handleCloseModal={handleCloseModal}
-                                            modalType={modalType}
-                                            selectedAffaire={selectedAffaire}
-                                            handleDelete={handleDelete}
-                                            handleEdit={handleEdit}
-                                        />
+                                        <Modal show={showModal} onHide={handleCloseModal}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>
+                                                    {modalType === 'edit' && 'Modifier l\'Affaire'}
+                                                    {modalType === 'info' && 'Détails de l\'Affaire'}
+                                                </Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                {modalType === 'edit' && selectedAffaire && (
+                                                    <form onSubmit={handleEdit}>
+                                                        <div className="mb-3">
+                                                            <label>Code</label>
+                                                            <input type="text" className="form-control" defaultValue={selectedAffaire.code} />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label>Libellé</label>
+                                                            <input type="text" className="form-control" defaultValue={selectedAffaire.libelle} />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label>Division</label>
+                                                            <input type="text" className="form-control" defaultValue={selectedAffaire.division} />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label>Client</label>
+                                                            <input type="text" className="form-control" defaultValue={selectedAffaire.client} />
+                                                        </div>
+                                                    </form>
+                                                )}
+                                                {modalType === 'info' && selectedAffaire && (
+                                                    <div>
+                                                        <p><strong>Code:</strong> {selectedAffaire.code}</p>
+                                                        <p><strong>Libellé:</strong> {selectedAffaire.libelle}</p>
+                                                        <p><strong>Division:</strong> {selectedAffaire.division}</p>
+                                                        <p><strong>Client:</strong> {selectedAffaire.client}</p>
+                                                    </div>
+                                                )}
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleCloseModal}>
+                                                    Fermer
+                                                </Button>
+                                                {modalType === 'edit' && (
+                                                    <Button variant="primary" onClick={handleEdit}>
+                                                        Enregistrer les modifications
+                                                    </Button>
+                                                )}
+                                                {modalType === 'info' && (
+                                                    <Button
+                                                        variant="primary"
+                                                        onClick={() => window.location.href = '/AfficherMissionCD'}>
+                                                        Voir les Missions
+                                                    </Button>
+                                                )}
+                                            </Modal.Footer>
+                                        </Modal>
                                     </div>
                                 </div>
                             </div>
@@ -168,105 +230,5 @@ const AfficherAffaire = () => {
         </div>
     );
 };
-
-const AffaireRow = ({ item, handleShowModal }) => (
-    <tr>
-        <td style={{ textAlign: 'left' }}>{item.code}</td>
-        <td style={{ textAlign: 'left' }}>{item.libelle}</td>
-        <td style={{ textAlign: 'left' }}>{item.division}</td>
-        <td style={{ textAlign: 'left' }}>{item.client}</td>
-        <td style={{ textAlign: 'left' }}>
-            <div className="form-button-action">
-                <button type="button" onClick={() => handleShowModal('info', item)} className="btn btn-link btn-primary">
-                    <i className="fa icon-information" />
-                </button>
-                <button type="button" onClick={() => handleShowModal('edit', item)} className="btn btn-link btn-primary">
-                    <i className="fa fa-edit" />
-                </button>
-                <button type="button" onClick={() => handleShowModal('delete', item)} className="btn btn-link btn-danger">
-                    <i className="fa fa-times" />
-                </button>
-            </div>
-        </td>
-    </tr>
-);
-
-const AffaireModal = ({ showModal, handleCloseModal, modalType, selectedAffaire, handleDelete, handleEdit }) => (
-    <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Modal.Header closeButton>
-            <Modal.Title>
-                {modalType === 'delete' && 'Delete Affaire'}
-                {modalType === 'edit' && 'Edit Affaire'}
-                {modalType === 'info' && 'Details of Affaire'}
-            </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            {modalType === 'delete' && (
-                <p>Etes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle}"?</p>
-            )}
-            {modalType === 'edit' && selectedAffaire && (
-                <form onSubmit={handleEdit}>
-                    <div className="mb-3">
-                        <label>Code</label>
-                        <input type="text" className="form-control" defaultValue={selectedAffaire.code} />
-                    </div>
-                    <div className="mb-3">
-                        <label>Libelle</label>
-                        <input type="text" className="form-control" defaultValue={selectedAffaire.libelle} />
-                    </div>
-                    <div className="mb-3">
-                        <label>Division</label>
-                        <input type="text" className="form-control" defaultValue={selectedAffaire.division} />
-                    </div>
-                    <div className="mb-3">
-                        <label>Client</label>
-                        <input type="text" className="form-control" defaultValue={selectedAffaire.client} />
-                    </div>
-                    <Button variant="primary" type="submit">
-                        Save Changes
-                    </Button>
-                </form>
-            )}
-            {modalType === 'info' && selectedAffaire && (
-                <div>
-                    <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                    <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
-                    <p><strong>Division:</strong> {selectedAffaire.division}</p>
-                    <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                    <Button
-                        variant="secondary"
-                        onClick={() => window.location.href = '/AfficherMissionCD'}>
-                        View Missions
-                    </Button>
-                </div>
-            )}
-        </Modal.Body>
-
-        <Modal.Footer>
-            {modalType === 'delete' && (
-                <>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={handleDelete}>
-                        Delete
-                    </Button>
-                </>
-            )}
-            {modalType === 'edit' && (
-                <>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Cancel
-                    </Button>
-                </>
-            )}
-            {modalType === 'info' && (
-                <Button variant="secondary" onClick={handleCloseModal}>
-                    Close
-                </Button>
-            )}
-        </Modal.Footer>
-    </Modal>
-);
 
 export default AfficherAffaire;

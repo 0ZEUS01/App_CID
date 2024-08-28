@@ -5,7 +5,14 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfo, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faHome, 
+    faArrowRight, 
+    faInfo, 
+    faSortUp, 
+    faSortDown,
+    faEye // Add this import for the consult icon
+} from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
@@ -46,12 +53,25 @@ const AfficherMission = () => {
         setSortConfig({ key, direction });
     };
 
+    const getClassNamesFor = (name) => {
+        if (!sortConfig) {
+            return;
+        }
+        return sortConfig.key === name ? sortConfig.direction : undefined;
+    };
+
     const handleShowModal = (mission) => {
         setSelectedMission(mission);
         setShowModal(true);
     };
 
     const handleCloseModal = () => setShowModal(false);
+
+    // Function to handle redirection to consult page
+    const handleConsult = (missionId) => {
+        // In the future, you'll replace this with a proper route to your consult page
+        window.location.href = `/consultMissionCDP`;
+    };
 
     return (
         <div className="wrapper">
@@ -61,14 +81,33 @@ const AfficherMission = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h3 className="fw-bold mb-3">Gestion des Missions</h3>
+                            <h3 className="fw-bold mb-3">Gestion des Affaires</h3>
+                            <ul className="breadcrumbs mb-3">
+                                <li className="nav-home">
+                                    <a href="#">
+                                        <FontAwesomeIcon icon={faHome} />
+                                    </a>
+                                </li>
+                                <li className="separator">
+                                    <FontAwesomeIcon icon={faArrowRight} />
+                                </li>
+                                <li className="nav-item">
+                                    <a href="#">Gestion des Affaires</a>
+                                </li>
+                                <li className="separator">
+                                    <FontAwesomeIcon icon={faArrowRight} />
+                                </li>
+                                <li className="nav-item">
+                                    <a href="#">Liste des Missions</a>
+                                </li>
+                            </ul>
                         </div>
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
-                                            <h4 className="card-title">Liste des missions de l'affaire "Réalisation des études de circulation 4"</h4>
+                                            <h4 className="card-title">Liste des missions de l'affaire " Réalisation des études de circulation 4 "</h4>
                                         </div>
                                     </div>
                                     <div className="card-body">
@@ -76,30 +115,20 @@ const AfficherMission = () => {
                                             <table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => requestSort('libelle')}>
-                                                            Libellé Mission {sortConfig.key === 'libelle' && (
-                                                                <FontAwesomeIcon icon={sortConfig.direction === 'ascending' ? faSortUp : faSortDown} />
-                                                            )}
+                                                        <th onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
+                                                            Libelle Mission <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th onClick={() => requestSort('prix')}>
-                                                            Prix Total {sortConfig.key === 'prix' && (
-                                                                <FontAwesomeIcon icon={sortConfig.direction === 'ascending' ? faSortUp : faSortDown} />
-                                                            )}
+                                                        <th onClick={() => requestSort('prix')} className={getClassNamesFor('prix')}>
+                                                            Prix Total <FontAwesomeIcon icon={getClassNamesFor('prix') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th onClick={() => requestSort('forfait')}>
-                                                            Forfait {sortConfig.key === 'forfait' && (
-                                                                <FontAwesomeIcon icon={sortConfig.direction === 'ascending' ? faSortUp : faSortDown} />
-                                                            )}
+                                                        <th onClick={() => requestSort('forfait')} className={getClassNamesFor('forfait')}>
+                                                            Forfait <FontAwesomeIcon icon={getClassNamesFor('forfait') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th onClick={() => requestSort('division')}>
-                                                            Division Principale {sortConfig.key === 'division' && (
-                                                                <FontAwesomeIcon icon={sortConfig.direction === 'ascending' ? faSortUp : faSortDown} />
-                                                            )}
+                                                        <th onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
+                                                            Division Principale <FontAwesomeIcon icon={getClassNamesFor('division') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th onClick={() => requestSort('Pourcentage')}>
-                                                            Pourcentage de Division Principale {sortConfig.key === 'Pourcentage' && (
-                                                                <FontAwesomeIcon icon={sortConfig.direction === 'ascending' ? faSortUp : faSortDown} />
-                                                            )}
+                                                        <th onClick={() => requestSort('Pourcentage')} className={getClassNamesFor('Pourcentage')}>
+                                                            Pourcentage de Division Principale <FontAwesomeIcon icon={getClassNamesFor('Pourcentage') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
                                                         <th>Actions</th>
                                                     </tr>
@@ -115,6 +144,9 @@ const AfficherMission = () => {
                                                             <td>
                                                                 <Button variant="link" onClick={() => handleShowModal(item)}>
                                                                     <FontAwesomeIcon icon={faInfo} />
+                                                                </Button>
+                                                                <Button variant="link" onClick={() => handleConsult(index)}>
+                                                                    <FontAwesomeIcon icon={faEye} />
                                                                 </Button>
                                                             </td>
                                                         </tr>
@@ -138,7 +170,7 @@ const AfficherMission = () => {
                 <Modal.Body>
                     {selectedMission && (
                         <div>
-                            <p><strong>Libellé:</strong> {selectedMission.libelle}</p>
+                            <p><strong>Libelle:</strong> {selectedMission.libelle}</p>
                             <p><strong>Prix:</strong> {selectedMission.prix}</p>
                             <p><strong>Forfait:</strong> {selectedMission.forfait}</p>
                             <p><strong>Division:</strong> {selectedMission.division}</p>
@@ -149,11 +181,6 @@ const AfficherMission = () => {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Fermer
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => window.location.href = '/addDivisionsCD'}>
-                        Répartition des tâches
                     </Button>
                 </Modal.Footer>
             </Modal>

@@ -4,15 +4,15 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faBriefcase, 
-  faCalendarAlt,
-  faBell,
-  faHome,
-  faArrowRight,
-  faHeart,
-  faListAlt,
-  faChartBar
+import {
+    faBriefcase,
+    faCalendarAlt,
+    faBell,
+    faHome,
+    faArrowRight,
+    faHeart,
+    faListAlt,
+    faChartBar
 } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
