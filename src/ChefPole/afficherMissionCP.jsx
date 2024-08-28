@@ -16,22 +16,16 @@ import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 
-const AfficherAffaire = () => {
+const AfficherMission = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [showModal, setShowModal] = useState(false);
-    const [selectedAffaire, setSelectedAffaire] = useState(null);
+    const [selectedMission, setSelectedMission] = useState(null);
 
     const data = [
-        { code: '202100890', libelle: "Réalisation des études de circulation 4", division: 'ET', client: 'Direction des amenagements hydrauliques', chef: 'Ammari Yousra' },
-        { code: '202100891', libelle: 'Etude de la rehabilitation du canal de distribution', division: 'G iu', client: 'Direction des infrastructures urbaines', chef: 'Elidrissi Mohamed' },
-        { code: '202100892', libelle: "Etude d'impact environnemental de l'extension de la zone industrielle", division: 'G edd', client: "Direction de l'environnement", chef: 'Rahimi Nour' },
-        { code: '202100893', libelle: "Construction de la station d'epuration des eaux usees", division: 'G edd', client: "Ministere de l'environnement", chef: 'Bouziane Samira' },
-        { code: '202100894', libelle: 'Amenagement des infrastructures routieres', division: 'G iu', client: "Ministere de l'equipement", chef: 'Benjelloun Yassir' },
-        { code: '202100895', libelle: "Rehabilitation du reseau d'assainissement", division: 'G ah', client: "Ministere de l'eau", chef: 'El Hammouchi Noura' },
-        { code: '202100896', libelle: "Etude technique pour l'extension de la zone industrielle", division: 'G edd', client: "Ministere de l'industrie", chef: 'El Ouardighi Anas' },
-        { code: '202100897', libelle: 'Projet de developpement durable des ressources en eau', division: 'G ah', client: "Ministere de l'eau", chef: 'Jabir Salima' },
-        { code: '202100898', libelle: "Construction d'une nouvelle usine de traitement des dechets", division: 'G edd', client: "Ministere de l'environnement", chef: 'Rahmani Fatima' },
-        { code: '202100899', libelle: 'Projet de renovation des infrastructures scolaires', division: 'G iu', client: "Ministere de l'education", chef: 'Habibi Soufiane' }
+        { libelle: "Gare LGV Casa Voyageurs", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '70 %' },
+        { libelle: "Gare LGV Rabat Agdal", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '100 %' },
+        { libelle: "Gare LGV Kénitra", prix: '405,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '90 %' },
+        { libelle: "Gare LGV Tanger", prix: '378,000.00', forfait: 'Non', division: 'ET', Pourcentage: '' }
     ];
 
     const sortedData = useMemo(() => {
@@ -65,8 +59,8 @@ const AfficherAffaire = () => {
         return sortConfig.key === name ? sortConfig.direction : undefined;
     };
 
-    const handleShowModal = (affaire) => {
-        setSelectedAffaire(affaire);
+    const handleShowModal = (mission) => {
+        setSelectedMission(mission);
         setShowModal(true);
     };
 
@@ -97,7 +91,7 @@ const AfficherAffaire = () => {
                                     <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <a href="#">Liste des affaires</a>
+                                    <a href="#">Liste des Missions</a>
                                 </li>
                             </ul>
                         </div>
@@ -106,7 +100,7 @@ const AfficherAffaire = () => {
                                 <div className="card">
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
-                                            <h4 className="card-title">Liste des affaires de pole Batiment, VRD </h4>
+                                            <h4 className="card-title">Liste des missions de l'affaire " Réalisation des études de circulation 4 "</h4>
                                         </div>
                                     </div>
                                     <div className="card-body">
@@ -114,17 +108,20 @@ const AfficherAffaire = () => {
                                             <table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => requestSort('code')} className={getClassNamesFor('code')}>
-                                                            Code Affaire <FontAwesomeIcon icon={getClassNamesFor('code') === 'ascending' ? faSortUp : faSortDown} />
-                                                        </th>
                                                         <th onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
-                                                            Libelle Affaire <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
+                                                            Libelle Mission <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('prix')} className={getClassNamesFor('prix')}>
+                                                            Prix Total <FontAwesomeIcon icon={getClassNamesFor('prix') === 'ascending' ? faSortUp : faSortDown} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('forfait')} className={getClassNamesFor('forfait')}>
+                                                            Forfait <FontAwesomeIcon icon={getClassNamesFor('forfait') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
                                                         <th onClick={() => requestSort('division')} className={getClassNamesFor('division')}>
-                                                            Division <FontAwesomeIcon icon={getClassNamesFor('division') === 'ascending' ? faSortUp : faSortDown} />
+                                                            Division Principale <FontAwesomeIcon icon={getClassNamesFor('division') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
-                                                        <th onClick={() => requestSort('client')} className={getClassNamesFor('client')}>
-                                                            Client <FontAwesomeIcon icon={getClassNamesFor('client') === 'ascending' ? faSortUp : faSortDown} />
+                                                        <th onClick={() => requestSort('Pourcentage')} className={getClassNamesFor('Pourcentage')}>
+                                                            Pourcentage de Division Principale <FontAwesomeIcon icon={getClassNamesFor('Pourcentage') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
                                                         <th>Actions</th>
                                                     </tr>
@@ -132,10 +129,11 @@ const AfficherAffaire = () => {
                                                 <tbody>
                                                     {sortedData.map((item, index) => (
                                                         <tr key={index}>
-                                                            <td>{item.code}</td>
                                                             <td>{item.libelle}</td>
+                                                            <td>{item.prix}</td>
+                                                            <td>{item.forfait}</td>
                                                             <td>{item.division}</td>
-                                                            <td>{item.client}</td>
+                                                            <td>{item.Pourcentage}</td>
                                                             <td>
                                                                 <Button variant="link" onClick={() => handleShowModal(item)}>
                                                                     <FontAwesomeIcon icon={faInfo} />
@@ -157,16 +155,16 @@ const AfficherAffaire = () => {
 
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Détails de l'Affaire</Modal.Title>
+                    <Modal.Title>Détails de la Mission</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {selectedAffaire && (
+                    {selectedMission && (
                         <div>
-                            <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                            <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
-                            <p><strong>Division:</strong> {selectedAffaire.division}</p>
-                            <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                            <p><strong>Chef de Projet:</strong> {selectedAffaire.chef}</p>
+                            <p><strong>Libelle:</strong> {selectedMission.libelle}</p>
+                            <p><strong>Prix:</strong> {selectedMission.prix}</p>
+                            <p><strong>Forfait:</strong> {selectedMission.forfait}</p>
+                            <p><strong>Division:</strong> {selectedMission.division}</p>
+                            <p><strong>Pourcentage:</strong> {selectedMission.Pourcentage || 'Non défini'}</p>
                         </div>
                     )}
                 </Modal.Body>
@@ -174,15 +172,10 @@ const AfficherAffaire = () => {
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Fermer
                     </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => window.location.href = '/AfficherMissionCP'}>
-                        Voir Missions
-                    </Button>
                 </Modal.Footer>
             </Modal>
         </div>
     );
 };
 
-export default AfficherAffaire;
+export default AfficherMission;

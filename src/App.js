@@ -10,6 +10,7 @@ import AddMissionCA from './CadreAdmin/addMissionCA';
 import AfficherMissionCA from './CadreAdmin/afficherMissionCA';
 import HomeCP from './ChefPole/homeCP';
 import AfficherAffaireCP from './ChefPole/afficherAffaireCP';
+import afficherMissionCP from './ChefPole/afficherMissionCP'
 import HomeCD from './ChefDiv/homeCD';
 import AfficherAffaireCD from './ChefDiv/afficherAffaireCD';
 import AddDivisionsCD from './ChefDiv/addDivisionsCD';
@@ -28,6 +29,7 @@ const routes = [
   { path: '/AfficherMissionCA', element: AfficherMissionCA },
   { path: '/HomeCP', element: HomeCP },
   { path: '/afficherAffaireCP', element: AfficherAffaireCP },
+  { path: '/afficherMissionCP', element: afficherMissionCP },
   { path: '/HomeCD', element: HomeCD },
   { path: '/afficherAffaireCD', element: AfficherAffaireCD },
   { path: '/AddDivisionsCD', element: AddDivisionsCD },
