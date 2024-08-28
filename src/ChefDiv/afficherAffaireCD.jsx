@@ -6,6 +6,7 @@ import React, { useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
+import Footer from './components/footer';
 
 const AfficherAffaire = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -161,26 +162,7 @@ const AfficherAffaire = () => {
                             </div>
                         </div>
                     </div>
-                    <footer className="footer">
-                        <div className="container-fluid d-flex justify-content-between">
-                            <nav className="pull-left">
-                                <ul className="nav">
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="https://github.com/Alyaeessiba">
-                                            Alyae Essiba
-                                        </a>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="https://github.com/0ZEUS01"> Yahya Zini </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            <div className="copyright">
-                                2024, made with <i className="fa fa-heart heart text-info" /> by
-                                <a href="http://cid.co.ma/"> CID</a>
-                            </div>
-                        </div>
-                    </footer>
+                    <Footer />
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
+import Footer from './components/footer';
 
 const AddDivisions = () => {
     const globalMontant = 378000.00;
@@ -195,6 +196,7 @@ const AddDivisions = () => {
                         </div>
                     </div>
                 </div>
+                <Footer />
             </div>
         </div>
     );
@@ -275,6 +277,7 @@ const SousTraitantRow = ({ sousTraitant, index, handleSousTraitantChange, handle
             )}
         </div>
     </div>
+    
 );
 
 export default AddDivisions;

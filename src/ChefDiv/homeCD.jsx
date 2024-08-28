@@ -4,6 +4,7 @@
 import React from 'react';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
+import Footer from './components/footer';
 
 const Home = () => (
     <div className="wrapper">
@@ -13,6 +14,7 @@ const Home = () => (
             <div className="main-content">
                 {/* Your main content here */}
             </div>
+            <Footer />
         </div>
     </div>
 );
