@@ -116,7 +116,7 @@ const AfficherMission = () => {
                                                 <thead>
                                                     <tr>
                                                         <th onClick={() => requestSort('libelle')} className={getClassNamesFor('libelle')}>
-                                                            Libelle Mission <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
+                                                            Libellé Mission <FontAwesomeIcon icon={getClassNamesFor('libelle') === 'ascending' ? faSortUp : faSortDown} />
                                                         </th>
                                                         <th onClick={() => requestSort('prix')} className={getClassNamesFor('prix')}>
                                                             Prix Total <FontAwesomeIcon icon={getClassNamesFor('prix') === 'ascending' ? faSortUp : faSortDown} />
@@ -163,14 +163,14 @@ const AfficherMission = () => {
                 </div>
             </div>
 
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Détails de la Mission</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {selectedMission && (
                         <div>
-                            <p><strong>Libelle:</strong> {selectedMission.libelle}</p>
+                            <p><strong>Libellé:</strong> {selectedMission.libelle}</p>
                             <p><strong>Prix:</strong> {selectedMission.prix}</p>
                             <p><strong>Forfait:</strong> {selectedMission.forfait}</p>
                             <p><strong>Division:</strong> {selectedMission.division}</p>

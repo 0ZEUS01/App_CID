@@ -64,11 +64,11 @@ const ConsultMission = () => {
                                         <Card.Title>Détails de la Mission</Card.Title>
                                     </Card.Header>
                                     <Card.Body>
-                                        <p><strong>Libellé:</strong> {mission.libelle}</p>
-                                        <p><strong>Prix:</strong> {mission.prix}</p>
-                                        <p><strong>Forfait:</strong> {mission.forfait}</p>
-                                        <p><strong>Division:</strong> {mission.division}</p>
-                                        <p><strong>Pourcentage:</strong> {mission.pourcentage}</p>
+                                        <p><strong>Libellé :</strong> {mission.libelle}</p>
+                                        <p><strong>Prix :</strong> {mission.prix}</p>
+                                        <p><strong>Forfait :</strong> {mission.forfait}</p>
+                                        <p><strong>Division :</strong> {mission.division}</p>
+                                        <p><strong>Pourcentage :</strong> {mission.pourcentage}</p>
                                     </Card.Body>
                                 </Card>
                             </div>
@@ -117,9 +117,9 @@ const ConsultMission = () => {
                                         <ListGroup>
                                             {avancements.map((avancement, index) => (
                                                 <ListGroup.Item key={index}>
-                                                    <p style={{ marginRight: '0.5rem' }}><strong>Date:</strong> {new Date(avancement.date_mise_a_jour).toLocaleString()}</p>
-                                                    <p style={{ marginRight: '0.5rem' }}><strong>Pourcentage:</strong> {avancement.pourcentage_avancement}%</p>
-                                                    <p style={{ marginRight: 0 }}><strong>Commentaire:</strong> {avancement.commentaire}</p>
+                                                    <p style={{ marginRight: '0.5rem' }}><strong>Date :</strong> {new Date(avancement.date_mise_a_jour).toLocaleString()}</p>
+                                                    <p style={{ marginRight: '0.5rem' }}><strong>Pourcentage :</strong> {avancement.pourcentage_avancement}%</p>
+                                                    <p style={{ marginRight: 0 }}><strong>Commentaire :</strong> {avancement.commentaire}</p>
                                                 </ListGroup.Item>
                                             ))}
                                         </ListGroup>

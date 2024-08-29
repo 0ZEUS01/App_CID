@@ -170,7 +170,7 @@ const AfficherAffaire = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <Modal show={showModal} onHide={handleCloseModal} size="lg">
+                                        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
                                             <Modal.Header closeButton>
                                                 <Modal.Title>
                                                     {modalType === 'edit' ? 'Modifier l\'Affaire' : 'Détails de l\'Affaire'}

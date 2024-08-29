@@ -182,7 +182,7 @@ const AfficherMission = () => {
                                                     <p>Êtes-vous sûr de vouloir supprimer cette mission : "{selectedMission?.libelle}"?</p>
                                                 )}
                                                 {modalType === 'edit' && selectedMission && (
-                                                    <Form onSubmit={handleEdit}>
+                                                    <Form id="editForm" onSubmit={handleEdit}>
                                                         {Object.keys(selectedMission).map((key) => (
                                                             <Form.Group key={key} className="mb-3">
                                                                 <Form.Label>{key.charAt(0).toUpperCase() + key.slice(1)}</Form.Label>
@@ -196,9 +196,6 @@ const AfficherMission = () => {
                                                                 )}
                                                             </Form.Group>
                                                         ))}
-                                                        <Button variant="primary" type="submit">
-                                                            Enregistrer les modifications
-                                                        </Button>
                                                     </Form>
                                                 )}
                                                 {modalType === 'info' && selectedMission && (
@@ -220,7 +217,17 @@ const AfficherMission = () => {
                                                         </Button>
                                                     </>
                                                 )}
-                                                {(modalType === 'edit' || modalType === 'info') && (
+                                                {modalType === 'edit' && (
+                                                    <>
+                                                        <Button variant="secondary" onClick={handleCloseModal}>
+                                                            Fermer
+                                                        </Button>
+                                                        <Button variant="primary" type="submit" form="editForm">
+                                                            Enregistrer les modifications
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {modalType === 'info' && (
                                                     <Button variant="secondary" onClick={handleCloseModal}>
                                                         Fermer
                                                     </Button>
