@@ -21,7 +21,7 @@ import HomeCDP from './ChefProjet/homeCDP';
 import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP';
 import AfficherMissionCDP from './ChefProjet/afficherMissionCDP'
 import ConsultMissionCDP from './ChefProjet/consultMissionCDP';
-import AddUnite from './Admin/Unite/addUnite';
+import AfficherUnite from './Admin/Unite/afficherUnite'
 
 // Update the routes array with French titles
 const routes = [
@@ -43,7 +43,7 @@ const routes = [
   { path: '/afficherAffaireCDP', element: AfficherAffaireCDP, title: 'Afficher Affaire - CID' },
   { path: '/afficherMissionCDP', element: AfficherMissionCDP, title: 'Afficher Mission - CID' },
   { path: '/consultMissionCDP', element: ConsultMissionCDP, title: 'Consulter Mission - CID' },
-  { path: '/addUnite', element: AddUnite, title: 'Ajouter Unité' },
+  { path: '/afficherUnite', element: AfficherUnite, title: 'Unité - CID' },
 ];
 
 function App() {
