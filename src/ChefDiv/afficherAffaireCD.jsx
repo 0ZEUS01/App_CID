@@ -16,12 +16,14 @@ import {
     faSortUp, 
     faSortDown 
 } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const AfficherAffaire = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
     const [selectedAffaire, setSelectedAffaire] = useState(null);
+    const navigate = useNavigate();
 
     const data = [
         { code: '202100890', libelle: "Réalisation des études de circulation 4", division: 'ET', client: 'Direction des amenagements hydrauliques', chef: 'Ammari Yousra' },
@@ -78,6 +80,10 @@ const AfficherAffaire = () => {
         e.preventDefault();
         // Perform edit action
         handleCloseModal();
+    };
+
+    const handleDesignateChef = () => {
+        navigate('/designationChefProjetCD');
     };
 
     const visibleData = useMemo(() => {
@@ -164,11 +170,10 @@ const AfficherAffaire = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <Modal show={showModal} onHide={handleCloseModal}>
+                                        <Modal show={showModal} onHide={handleCloseModal} size="lg">
                                             <Modal.Header closeButton>
                                                 <Modal.Title>
-                                                    {modalType === 'edit' && 'Modifier l\'Affaire'}
-                                                    {modalType === 'info' && 'Détails de l\'Affaire'}
+                                                    {modalType === 'edit' ? 'Modifier l\'Affaire' : 'Détails de l\'Affaire'}
                                                 </Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
@@ -201,22 +206,24 @@ const AfficherAffaire = () => {
                                                     </div>
                                                 )}
                                             </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={handleCloseModal}>
-                                                    Fermer
-                                                </Button>
-                                                {modalType === 'edit' && (
-                                                    <Button variant="primary" onClick={handleEdit}>
-                                                        Enregistrer les modifications
-                                                    </Button>
-                                                )}
-                                                {modalType === 'info' && (
-                                                    <Button
-                                                        variant="primary"
-                                                        onClick={() => window.location.href = '/AfficherMissionCD'}>
+                                            <Modal.Footer className="d-flex justify-content-end">
+                                                {modalType === 'edit' ? (
+                                                    <>
+                                                        <Button variant="primary" onClick={handleEdit} className="me-2">
+                                                            Enregistrer les modifications
+                                                        </Button>
+                                                        <Button variant="info" onClick={handleDesignateChef} className="me-2">
+                                                            Désigner Chef de Projet
+                                                        </Button>
+                                                    </>
+                                                ) : modalType === 'info' && (
+                                                    <Button variant="primary" onClick={() => navigate('/AfficherMissionCD')} className="me-2">
                                                         Voir les Missions
                                                     </Button>
                                                 )}
+                                                <Button variant="secondary" onClick={handleCloseModal}>
+                                                    Fermer
+                                                </Button>
                                             </Modal.Footer>
                                         </Modal>
                                     </div>

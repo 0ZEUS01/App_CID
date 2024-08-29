@@ -103,6 +103,9 @@ const AddDivisions = () => {
         return divisionsList.filter(division => !selectedDivisions.includes(division.id));
     };
 
+    const hasDivisions = divisions.some(d => d.divisionId !== '' && d.montant !== '');
+    const hasSousTraitants = sousTraitants.some(st => st.name !== '' && st.montant !== '');
+
     const visibleDivisions = totalMontant === globalMontant
         ? divisions.filter(d => d.montant !== '')
         : divisions;
@@ -143,49 +146,58 @@ const AddDivisions = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 {/* Divisions card */}
-                                <div className="card">
-                                    <div className="card-header">
-                                        <div className="card-title" style={{ textAlign: 'left' }}>
-                                            Définir les divisions montant à la mission "Gare LGV Tanger" dont le montant : {globalMontant.toFixed(2)}
+                                {(!hasSousTraitants || divisions.length > 1) && (
+                                    <div className="card mb-4">
+                                        <div className="card-header">
+                                            <div className="card-title" style={{ textAlign: 'left' }}>
+                                                Définir les divisions montant à la mission "Gare LGV Tanger" dont le montant : {globalMontant.toFixed(2)}
+                                            </div>
+                                        </div>
+                                        <div className="card-body">
+                                            {visibleDivisions.map((division, index) => (
+                                                <DivisionRow
+                                                    key={index}
+                                                    division={division}
+                                                    index={index}
+                                                    handleDivisionChange={handleDivisionChange}
+                                                    handleSuggestion={handleSuggestion}
+                                                    availableDivisions={getAvailableDivisions(divisions.map(d => d.divisionId), index)}
+                                                    totalMontant={totalMontant}
+                                                    globalMontant={globalMontant}
+                                                    isLast={index === visibleDivisions.length - 1}
+                                                />
+                                            ))}
                                         </div>
                                     </div>
-                                    <div className="card-body">
-                                        {visibleDivisions.map((division, index) => (
-                                            <DivisionRow
-                                                key={index}
-                                                division={division}
-                                                index={index}
-                                                handleDivisionChange={handleDivisionChange}
-                                                handleSuggestion={handleSuggestion}
-                                                availableDivisions={getAvailableDivisions(divisions.map(d => d.divisionId), index)}
-                                                totalMontant={totalMontant}
-                                                globalMontant={globalMontant}
-                                                isLast={index === visibleDivisions.length - 1}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
+                                )}
 
                                 {/* Sous-traitant card */}
-                                <div className={`card ${totalMontant > globalMontant ? 'border-danger' : ''}`}>
-                                    <div className="card-header">
-                                        <div className="card-title" style={{ textAlign: 'left' }}>
-                                            Définir les sous traitants montant à la mission "Gare LGV Tanger"
+                                {(!hasDivisions || sousTraitants.length > 1) && (
+                                    <div className={`card mb-4 ${totalMontant > globalMontant ? 'border-danger' : ''}`}>
+                                        <div className="card-header">
+                                            <div className="card-title" style={{ textAlign: 'left' }}>
+                                                Définir les sous traitants montant à la mission "Gare LGV Tanger"
+                                            </div>
+                                        </div>
+                                        <div className="card-body">
+                                            {visibleSousTraitants.map((sousTraitant, index) => (
+                                                <SousTraitantRow
+                                                    key={index}
+                                                    sousTraitant={sousTraitant}
+                                                    index={index}
+                                                    handleSousTraitantChange={handleSousTraitantChange}
+                                                    handleSuggestion={handleSuggestion}
+                                                    totalMontant={totalMontant}
+                                                    globalMontant={globalMontant}
+                                                    isLast={index === visibleSousTraitants.length - 1}
+                                                />
+                                            ))}
                                         </div>
                                     </div>
+                                )}
+
+                                <div className="card">
                                     <div className="card-body">
-                                        {visibleSousTraitants.map((sousTraitant, index) => (
-                                            <SousTraitantRow
-                                                key={index}
-                                                sousTraitant={sousTraitant}
-                                                index={index}
-                                                handleSousTraitantChange={handleSousTraitantChange}
-                                                handleSuggestion={handleSuggestion}
-                                                totalMontant={totalMontant}
-                                                globalMontant={globalMontant}
-                                                isLast={index === visibleSousTraitants.length - 1}
-                                            />
-                                        ))}
                                         <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
                                             <button className="btn btn-primary" onClick={handleApply}>Appliquer</button>
                                         </div>
@@ -277,7 +289,6 @@ const SousTraitantRow = ({ sousTraitant, index, handleSousTraitantChange, handle
             )}
         </div>
     </div>
-    
 );
 
 export default AddDivisions;

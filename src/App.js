@@ -16,6 +16,7 @@ import HomeCD from './ChefDiv/homeCD';
 import AfficherAffaireCD from './ChefDiv/afficherAffaireCD';
 import AddDivisionsCD from './ChefDiv/addDivisionsCD';
 import AfficherMissionCD from './ChefDiv/afficherMissionCD';
+import DesignationChefProjetCD from './ChefDiv/designationChefProjetCD';
 import HomeCDP from './ChefProjet/homeCDP';
 import AfficherAffaireCDP from './ChefProjet/afficherAffaireCDP';
 import AfficherMissionCDP from './ChefProjet/afficherMissionCDP'
@@ -37,6 +38,7 @@ const routes = [
   { path: '/afficherAffaireCD', element: AfficherAffaireCD, title: 'Afficher Affaire - CID' },
   { path: '/AddDivisionsCD', element: AddDivisionsCD, title: 'Ajouter Divisions - CID' },
   { path: '/afficherMissionCD', element: AfficherMissionCD, title: 'Afficher Mission - CID' },
+  { path: '/designationChefProjetCD', element: DesignationChefProjetCD, title: 'Designation de Chef de Projet - CID' },
   { path: '/HomeCDP', element: HomeCDP, title: 'Accueil - CID' },
   { path: '/afficherAffaireCDP', element: AfficherAffaireCDP, title: 'Afficher Affaire - CID' },
   { path: '/afficherMissionCDP', element: AfficherMissionCDP, title: 'Afficher Mission - CID' },
