@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faHome,
-    faArrowRight,
-    faEdit,
+import { 
+    faHome, 
+    faArrowRight, 
+    faEdit, 
     faTimes,
     faPlus,
     faHeart
@@ -12,46 +12,45 @@ import {
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
 
-const AfficherUnite = () => {
-    const [unites, setUnites] = useState([
-        { id: 1, libelle: 'Forfait' },
-        { id: 2, libelle: 'Kilomètre' },
-        { id: 3, libelle: 'Mètre' },
-        { id: 4, libelle: 'Mètre cube' },
-        { id: 5, libelle: 'Mètre carré' }
+const AfficherRole = () => {
+    const [roles, setRoles] = useState([
+        { id: 1, libelle: 'Chef de Projet' },
+        { id: 2, libelle: 'Chef de Division' },
+        { id: 3, libelle: 'Cadre Administratif' },
+        { id: 4, libelle: 'Chef de Pôle' }
     ]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [editingUnite, setEditingUnite] = useState(null);
-    const [deletingUnite, setDeletingUnite] = useState(null);
-    const [newUnite, setNewUnite] = useState('');
+    const [editingRole, setEditingRole] = useState(null);
+    const [deletingRole, setDeletingRole] = useState(null);
+    const [newRole, setNewRole] = useState('');
 
-    const handleEditUnite = (unite) => {
-        setEditingUnite(unite);
+    const handleEditRole = (role) => {
+        setEditingRole(role);
         setShowEditModal(true);
     };
 
-    const handleUpdateUnite = () => {
-        setUnites(unites.map(unite =>
-            unite.id === editingUnite.id ? editingUnite : unite
+    const handleUpdateRole = () => {
+        setRoles(roles.map(role => 
+            role.id === editingRole.id ? editingRole : role
         ));
         setShowEditModal(false);
     };
 
-    const handleDeleteUnite = (unite) => {
-        setDeletingUnite(unite);
+    const handleDeleteRole = (role) => {
+        setDeletingRole(role);
         setShowDeleteModal(true);
     };
 
-    const confirmDeleteUnite = () => {
-        setUnites(unites.filter(unite => unite.id !== deletingUnite.id));
+    const confirmDeleteRole = () => {
+        setRoles(roles.filter(role => role.id !== deletingRole.id));
         setShowDeleteModal(false);
     };
 
-    const handleAddUnite = () => {
-        if (newUnite.trim()) {
-            setUnites([...unites, { id: unites.length + 1, libelle: newUnite.trim() }]);
-            setNewUnite('');
+    const handleAddRole = () => {
+        if (newRole.trim()) {
+            setRoles([...roles, { id: roles.length + 1, libelle: newRole.trim() }]);
+            setNewRole('');
         }
     };
 
@@ -63,7 +62,7 @@ const AfficherUnite = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h3 className="fw-bold mb-3">Gestion des Unités</h3>
+                            <h3 className="fw-bold mb-3">Gestion des Rôles</h3>
                             <ul className="breadcrumbs mb-3">
                                 <li className="nav-home">
                                     <span><FontAwesomeIcon icon={faHome} /></span>
@@ -72,7 +71,7 @@ const AfficherUnite = () => {
                                     <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <span>Gestion des Unités</span>
+                                    <span>Gestion des Rôles</span>
                                 </li>
                             </ul>
                         </div>
@@ -80,23 +79,22 @@ const AfficherUnite = () => {
                             <div className="col-md-12">
                                 <div className="card">
                                     <div className="card-header">
-                                        <h4 className="card-title">Liste des Unités</h4>
+                                        <h4 className="card-title">Liste des Rôles</h4>
                                         <div className="d-flex align-items-center mt-3">
-                                            <input
-                                                style={{ marginRight: 15 }}
-                                                type="text"
-                                                value={newUnite}
-                                                onChange={(e) => setNewUnite(e.target.value)}
-                                                placeholder="Nouvelle unité"
+                                            <input 
+                                                type="text" 
+                                                value={newRole}
+                                                onChange={(e) => setNewRole(e.target.value)}
+                                                placeholder="Nouveau rôle"
                                                 className="form-control flex-grow-1 mr-2"
                                             />
-                                            <Button
-                                                variant="primary"
-                                                onClick={handleAddUnite}
+                                            <Button 
+                                                variant="primary" 
+                                                onClick={handleAddRole}
                                                 className="btn-lg"
                                                 style={{ whiteSpace: 'nowrap' }}
                                             >
-                                                <FontAwesomeIcon icon={faPlus} /> Ajouter une unité
+                                                <FontAwesomeIcon icon={faPlus} /> Ajouter un rôle
                                             </Button>
                                         </div>
                                     </div>
@@ -111,15 +109,15 @@ const AfficherUnite = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {unites.map((unite) => (
-                                                        <tr key={unite.id}>
-                                                            <td>{unite.id}</td>
-                                                            <td>{unite.libelle}</td>
+                                                    {roles.map((role) => (
+                                                        <tr key={role.id}>
+                                                            <td>{role.id}</td>
+                                                            <td>{role.libelle}</td>
                                                             <td>
-                                                                <Button variant="link" className="btn-primary" onClick={() => handleEditUnite(unite)}>
+                                                                <Button variant="link" className="btn-primary" onClick={() => handleEditRole(role)}>
                                                                     <FontAwesomeIcon icon={faEdit} />
                                                                 </Button>
-                                                                <Button variant="link" className="btn-danger" onClick={() => handleDeleteUnite(unite)}>
+                                                                <Button variant="link" className="btn-danger" onClick={() => handleDeleteRole(role)}>
                                                                     <FontAwesomeIcon icon={faTimes} />
                                                                 </Button>
                                                             </td>
@@ -163,21 +161,21 @@ const AfficherUnite = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Modifier l'unité</Modal.Title>
+                    <Modal.Title>Modifier le rôle</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input
-                        type="text"
+                    <input 
+                        type="text" 
                         className="form-control"
-                        value={editingUnite?.libelle || ''}
-                        onChange={(e) => setEditingUnite({ ...editingUnite, libelle: e.target.value })}
+                        value={editingRole?.libelle || ''}
+                        onChange={(e) => setEditingRole({...editingRole, libelle: e.target.value})}
                     />
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="primary" onClick={handleUpdateUnite}>
+                    <Button variant="primary" onClick={handleUpdateRole}>
                         Sauvegarder
                     </Button>
                 </Modal.Footer>
@@ -193,13 +191,13 @@ const AfficherUnite = () => {
                     <Modal.Title>Confirmer la suppression</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Êtes-vous sûr de vouloir supprimer cette unité ?
+                    Êtes-vous sûr de vouloir supprimer ce rôle ?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="danger" onClick={confirmDeleteUnite}>
+                    <Button variant="danger" onClick={confirmDeleteRole}>
                         Supprimer
                     </Button>
                 </Modal.Footer>
@@ -208,4 +206,4 @@ const AfficherUnite = () => {
     );
 };
 
-export default AfficherUnite;
+export default AfficherRole;

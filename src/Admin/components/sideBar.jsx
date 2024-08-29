@@ -59,8 +59,8 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                         </span>
                         <h4 className="text-section">Composants</h4>
                     </li>
-                    <SidebarItem href="#" icon="fas fa-tags" text="Gestion des Unités" />
-                    <SidebarItem href="#" icon="fas fa-user-tag" text="Gestion des Rôles" />
+                    <SidebarItem href="/afficherUnite" icon="fas fa-tags" text="Gestion des Unités" />
+                    <SidebarItem href="/afficherRole" icon="fas fa-user-tag" text="Gestion des Rôles" />
                     <SidebarItem href="#" icon="fas fa-users" text="Gestion des Utilisateurs" />
                     <SidebarItem href="#" icon="fas fa-sitemap" text="Gestion des Pôles" />
                     <SidebarItem href="#" icon="fas fa-building" text="Gestion des Divisions" />
