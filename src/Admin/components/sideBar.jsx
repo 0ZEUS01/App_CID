@@ -62,19 +62,20 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                     <SidebarItem href="/afficherUnite" icon="fas fa-tags" text="Gestion des Unités" />
                     <SidebarItem href="/afficherRole" icon="fas fa-user-tag" text="Gestion des Rôles" />
                     <SidebarItem href="#" icon="fas fa-users" text="Gestion des Utilisateurs">
-                    <li>
+                        <li>
                             <Link to="/AddUser">
-                                <span className="sub-item">Ajouter une Utilisateur</span>
+                                <span className="sub-item">Ajouter un Utilisateur</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/afficherUser">
-                                <span className="sub-item">Liste des Utilisateur</span>
+                                <span className="sub-item">Liste des Utilisateurs</span>
                             </Link>
                         </li>
                     </SidebarItem>
                     <SidebarItem href="/afficherPole" icon="fas fa-sitemap" text="Gestion des Pôles" />
                     <SidebarItem href="/afficherDivision" icon="fas fa-building" text="Gestion des Divisions" />
+                    <SidebarItem href="/afficherClient" icon="fas fa-user-tie" text="Gestion des Clients" />
                 </ul>
                 <ul className="nav">
                     {menuItems.map((item, index) => (

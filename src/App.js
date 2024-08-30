@@ -27,6 +27,7 @@ import AfficherUser from './Admin/Utilisateur/afficherUser';
 import AddUser from './Admin/Utilisateur/addUser';
 import AfficherPole from './Admin/Pole/afficherPole';
 import AfficherDivision from './Admin/Division/afficherDivision'
+import AfficherClient from './Admin/Client/afficherClient'
 
 // Update the routes array with French titles
 const routes = [
@@ -54,6 +55,7 @@ const routes = [
   { path: '/addUser', element: AddUser, title: 'Gestion des Utilisateurs - CID' },
   { path: '/afficherPole', element: AfficherPole, title: 'Gestion des Poles - CID' },
   { path: '/afficherDivision', element: AfficherDivision, title: 'Gestion des Divisions - CID' },
+  { path: '/afficherClient', element: AfficherClient, title: 'Gestion des Clients - CID' },
 ];
 
 function App() {
