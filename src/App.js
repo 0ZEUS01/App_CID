@@ -23,6 +23,10 @@ import AfficherMissionCDP from './ChefProjet/afficherMissionCDP'
 import ConsultMissionCDP from './ChefProjet/consultMissionCDP';
 import AfficherUnite from './Admin/Unite/afficherUnite'
 import AfficherRole from './Admin/Role/afficherRole';
+import AfficherUser from './Admin/Utilisateur/afficherUser';
+import AddUser from './Admin/Utilisateur/addUser';
+import AfficherPole from './Admin/Pole/afficherPole';
+import AfficherDivision from './Admin/Division/afficherDivision'
 
 // Update the routes array with French titles
 const routes = [
@@ -44,8 +48,12 @@ const routes = [
   { path: '/afficherAffaireCDP', element: AfficherAffaireCDP, title: 'Afficher Affaire - CID' },
   { path: '/afficherMissionCDP', element: AfficherMissionCDP, title: 'Afficher Mission - CID' },
   { path: '/consultMissionCDP', element: ConsultMissionCDP, title: 'Consulter Mission - CID' },
-  { path: '/afficherUnite', element: AfficherUnite, title: 'Gestion des Unité - CID' },
-  { path: '/afficherRole', element: AfficherRole, title: 'Gestion des Role - CID' },
+  { path: '/afficherUnite', element: AfficherUnite, title: 'Gestion des Unités - CID' },
+  { path: '/afficherRole', element: AfficherRole, title: 'Gestion des Roles - CID' },
+  { path: '/afficherUser', element: AfficherUser, title: 'Gestion des Utilisateurs - CID' },
+  { path: '/addUser', element: AddUser, title: 'Gestion des Utilisateurs - CID' },
+  { path: '/afficherPole', element: AfficherPole, title: 'Gestion des Poles - CID' },
+  { path: '/afficherDivision', element: AfficherDivision, title: 'Gestion des Divisions - CID' },
 ];
 
 function App() {
