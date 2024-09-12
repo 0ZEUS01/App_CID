@@ -231,14 +231,14 @@ const AfficherAffaire = () => {
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {modalType === 'delete' && 'Delete Affaire'}
-                        {modalType === 'edit' && 'Edit Affaire'}
-                        {modalType === 'info' && 'Details of Affaire'}
+                        {modalType === 'delete' && 'Supprimer l\'affaire'}
+                        {modalType === 'edit' && 'Modifier l\'affaire'}
+                        {modalType === 'info' && 'Détails de l\'affaire'}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {modalType === 'delete' && (
-                        <p>Etes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle}"?</p>
+                        <p>Êtes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle}"?</p>
                     )}
                     {modalType === 'edit' && selectedAffaire && (
                         <EditForm 
@@ -249,42 +249,42 @@ const AfficherAffaire = () => {
                     {modalType === 'info' && selectedAffaire && (
                         <div>
                             <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                            <p><strong>Libelle:</strong> {selectedAffaire.libelle}</p>
+                            <p><strong>Libellé:</strong> {selectedAffaire.libelle}</p>
                             <p><strong>Division:</strong> {selectedAffaire.division}</p>
                             <p><strong>Client:</strong> {selectedAffaire.client}</p>
-                            <Button
-                                variant="secondary"
-                                onClick={() => window.location.href = '/AfficherMissionCA'}>
-                                View Missions
-                            </Button>
                         </div>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
                     {modalType === 'delete' && (
                         <>
-                            <Button variant="secondary" onClick={handleCloseModal}>
-                                Cancel
-                            </Button>
                             <Button variant="danger" onClick={handleDelete}>
-                                Delete
+                                Supprimer
+                            </Button>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                Annuler
                             </Button>
                         </>
                     )}
                     {modalType === 'edit' && (
                         <>
-                            <Button variant="secondary" onClick={handleCloseModal}>
-                                Cancel
-                            </Button>
                             <Button variant="primary" onClick={handleEditSubmit}>
-                                Save Changes
+                                Enregistrer les modifications
+                            </Button>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                Annuler
                             </Button>
                         </>
                     )}
                     {modalType === 'info' && (
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Close
-                        </Button>
+                        <>
+                            <Button variant="primary" onClick={() => window.location.href = '/AfficherMissionCA'}>
+                                Voir les missions
+                            </Button>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                Fermer
+                            </Button>
+                        </>
                     )}
                 </Modal.Footer>
             </Modal>

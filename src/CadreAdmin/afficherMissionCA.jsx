@@ -5,12 +5,12 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faHome, 
-    faArrowRight, 
-    faInfo, 
-    faEdit, 
-    faTimes, 
+import {
+    faHome,
+    faArrowRight,
+    faInfo,
+    faEdit,
+    faTimes,
     faPlus,
     faSortUp,
     faSortDown,
@@ -84,7 +84,7 @@ const AfficherMission = () => {
             division: e.target.division.value,
             Pourcentage: e.target.Pourcentage.value
         };
-        setMissions(missions.map(mission => 
+        setMissions(missions.map(mission =>
             mission.libelle === selectedMission.libelle ? updatedMission : mission
         ));
         handleCloseModal();
@@ -209,21 +209,21 @@ const AfficherMission = () => {
                                             <Modal.Footer>
                                                 {modalType === 'delete' && (
                                                     <>
-                                                        <Button variant="secondary" onClick={handleCloseModal}>
-                                                            Annuler
-                                                        </Button>
                                                         <Button variant="danger" onClick={handleDelete}>
                                                             Supprimer
+                                                        </Button>
+                                                        <Button variant="secondary" onClick={handleCloseModal}>
+                                                            Annuler
                                                         </Button>
                                                     </>
                                                 )}
                                                 {modalType === 'edit' && (
                                                     <>
-                                                        <Button variant="secondary" onClick={handleCloseModal}>
-                                                            Fermer
-                                                        </Button>
                                                         <Button variant="primary" type="submit" form="editForm">
                                                             Enregistrer les modifications
+                                                        </Button>
+                                                        <Button variant="secondary" onClick={handleCloseModal}>
+                                                            Fermer
                                                         </Button>
                                                     </>
                                                 )}
