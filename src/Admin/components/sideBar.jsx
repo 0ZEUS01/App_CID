@@ -59,7 +59,9 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                         </span>
                         <h4 className="text-section">Composants</h4>
                     </li>
-                    <SidebarItem href="/afficherUnite" icon="fas fa-tags" text="Gestion des Unités" />
+                    <SidebarItem href="/afficherPole" icon="fas fa-sitemap" text="Gestion des Pôles" />
+                    <SidebarItem href="/afficherDivision" icon="fas fa-building" text="Gestion des Divisions" />
+                    <SidebarItem href="/afficherClient" icon="fas fa-user-tie" text="Gestion des Clients" />
                     <SidebarItem href="/afficherRole" icon="fas fa-user-tag" text="Gestion des Rôles" />
                     <SidebarItem href="#" icon="fas fa-users" text="Gestion des Utilisateurs">
                         <li>
@@ -73,9 +75,8 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                             </Link>
                         </li>
                     </SidebarItem>
-                    <SidebarItem href="/afficherPole" icon="fas fa-sitemap" text="Gestion des Pôles" />
-                    <SidebarItem href="/afficherDivision" icon="fas fa-building" text="Gestion des Divisions" />
-                    <SidebarItem href="/afficherClient" icon="fas fa-user-tie" text="Gestion des Clients" />
+                    <SidebarItem href="/afficherUnite" icon="fas fa-tags" text="Gestion des Unités" />
+                    <SidebarItem href="/afficherPays" icon="fas fa-globe-americas" text="Gestion des Pays" />
                 </ul>
                 <ul className="nav">
                     {menuItems.map((item, index) => (

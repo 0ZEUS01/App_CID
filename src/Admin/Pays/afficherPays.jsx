@@ -16,42 +16,31 @@ import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
-const AfficherClient = () => {
-    const [clients, setClients] = useState([]);
+const AfficherPays = () => {
     const [pays, setPays] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [editingClient, setEditingClient] = useState(null);
-    const [deletingClient, setDeletingClient] = useState(null);
-    const [newClient, setNewClient] = useState({ nom_client: '', pays: { id_pays: '' } });
+    const [editingPays, setEditingPays] = useState(null);
+    const [deletingPays, setDeletingPays] = useState(null);
+    const [newPays, setNewPays] = useState({ libelle_pays: '' });
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
     useEffect(() => {
-        fetchClients();
         fetchPays();
     }, []);
 
-    const fetchClients = async () => {
-        setIsLoading(true);
-        try {
-            const response = await axios.get('http://localhost:8080/api/clients');
-            setClients(response.data);
-        } catch (error) {
-            console.error('Error fetching clients:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const fetchPays = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get('http://localhost:8080/api/pays');
             setPays(response.data);
         } catch (error) {
             console.error('Error fetching pays:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -59,37 +48,27 @@ const AfficherClient = () => {
         setSearchTerm(term);
     };
 
-    const sortedClients = useMemo(() => {
-        let sortableClients = [...clients];
+    const sortedPays = useMemo(() => {
+        let sortablePays = [...pays];
         if (sortConfig.key !== null) {
-            sortableClients.sort((a, b) => {
-                if (sortConfig.key === 'pays.libelle_pays') {
-                    if (a.pays.libelle_pays < b.pays.libelle_pays) {
-                        return sortConfig.direction === 'ascending' ? -1 : 1;
-                    }
-                    if (a.pays.libelle_pays > b.pays.libelle_pays) {
-                        return sortConfig.direction === 'ascending' ? 1 : -1;
-                    }
-                } else {
-                    if (a[sortConfig.key] < b[sortConfig.key]) {
-                        return sortConfig.direction === 'ascending' ? -1 : 1;
-                    }
-                    if (a[sortConfig.key] > b[sortConfig.key]) {
-                        return sortConfig.direction === 'ascending' ? 1 : -1;
-                    }
+            sortablePays.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
                 }
                 return 0;
             });
         }
-        return sortableClients;
-    }, [clients, sortConfig]);
+        return sortablePays;
+    }, [pays, sortConfig]);
 
-    const filteredClients = useMemo(() => {
-        return sortedClients.filter(client => 
-            client.nom_client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            client.pays.libelle_pays.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredPays = useMemo(() => {
+        return sortedPays.filter(p => 
+            p.libelle_pays.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [sortedClients, searchTerm]);
+    }, [sortedPays, searchTerm]);
 
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -106,44 +85,44 @@ const AfficherClient = () => {
         return faSort;
     };
 
-    const handleEditClient = (client) => {
-        setEditingClient(client);
+    const handleEditPays = (p) => {
+        setEditingPays(p);
         setShowEditModal(true);
     };
 
-    const handleUpdateClient = async () => {
+    const handleUpdatePays = async () => {
         try {
-            await axios.put(`http://localhost:8080/api/clients/${editingClient.id_client}`, editingClient);
-            fetchClients();
+            await axios.put(`http://localhost:8080/api/pays/${editingPays.id_pays}`, editingPays);
+            fetchPays();
             setShowEditModal(false);
         } catch (error) {
-            console.error('Error updating client:', error);
+            console.error('Error updating pays:', error);
         }
     };
 
-    const handleDeleteClient = (client) => {
-        setDeletingClient(client);
+    const handleDeletePays = (p) => {
+        setDeletingPays(p);
         setShowDeleteModal(true);
     };
 
-    const confirmDeleteClient = async () => {
+    const confirmDeletePays = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/clients/${deletingClient.id_client}`);
-            fetchClients();
+            await axios.delete(`http://localhost:8080/api/pays/${deletingPays.id_pays}`);
+            fetchPays();
             setShowDeleteModal(false);
         } catch (error) {
-            console.error('Error deleting client:', error);
+            console.error('Error deleting pays:', error);
         }
     };
 
-    const handleAddClient = async () => {
+    const handleAddPays = async () => {
         try {
-            await axios.post('http://localhost:8080/api/clients', newClient);
-            fetchClients();
+            await axios.post('http://localhost:8080/api/pays', newPays);
+            fetchPays();
             setShowAddModal(false);
-            setNewClient({ nom_client: '', pays: { id_pays: '' } });
+            setNewPays({ libelle_pays: '' });
         } catch (error) {
-            console.error('Error adding client:', error);
+            console.error('Error adding pays:', error);
         }
     };
 
@@ -151,45 +130,44 @@ const AfficherClient = () => {
         if (isLoading) {
             return (
                 <tr>
-                    <td colSpan="4" className="text-center">Chargement...</td>
+                    <td colSpan="3" className="text-center">Chargement...</td>
                 </tr>
             );
         }
 
-        if (clients.length === 0) {
+        if (pays.length === 0) {
             return (
                 <tr>
-                    <td colSpan="4" className="text-center">
+                    <td colSpan="3" className="text-center">
                         <Alert variant="info">
-                            Aucun client n'existe dans la base de données.
+                            Aucun pays n'existe dans la base de données.
                         </Alert>
                     </td>
                 </tr>
             );
         }
 
-        if (filteredClients.length === 0) {
+        if (filteredPays.length === 0) {
             return (
                 <tr>
-                    <td colSpan="4" className="text-center">
+                    <td colSpan="3" className="text-center">
                         <Alert variant="warning">
-                            Aucun client ne correspond à la recherche "{searchTerm}".
+                            Aucun pays ne correspond à la recherche "{searchTerm}".
                         </Alert>
                     </td>
                 </tr>
             );
         }
 
-        return filteredClients.map((client) => (
-            <tr key={client.id_client}>
-                <td>{client.id_client}</td>
-                <td>{client.nom_client}</td>
-                <td>{client.pays.libelle_pays}</td>
+        return filteredPays.map((p) => (
+            <tr key={p.id_pays}>
+                <td>{p.id_pays}</td>
+                <td>{p.libelle_pays}</td>
                 <td>
-                    <Button variant="link" className="btn-primary" onClick={() => handleEditClient(client)}>
+                    <Button variant="link" className="btn-primary" onClick={() => handleEditPays(p)}>
                         <FontAwesomeIcon icon={faEdit} />
                     </Button>
-                    <Button variant="link" className="btn-danger" onClick={() => handleDeleteClient(client)}>
+                    <Button variant="link" className="btn-danger" onClick={() => handleDeletePays(p)}>
                         <FontAwesomeIcon icon={faTimes} />
                     </Button>
                 </td>
@@ -205,7 +183,7 @@ const AfficherClient = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h3 className="fw-bold mb-3">Gestion des Clients</h3>
+                            <h3 className="fw-bold mb-3">Gestion des Pays</h3>
                             <ul className="breadcrumbs mb-3">
                                 <li className="nav-home">
                                     <span><FontAwesomeIcon icon={faHome} /></span>
@@ -214,7 +192,7 @@ const AfficherClient = () => {
                                     <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <span>Gestion des Clients</span>
+                                    <span>Gestion des Pays</span>
                                 </li>
                             </ul>
                         </div>
@@ -222,13 +200,13 @@ const AfficherClient = () => {
                             <div className="col-md-12">
                                 <div className="card">
                                     <div className="card-header d-flex justify-content-between align-items-center">
-                                        <h4 className="card-title mb-0">Liste des Clients</h4>
+                                        <h4 className="card-title mb-0">Liste des Pays</h4>
                                         <Button
                                             variant="primary"
                                             onClick={() => setShowAddModal(true)}
                                             className="btn-lg"
                                         >
-                                            <FontAwesomeIcon icon={faPlus} /> Ajouter un client
+                                            <FontAwesomeIcon icon={faPlus} /> Ajouter un pays
                                         </Button>
                                     </div>
                                     <div className="card-body">
@@ -236,14 +214,11 @@ const AfficherClient = () => {
                                             <Table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => requestSort('id_client')}>
-                                                            ID <FontAwesomeIcon icon={getSortIcon('id_client')} />
+                                                        <th onClick={() => requestSort('id_pays')}>
+                                                            ID <FontAwesomeIcon icon={getSortIcon('id_pays')} />
                                                         </th>
-                                                        <th onClick={() => requestSort('nom_client')}>
-                                                            Nom du Client <FontAwesomeIcon icon={getSortIcon('nom_client')} />
-                                                        </th>
-                                                        <th onClick={() => requestSort('pays.libelle_pays')}>
-                                                            Pays <FontAwesomeIcon icon={getSortIcon('pays.libelle_pays')} />
+                                                        <th onClick={() => requestSort('libelle_pays')}>
+                                                            Nom du Pays <FontAwesomeIcon icon={getSortIcon('libelle_pays')} />
                                                         </th>
                                                         <th>Actions</th>
                                                     </tr>
@@ -262,45 +237,30 @@ const AfficherClient = () => {
                 </div>
             </div>
 
-            {/* Add Client Modal */}
+            {/* Add Pays Modal */}
             <Modal 
                 show={showAddModal} 
                 onHide={() => setShowAddModal(false)}
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Ajouter un nouveau client</Modal.Title>
+                    <Modal.Title>Ajouter un nouveau pays</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group>
-                        <Form.Label>Nom du client</Form.Label>
+                        <Form.Label>Nom du pays</Form.Label>
                         <Form.Control
                             type="text"
-                            value={newClient.nom_client}
-                            onChange={(e) => setNewClient({ ...newClient, nom_client: e.target.value })}
+                            value={newPays.libelle_pays}
+                            onChange={(e) => setNewPays({ ...newPays, libelle_pays: e.target.value })}
                         />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Pays</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={newClient.pays.id_pays}
-                            onChange={(e) => setNewClient({ ...newClient, pays: { id_pays: e.target.value } })}
-                        >
-                            <option value="">Sélectionnez un pays</option>
-                            {pays.map((p) => (
-                                <option key={p.id_pays} value={p.id_pays}>
-                                    {p.libelle_pays}
-                                </option>
-                            ))}
-                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowAddModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="primary" onClick={handleAddClient}>
+                    <Button variant="primary" onClick={handleAddPays}>
                         Ajouter
                     </Button>
                 </Modal.Footer>
@@ -313,38 +273,23 @@ const AfficherClient = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Modifier le client</Modal.Title>
+                    <Modal.Title>Modifier le pays</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group>
-                        <Form.Label>Nom du client</Form.Label>
+                        <Form.Label>Nom du pays</Form.Label>
                         <Form.Control
                             type="text"
-                            value={editingClient?.nom_client || ''}
-                            onChange={(e) => setEditingClient({ ...editingClient, nom_client: e.target.value })}
+                            value={editingPays?.libelle_pays || ''}
+                            onChange={(e) => setEditingPays({ ...editingPays, libelle_pays: e.target.value })}
                         />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Pays</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={editingClient?.pays.id_pays || ''}
-                            onChange={(e) => setEditingClient({ ...editingClient, pays: { id_pays: e.target.value } })}
-                        >
-                            <option value="">Sélectionnez un pays</option>
-                            {pays.map((p) => (
-                                <option key={p.id_pays} value={p.id_pays}>
-                                    {p.libelle_pays}
-                                </option>
-                            ))}
-                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="primary" onClick={handleUpdateClient}>
+                    <Button variant="primary" onClick={handleUpdatePays}>
                         Sauvegarder
                     </Button>
                 </Modal.Footer>
@@ -360,13 +305,13 @@ const AfficherClient = () => {
                     <Modal.Title>Confirmer la suppression</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Êtes-vous sûr de vouloir supprimer ce client ?
+                    Êtes-vous sûr de vouloir supprimer ce pays ?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="danger" onClick={confirmDeleteClient}>
+                    <Button variant="danger" onClick={confirmDeletePays}>
                         Supprimer
                     </Button>
                 </Modal.Footer>
@@ -375,4 +320,4 @@ const AfficherClient = () => {
     );
 };
 
-export default AfficherClient;
+export default AfficherPays;
