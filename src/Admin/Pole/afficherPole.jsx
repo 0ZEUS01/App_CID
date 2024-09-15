@@ -23,6 +23,8 @@ const AfficherPole = () => {
     const [newPole, setNewPole] = useState({ libelle_pole: '' });
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [showCascadeDeleteModal, setShowCascadeDeleteModal] = useState(false);
+    const [deleteError, setDeleteError] = useState(null);
 
     useEffect(() => {
         fetchPoles();
@@ -72,11 +74,30 @@ const AfficherPole = () => {
 
     const confirmDeletePole = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/poles/${deletingPole.id_pole}`);
-            fetchPoles();
-            setShowDeleteModal(false);
+            const response = await axios.delete(`http://localhost:8080/api/poles/${deletingPole.id_pole}`);
+            if (response.status === 200) {
+                fetchPoles();
+                setShowDeleteModal(false);
+                setShowCascadeDeleteModal(false);
+            }
         } catch (error) {
-            console.error('Error deleting pole:', error);
+            if (error.response && error.response.status === 409) {
+                setDeleteError(error.response.data);
+                setShowDeleteModal(false);
+                setShowCascadeDeleteModal(true);
+            } else {
+                console.error('Error deleting pole:', error);
+            }
+        }
+    };
+
+    const confirmCascadeDelete = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/poles/${deletingPole.id_pole}/cascade`);
+            fetchPoles();
+            setShowCascadeDeleteModal(false);
+        } catch (error) {
+            console.error('Error performing cascade delete:', error);
         }
     };
 
@@ -273,6 +294,29 @@ const AfficherPole = () => {
                         </Button>
                         <Button variant="danger" onClick={confirmDeletePole}>
                             Supprimer
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                {/* Cascade Delete Confirmation Modal */}
+                <Modal 
+                    show={showCascadeDeleteModal} 
+                    onHide={() => setShowCascadeDeleteModal(false)}
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirmer la suppression en cascade</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>{deleteError}</p>
+                        <p>Êtes-vous sûr de vouloir supprimer ce pôle et toutes les données associées ?</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowCascadeDeleteModal(false)}>
+                            Annuler
+                        </Button>
+                        <Button variant="danger" onClick={confirmCascadeDelete}>
+                            Supprimer en cascade
                         </Button>
                     </Modal.Footer>
                 </Modal>
