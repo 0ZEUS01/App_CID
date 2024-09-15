@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { Button, Modal, Form, Table } from 'react-bootstrap';
+import { Button, Modal, Form, Table, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -8,6 +8,9 @@ import {
     faEdit,
     faTimes,
     faPlus,
+    faSort,
+    faSortUp,
+    faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
@@ -21,28 +24,75 @@ const AfficherUnite = () => {
     const [editingUnite, setEditingUnite] = useState(null);
     const [deletingUnite, setDeletingUnite] = useState(null);
     const [newUnite, setNewUnite] = useState({ nom_unite: '' });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
     useEffect(() => {
         fetchUnites();
     }, []);
 
     const fetchUnites = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get('http://localhost:8080/api/unites');
             setUnites(response.data);
         } catch (error) {
             console.error('Error fetching unites:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
+
+    const sortedUnites = useMemo(() => {
+        let sortableUnites = [...unites];
+        if (sortConfig.key !== null) {
+            sortableUnites.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableUnites;
+    }, [unites, sortConfig]);
+
+    const filteredUnites = useMemo(() => {
+        return sortedUnites.filter(unite => 
+            unite.nom_unite.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sortedUnites, searchTerm]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (columnName) => {
+        if (sortConfig.key === columnName) {
+            return sortConfig.direction === 'ascending' ? faSortUp : faSortDown;
+        }
+        return faSort;
+    };
+
     const handleEditUnite = (unite) => {
-        setEditingUnite(unite);
+        setEditingUnite({ ...unite });
         setShowEditModal(true);
     };
 
     const handleUpdateUnite = async () => {
         try {
-            await axios.put(`http://localhost:8080/api/unites/${editingUnite.id}`, editingUnite);
+            await axios.put(`http://localhost:8080/api/unites/${editingUnite.id_unite}`, editingUnite);
             fetchUnites();
             setShowEditModal(false);
         } catch (error) {
@@ -57,7 +107,7 @@ const AfficherUnite = () => {
 
     const confirmDeleteUnite = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/unites/${deletingUnite.id}`);
+            await axios.delete(`http://localhost:8080/api/unites/${deletingUnite.id_unite}`);
             fetchUnites();
             setShowDeleteModal(false);
         } catch (error) {
@@ -76,11 +126,60 @@ const AfficherUnite = () => {
         }
     };
 
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">Chargement...</td>
+                </tr>
+            );
+        }
+
+        if (unites.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">
+                        <Alert variant="info">
+                            Aucune unité n'existe dans la base de données.
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        if (filteredUnites.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">
+                        <Alert variant="warning">
+                            Aucune unité n'existe avec le nom "{searchTerm}".
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        return filteredUnites.map((unite) => (
+            <tr key={unite.id_unite}>
+                <td>{unite.id_unite}</td>
+                <td>{unite.nom_unite}</td>
+                <td>
+                    <Button variant="link" className="btn-primary" onClick={() => handleEditUnite(unite)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Button>
+                    <Button variant="link" className="btn-danger" onClick={() => handleDeleteUnite(unite)}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </Button>
+                </td>
+            </tr>
+        ));
+    };
+
     return (
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
@@ -115,26 +214,17 @@ const AfficherUnite = () => {
                                             <Table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th>ID</th>
-                                                        <th>Nom de l'Unité</th>
+                                                        <th onClick={() => requestSort('id_unite')}>
+                                                            ID <FontAwesomeIcon icon={getSortIcon('id_unite')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('nom_unite')}>
+                                                            Nom de l'Unité <FontAwesomeIcon icon={getSortIcon('nom_unite')} />
+                                                        </th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {unites.map((unite) => (
-                                                        <tr key={unite.id}>
-                                                            <td>{unite.id}</td>
-                                                            <td>{unite.nom_unite}</td>
-                                                            <td>
-                                                                <Button variant="link" className="btn-primary" onClick={() => handleEditUnite(unite)}>
-                                                                    <FontAwesomeIcon icon={faEdit} />
-                                                                </Button>
-                                                                <Button variant="link" className="btn-danger" onClick={() => handleDeleteUnite(unite)}>
-                                                                    <FontAwesomeIcon icon={faTimes} />
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    {renderTableContent()}
                                                 </tbody>
                                             </Table>
                                         </div>

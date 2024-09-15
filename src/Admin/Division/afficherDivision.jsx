@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { Button, Modal, Form, Table } from 'react-bootstrap';
+import { Button, Modal, Form, Table, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -8,6 +8,9 @@ import {
     faEdit,
     faTimes,
     faPlus,
+    faSort,
+    faSortUp,
+    faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
@@ -22,6 +25,9 @@ const AfficherDivision = () => {
     const [editingDivision, setEditingDivision] = useState(null);
     const [deletingDivision, setDeletingDivision] = useState(null);
     const [newDivision, setNewDivision] = useState({ nom_division: '', pole: { id_pole: '' } });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
     useEffect(() => {
         fetchDivisions();
@@ -29,11 +35,14 @@ const AfficherDivision = () => {
     }, []);
 
     const fetchDivisions = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get('http://localhost:8080/api/divisions');
             setDivisions(response.data);
         } catch (error) {
             console.error('Error fetching divisions:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -44,6 +53,57 @@ const AfficherDivision = () => {
         } catch (error) {
             console.error('Error fetching poles:', error);
         }
+    };
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
+
+    const sortedDivisions = useMemo(() => {
+        let sortableDivisions = [...divisions];
+        if (sortConfig.key !== null) {
+            sortableDivisions.sort((a, b) => {
+                if (sortConfig.key === 'pole.libelle_pole') {
+                    if (a.pole.libelle_pole < b.pole.libelle_pole) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (a.pole.libelle_pole > b.pole.libelle_pole) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                } else {
+                    if (a[sortConfig.key] < b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (a[sortConfig.key] > b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                }
+                return 0;
+            });
+        }
+        return sortableDivisions;
+    }, [divisions, sortConfig]);
+
+    const filteredDivisions = useMemo(() => {
+        return sortedDivisions.filter(division => 
+            division.nom_division.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            division.pole.libelle_pole.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sortedDivisions, searchTerm]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (columnName) => {
+        if (sortConfig.key === columnName) {
+            return sortConfig.direction === 'ascending' ? faSortUp : faSortDown;
+        }
+        return faSort;
     };
 
     const handleEditDivision = (division) => {
@@ -87,11 +147,61 @@ const AfficherDivision = () => {
         }
     };
 
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <tr>
+                    <td colSpan="4" className="text-center">Chargement...</td>
+                </tr>
+            );
+        }
+
+        if (divisions.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="4" className="text-center">
+                        <Alert variant="info">
+                            Aucune division n'existe dans la base de données.
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        if (filteredDivisions.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="4" className="text-center">
+                        <Alert variant="warning">
+                            Aucune division ne correspond à la recherche "{searchTerm}".
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        return filteredDivisions.map((division) => (
+            <tr key={division.id_division}>
+                <td>{division.id_division}</td>
+                <td>{division.nom_division}</td>
+                <td>{division.pole.libelle_pole}</td>
+                <td>
+                    <Button variant="link" className="btn-primary" onClick={() => handleEditDivision(division)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Button>
+                    <Button variant="link" className="btn-danger" onClick={() => handleDeleteDivision(division)}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </Button>
+                </td>
+            </tr>
+        ));
+    };
+
     return (
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
@@ -126,28 +236,20 @@ const AfficherDivision = () => {
                                             <Table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th>ID</th>
-                                                        <th>Nom de la Division</th>
-                                                        <th>Pôle</th>
+                                                        <th onClick={() => requestSort('id_division')}>
+                                                            ID <FontAwesomeIcon icon={getSortIcon('id_division')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('nom_division')}>
+                                                            Nom de la Division <FontAwesomeIcon icon={getSortIcon('nom_division')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('pole.libelle_pole')}>
+                                                            Pôle <FontAwesomeIcon icon={getSortIcon('pole.libelle_pole')} />
+                                                        </th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {divisions.map((division) => (
-                                                        <tr key={division.id_division}>
-                                                            <td>{division.id_division}</td>
-                                                            <td>{division.nom_division}</td>
-                                                            <td>{division.pole.libelle_pole}</td>
-                                                            <td>
-                                                                <Button variant="link" className="btn-primary" onClick={() => handleEditDivision(division)}>
-                                                                    <FontAwesomeIcon icon={faEdit} />
-                                                                </Button>
-                                                                <Button variant="link" className="btn-danger" onClick={() => handleDeleteDivision(division)}>
-                                                                    <FontAwesomeIcon icon={faTimes} />
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    {renderTableContent()}
                                                 </tbody>
                                             </Table>
                                         </div>
