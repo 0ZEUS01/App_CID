@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Button, Modal, Form, Table, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -32,6 +32,8 @@ const AfficherUser = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [allDivisions, setAllDivisions] = useState([]);
     const [filteredDivisions, setFilteredDivisions] = useState([]);
+    const [emailValid, setEmailValid] = useState(null);
+    const [usernameValid, setUsernameValid] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -93,10 +95,13 @@ const AfficherUser = () => {
             ...user,
             pole: user.pole ? user.pole.id_pole.toString() : '',
             division: user.division ? user.division.id_division.toString() : '',
-            pays: user.pays ? user.pays.id_pays.toString() : ''
+            originalEmail: user.email,
+            originalUsername: user.username
         });
         const relatedDivisions = allDivisions.filter(division => division.pole.id_pole === user.pole.id_pole);
         setFilteredDivisions(relatedDivisions);
+        setEmailValid(null);
+        setUsernameValid(null);
         setShowEditModal(true);
     };
 
@@ -106,8 +111,19 @@ const AfficherUser = () => {
     };
 
     const handleEditUser = async () => {
+        if (emailValid === false || usernameValid === false) {
+            // Show an error message or prevent form submission
+            return;
+        }
+
         try {
-            await axios.put(`http://localhost:8080/api/utilisateurs/${selectedUser.id_utilisateur}`, selectedUser);
+            const userToUpdate = {
+                ...selectedUser,
+                pole: selectedUser.pole ? { id_pole: parseInt(selectedUser.pole) } : null,
+                division: selectedUser.division ? { id_division: parseInt(selectedUser.division) } : null,
+                pays: selectedUser.pays ? { id_pays: parseInt(selectedUser.pays) } : null
+            };
+            await axios.put(`http://localhost:8080/api/utilisateurs/${selectedUser.id_utilisateur}`, userToUpdate);
             fetchUsers();
             setShowEditModal(false);
         } catch (error) {
@@ -140,28 +156,51 @@ const AfficherUser = () => {
         return faSort;
     };
 
-    const sortedUsers = React.useMemo(() => {
+    const sortedUsers = useMemo(() => {
         let sortableUsers = [...users];
         if (sortConfig.key !== null) {
             sortableUsers.sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                if (sortConfig.key === 'nom_complet') {
+                    // Sort by last name
+                    if (a.nom.toLowerCase() < b.nom.toLowerCase()) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (a.nom.toLowerCase() > b.nom.toLowerCase()) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    return 0;
+                } else {
+                    if (a[sortConfig.key] < b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (a[sortConfig.key] > b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    return 0;
                 }
-                if (a[sortConfig.key] > b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
             });
         }
         return sortableUsers;
     }, [users, sortConfig]);
 
-    const filteredUsers = React.useMemo(() => {
-        return sortedUsers.filter(user => 
-            user.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    const filteredUsers = useMemo(() => {
+        return sortedUsers.filter(user => {
+            const searchString = searchTerm.toLowerCase();
+            return (
+                user.nom.toLowerCase().includes(searchString) ||
+                user.prenom.toLowerCase().includes(searchString) ||
+                `${user.nom} ${user.prenom}`.toLowerCase().includes(searchString) ||
+                user.email.toLowerCase().includes(searchString) ||
+                user.username.toLowerCase().includes(searchString) ||
+                user.num_telephone.toLowerCase().includes(searchString) ||
+                user.sexe.toLowerCase().includes(searchString) ||
+                (user.pole && user.pole.libelle_pole.toLowerCase().includes(searchString)) ||
+                (user.division && user.division.nom_division.toLowerCase().includes(searchString)) ||
+                (user.pays && user.pays.libelle_pays.toLowerCase().includes(searchString)) ||
+                user.adresse.toLowerCase().includes(searchString) ||
+                user.date_naissance.toLowerCase().includes(searchString)
+            );
+        });
     }, [sortedUsers, searchTerm]);
 
     const renderTableContent = () => {
@@ -199,10 +238,10 @@ const AfficherUser = () => {
 
         return filteredUsers.map((user) => (
             <tr key={user.id_utilisateur}>
-                <td>{`${user.prenom} ${user.nom}`}</td>
+                <td>{`${user.nom} ${user.prenom}`}</td>
                 <td>{user.sexe === 'M' ? 'Homme' : 'Femme'}</td>
-                <td>{user.pole.libelle_pole}</td>
-                <td>{user.division.nom_division}</td>
+                <td>{user.pole ? user.pole.libelle_pole : 'N/A'}</td>
+                <td>{user.division ? user.division.nom_division : 'N/A'}</td>
                 <td>
                     <Button variant="link" className="btn-info" onClick={() => handleShowDetails(user)}>
                         <FontAwesomeIcon icon={faInfoCircle} />
@@ -220,17 +259,54 @@ const AfficherUser = () => {
 
     const handleEditInputChange = (e) => {
         const { name, value } = e.target;
-        setSelectedUser({ ...selectedUser, [name]: value });
-
+        
         if (name === 'pole') {
             const selectedPoleId = parseInt(value);
             const relatedDivisions = allDivisions.filter(division => division.pole.id_pole === selectedPoleId);
             setFilteredDivisions(relatedDivisions);
             setSelectedUser(prevState => ({ 
                 ...prevState, 
-                pole: poles.find(p => p.id_pole === selectedPoleId), 
-                division: null 
+                pole: value,
+                division: '' // Clear the division when pole changes
             }));
+        } else {
+            setSelectedUser(prevState => ({ ...prevState, [name]: value }));
+        }
+
+        if (name === 'email') {
+            validateEmail(value);
+        }
+
+        if (name === 'username') {
+            validateUsername(value);
+        }
+    };
+
+    const validateEmail = async (email) => {
+        if (email.length > 0 && email !== selectedUser.originalEmail) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/check-email?email=${email}`);
+                setEmailValid(response.data);
+            } catch (error) {
+                console.error('Error validating email:', error);
+                setEmailValid(false);
+            }
+        } else {
+            setEmailValid(null);
+        }
+    };
+
+    const validateUsername = async (username) => {
+        if (username.length > 0 && username !== selectedUser.originalUsername) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/check-username?username=${username}`);
+                setUsernameValid(response.data);
+            } catch (error) {
+                console.error('Error validating username:', error);
+                setUsernameValid(false);
+            }
+        } else {
+            setUsernameValid(null);
         }
     };
 
@@ -238,7 +314,7 @@ const AfficherUser = () => {
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
@@ -271,8 +347,8 @@ const AfficherUser = () => {
                                             <table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => requestSort('nom')}>
-                                                            Nom complet <FontAwesomeIcon icon={getSortIcon('nom')} />
+                                                        <th onClick={() => requestSort('nom_complet')}>
+                                                            Nom complet <FontAwesomeIcon icon={getSortIcon('nom_complet')} />
                                                         </th>
                                                         <th onClick={() => requestSort('sexe')}>
                                                             Sexe <FontAwesomeIcon icon={getSortIcon('sexe')} />
@@ -319,8 +395,8 @@ const AfficherUser = () => {
                             <p><strong>Date de naissance:</strong> {selectedUser.date_naissance}</p>
                             <p><strong>Sexe:</strong> {selectedUser.sexe === 'M' ? 'Homme' : 'Femme'}</p>
                             <p><strong>Adresse:</strong> {selectedUser.adresse}</p>
-                            <p><strong>Pôle:</strong> {selectedUser.pole.libelle_pole}</p>
-                            <p><strong>Division:</strong> {selectedUser.division.nom_division}</p>
+                            <p><strong>Pôle:</strong> {selectedUser.pole ? selectedUser.pole.libelle_pole : 'N/A'}</p>
+                            <p><strong>Division:</strong> {selectedUser.division ? selectedUser.division.nom_division : 'N/A'}</p>
                         </div>
                     )}
                 </Modal.Body>
@@ -364,9 +440,29 @@ const AfficherUser = () => {
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control 
                                     type="email" 
+                                    name="email"
                                     value={selectedUser.email}
-                                    onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+                                    onChange={handleEditInputChange}
+                                    isValid={emailValid === true}
+                                    isInvalid={emailValid === false}
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    Cet email est déjà utilisé.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Nom d'utilisateur</Form.Label>
+                                <Form.Control 
+                                    type="text" 
+                                    name="username"
+                                    value={selectedUser.username}
+                                    onChange={handleEditInputChange}
+                                    isValid={usernameValid === true}
+                                    isInvalid={usernameValid === false}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Ce nom d'utilisateur est déjà pris.
+                                </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Numéro de téléphone</Form.Label>
@@ -374,14 +470,6 @@ const AfficherUser = () => {
                                     type="tel" 
                                     value={selectedUser.num_telephone}
                                     onChange={(e) => setSelectedUser({...selectedUser, num_telephone: e.target.value})}
-                                />
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Label>Nom d'utilisateur</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={selectedUser.username}
-                                    onChange={(e) => setSelectedUser({...selectedUser, username: e.target.value})}
                                 />
                             </Form.Group>
                             <Form.Group>
@@ -447,7 +535,7 @@ const AfficherUser = () => {
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>
                         Annuler
                     </Button>
-                    <Button variant="primary" onClick={handleEditUser}>
+                    <Button variant="primary" onClick={handleEditUser} disabled={emailValid === false || usernameValid === false}>
                         Sauvegarder
                     </Button>
                 </Modal.Footer>

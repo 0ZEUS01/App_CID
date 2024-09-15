@@ -51,9 +51,18 @@ public class UtilisateurController {
                     existingUtilisateur.setDate_naissance(utilisateur.getDate_naissance());
                     existingUtilisateur.setSexe(utilisateur.getSexe());
                     existingUtilisateur.setAdresse(utilisateur.getAdresse());
-                    existingUtilisateur.setPole(utilisateur.getPole());
-                    existingUtilisateur.setDivision(utilisateur.getDivision());
-                    existingUtilisateur.setPays(utilisateur.getPays());
+
+                    // Handle Pole, Division, and Pays
+                    if (utilisateur.getPole() != null && utilisateur.getPole().getId_pole() != null) {
+                        existingUtilisateur.setPole(utilisateur.getPole());
+                    }
+                    if (utilisateur.getDivision() != null && utilisateur.getDivision().getId_division() != null) {
+                        existingUtilisateur.setDivision(utilisateur.getDivision());
+                    }
+                    if (utilisateur.getPays() != null && utilisateur.getPays().getId_pays() != null) {
+                        existingUtilisateur.setPays(utilisateur.getPays());
+                    }
+
                     return ResponseEntity.ok().body(utilisateurRepository.save(existingUtilisateur));
                 })
                 .orElse(ResponseEntity.notFound().build());
