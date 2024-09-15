@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Button, Card, Container, Row, Col, InputGroup } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, InputGroup, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faArrowRight, faUserPlus, faKey, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { faHome, faArrowRight, faUserPlus, faKey, faEye, faEyeSlash, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
-const poles = ['Développement', 'Marketing', 'Finance', 'Ressources Humaines'];
-const divisions = ['IT', 'Communication', 'Comptabilité', 'Recrutement'];
-
 const AddUser = () => {
-    const navigate = useNavigate();
-    const [newUser, setNewUser] = useState({
+    const initialUserState = {
         prenom: '',
         nom: '',
         email: '',
@@ -24,26 +19,124 @@ const AddUser = () => {
         sexe: 'M',
         adresse: '',
         pole: '',
-        division: ''
-    });
+        division: '',
+        pays: ''
+    };
+
+    const [newUser, setNewUser] = useState(initialUserState);
     const [showPassword, setShowPassword] = useState(false);
+    const [poles, setPoles] = useState([]);
+    const [allDivisions, setAllDivisions] = useState([]);
+    const [filteredDivisions, setFilteredDivisions] = useState([]);
+    const [pays, setPays] = useState([]);
+    const [emailValid, setEmailValid] = useState(null);
+    const [usernameValid, setUsernameValid] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    useEffect(() => {
+        fetchPoles();
+        fetchDivisions();
+        fetchPays();
+    }, []);
+
+    const fetchPoles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/poles');
+            setPoles(response.data);
+        } catch (error) {
+            console.error('Error fetching poles:', error);
+        }
+    };
+
+    const fetchDivisions = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/divisions');
+            setAllDivisions(response.data);
+        } catch (error) {
+            console.error('Error fetching divisions:', error);
+        }
+    };
+
+    const fetchPays = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/pays');
+            setPays(response.data);
+        } catch (error) {
+            console.error('Error fetching pays:', error);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewUser({ ...newUser, [name]: value });
+
+        if (name === 'pole') {
+            const selectedPoleId = value;
+            const relatedDivisions = allDivisions.filter(division => division.pole.id_pole.toString() === selectedPoleId);
+            setFilteredDivisions(relatedDivisions);
+            setNewUser(prevState => ({ ...prevState, pole: selectedPoleId, division: '' }));
+        }
+
+        if (name === 'email') {
+            validateEmail(value);
+        }
+
+        if (name === 'username') {
+            validateUsername(value);
+        }
+    };
+
+    const validateEmail = async (email) => {
+        if (email.length > 0) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/check-email?email=${email}`);
+                setEmailValid(response.data);
+            } catch (error) {
+                console.error('Error validating email:', error);
+                setEmailValid(false);
+            }
+        } else {
+            setEmailValid(null);
+        }
+    };
+
+    const validateUsername = async (username) => {
+        if (username.length > 0) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/check-username?username=${username}`);
+                setUsernameValid(response.data);
+            } catch (error) {
+                console.error('Error validating username:', error);
+                setUsernameValid(false);
+            }
+        } else {
+            setUsernameValid(null);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/utilisateurs', newUser);
+            const userToSend = {
+                ...newUser,
+                pole: newUser.pole ? { id_pole: parseInt(newUser.pole) } : null,
+                division: newUser.division ? { id_division: parseInt(newUser.division) } : null,
+                pays: newUser.pays ? { id_pays: parseInt(newUser.pays) } : null,
+                date_naissance: newUser.date_naissance || null
+            };
+            console.log('Sending user data:', userToSend);
+            const response = await axios.post('http://localhost:8080/api/utilisateurs', userToSend);
             console.log('New user created:', response.data);
-            // After successful creation, navigate back to the user list
-            navigate('/users');
+            setShowSuccessModal(true);
         } catch (error) {
-            console.error('Error creating user:', error);
-            // Handle error (e.g., show error message to user)
+            console.error('Error creating user:', error.response?.data || error.message);
+            // Show error message
         }
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        window.location.reload(); // Reload the page
     };
 
     const generatePassword = () => {
@@ -64,208 +157,246 @@ const AddUser = () => {
             <Sidebar />
             <div className="main-panel">
                 <MainHeader />
-                <Container fluid>
-                    <div className="page-header">
-                        <h3 className="fw-bold mb-3">Ajouter un Utilisateur</h3>
-                        <ul className="breadcrumbs mb-3">
-                            <li className="nav-home">
-                                <Link to="/dashboard">
-                                    <FontAwesomeIcon icon={faHome} />
-                                </Link>
-                            </li>
-                            <li className="separator">
-                                <FontAwesomeIcon icon={faArrowRight} />
-                            </li>
-                            <li className="nav-item">
-                                <Link to="/users">Gestion des Utilisateurs</Link>
-                            </li>
-                            <li className="separator">
-                                <FontAwesomeIcon icon={faArrowRight} />
-                            </li>
-                            <li className="nav-item">
-                                <span>Ajouter un Utilisateur</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <Row>
-                        <Col md={12}>
-                            <Card>
-                                <Card.Header>
-                                    <Card.Title>Formulaire d'Ajout d'Utilisateur</Card.Title>
-                                </Card.Header>
-                                <Card.Body>
-                                    <Form onSubmit={handleSubmit}>
-                                        <Row className="mb-3">
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Prénom</Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name="prenom"
-                                                        value={newUser.prenom}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Nom</Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name="nom"
-                                                        value={newUser.nom}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Email</Form.Label>
-                                                    <Form.Control 
-                                                        type="email" 
-                                                        name="email"
-                                                        value={newUser.email}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Numéro de téléphone</Form.Label>
-                                                    <Form.Control 
-                                                        type="tel" 
-                                                        name="num_telephone"
-                                                        value={newUser.num_telephone}
-                                                        onChange={handleInputChange}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                        <Row className="mb-3">
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Nom d'utilisateur</Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name="username"
-                                                        value={newUser.username}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Mot de passe</Form.Label>
-                                                    <InputGroup className="password-input-group">
+                <div className="container">
+                    <div className="page-inner">
+                        <div className="page-header">
+                            <h3 className="fw-bold mb-3">Ajouter un Utilisateur</h3>
+                            <ul className="breadcrumbs mb-3">
+                                <li className="nav-home">
+                                    <span><FontAwesomeIcon icon={faHome} /></span>
+                                </li>
+                                <li className="separator">
+                                    <FontAwesomeIcon icon={faArrowRight} />
+                                </li>
+                                <li className="nav-item">
+                                    <span>Ajouter un Utilisateur</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h4 className="card-title">Formulaire d'ajout d'utilisateur</h4>
+                                    </div>
+                                    <div className="card-body">
+                                        <Form onSubmit={handleSubmit}>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Prénom</Form.Label>
                                                         <Form.Control 
-                                                            type={showPassword ? "text" : "password"}
-                                                            name="mot_de_passe"
-                                                            value={newUser.mot_de_passe}
+                                                            type="text" 
+                                                            name="prenom"
+                                                            value={newUser.prenom}
                                                             onChange={handleInputChange}
                                                             required
                                                         />
-                                                        <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
-                                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                                                        </Button>
-                                                        <Button variant="outline-secondary" onClick={generatePassword}>
-                                                            <FontAwesomeIcon icon={faKey} /> Générer
-                                                        </Button>
-                                                    </InputGroup>
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Date de naissance</Form.Label>
-                                                    <Form.Control 
-                                                        type="date" 
-                                                        name="date_naissance"
-                                                        value={newUser.date_naissance}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Sexe</Form.Label>
-                                                    <Form.Control 
-                                                        as="select"
-                                                        name="sexe"
-                                                        value={newUser.sexe}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    >
-                                                        <option value="M">Homme</option>
-                                                        <option value="F">Femme</option>
-                                                    </Form.Control>
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                        <Form.Group>
-                                            <Form.Label>Adresse</Form.Label>
-                                            <Form.Control 
-                                                type="text" 
-                                                name="adresse"
-                                                value={newUser.adresse}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </Form.Group>
-                                        <Row>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Pôle</Form.Label>
-                                                    <Form.Control 
-                                                        as="select"
-                                                        name="pole"
-                                                        value={newUser.pole}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    >
-                                                        <option value="">Sélectionnez un pôle</option>
-                                                        {poles.map((pole, index) => (
-                                                            <option key={index} value={pole}>{pole}</option>
-                                                        ))}
-                                                    </Form.Control>
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Division</Form.Label>
-                                                    <Form.Control 
-                                                        as="select"
-                                                        name="division"
-                                                        value={newUser.division}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    >
-                                                        <option value="">Sélectionnez une division</option>
-                                                        {divisions.map((division, index) => (
-                                                            <option key={index} value={division}>{division}</option>
-                                                        ))}
-                                                    </Form.Control>
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                        <Button type="submit" variant="primary" className="mt-3">
-                                            <FontAwesomeIcon icon={faUserPlus} className="mr-2" /> Ajouter l'Utilisateur
-                                        </Button>
-                                    </Form>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Container>
-                <Footer />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Nom</Form.Label>
+                                                        <Form.Control 
+                                                            type="text" 
+                                                            name="nom"
+                                                            value={newUser.nom}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Email</Form.Label>
+                                                        <Form.Control 
+                                                            type="email" 
+                                                            name="email"
+                                                            value={newUser.email}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            isValid={emailValid === true}
+                                                            isInvalid={emailValid === false}
+                                                        />
+                                                        <Form.Control.Feedback type="invalid">
+                                                            Cet email est déjà utilisé.
+                                                        </Form.Control.Feedback>
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Nom d'utilisateur</Form.Label>
+                                                        <Form.Control 
+                                                            type="text" 
+                                                            name="username"
+                                                            value={newUser.username}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            isValid={usernameValid === true}
+                                                            isInvalid={usernameValid === false}
+                                                        />
+                                                        <Form.Control.Feedback type="invalid">
+                                                            Ce nom d'utilisateur est déjà pris.
+                                                        </Form.Control.Feedback>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Numéro de téléphone</Form.Label>
+                                                        <Form.Control 
+                                                            type="tel" 
+                                                            name="num_telephone"
+                                                            value={newUser.num_telephone}
+                                                            onChange={handleInputChange}
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Mot de passe</Form.Label>
+                                                        <InputGroup className="password-input-group">
+                                                            <Form.Control 
+                                                                type={showPassword ? "text" : "password"}
+                                                                name="mot_de_passe"
+                                                                value={newUser.mot_de_passe}
+                                                                onChange={handleInputChange}
+                                                                required
+                                                            />
+                                                            <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
+                                                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                                            </Button>
+                                                            <Button variant="outline-secondary" onClick={generatePassword}>
+                                                                <FontAwesomeIcon icon={faKey} /> Générer
+                                                            </Button>
+                                                        </InputGroup>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Date de naissance</Form.Label>
+                                                        <Form.Control 
+                                                            type="date" 
+                                                            name="date_naissance"
+                                                            value={newUser.date_naissance}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Sexe</Form.Label>
+                                                        <Form.Control 
+                                                            as="select"
+                                                            name="sexe"
+                                                            value={newUser.sexe}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                        >
+                                                            <option value="M">Homme</option>
+                                                            <option value="F">Femme</option>
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Adresse</Form.Label>
+                                                <Form.Control 
+                                                    type="text" 
+                                                    name="adresse"
+                                                    value={newUser.adresse}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Pôle</Form.Label>
+                                                        <Form.Control 
+                                                            as="select"
+                                                            name="pole"
+                                                            value={newUser.pole}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                        >
+                                                            <option value="">Sélectionnez un pôle</option>
+                                                            {poles.map((pole) => (
+                                                                <option key={pole.id_pole} value={pole.id_pole}>{pole.libelle_pole}</option>
+                                                            ))}
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Division</Form.Label>
+                                                        <Form.Control 
+                                                            as="select"
+                                                            name="division"
+                                                            value={newUser.division}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            disabled={!newUser.pole}
+                                                        >
+                                                            <option value="">Sélectionnez une division</option>
+                                                            {filteredDivisions.map((division) => (
+                                                                <option key={division.id_division} value={division.id_division}>{division.nom_division}</option>
+                                                            ))}
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Pays</Form.Label>
+                                                <Form.Control 
+                                                    as="select"
+                                                    name="pays"
+                                                    value={newUser.pays}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                >
+                                                    <option value="">Sélectionnez un pays</option>
+                                                    {pays.map((pays, index) => (
+                                                        <option key={index} value={pays.id_pays}>{pays.libelle_pays}</option>
+                                                    ))}
+                                                </Form.Control>
+                                            </Form.Group>
+                                            <Button type="submit" variant="primary" className="mt-3">
+                                                <FontAwesomeIcon icon={faUserPlus} className="mr-2" /> Ajouter l'Utilisateur
+                                            </Button>
+                                        </Form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <Footer />
+                </div>
             </div>
+
+            {/* Success Modal */}
+            <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Succès</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-success mr-2" />&nbsp;
+                        L'utilisateur a été créé avec succès!
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseSuccessModal}>
+                        Fermer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button, Modal, Form, Table, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -7,27 +8,80 @@ import {
     faEdit,
     faTimes,
     faPlus,
-    faInfoCircle
+    faInfoCircle,
+    faSort,
+    faSortUp,
+    faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
-// Assume we have these arrays of Poles and Divisions
-const poles = ['Développement', 'Marketing', 'Finance', 'Ressources Humaines'];
-const divisions = ['IT', 'Communication', 'Comptabilité', 'Recrutement'];
-
 const AfficherUser = () => {
-    const [users, setUsers] = useState([
-        { id_utilisateur: 1, prenom: 'Youssef', nom: 'El Amrani', email: 'youssef.elamrani@example.com', num_telephone: '0612345678', username: 'youssefea', mot_de_passe: 'hashed_password', date_naissance: '1990-05-15', sexe: 'M', adresse: '123 Rue Hassan II, Casablanca', pole: 'Développement', division: 'IT' },
-        { id_utilisateur: 2, prenom: 'Fatima', nom: 'Benali', email: 'fatima.benali@example.com', num_telephone: '0623456789', username: 'fatimab', mot_de_passe: 'hashed_password', date_naissance: '1988-09-22', sexe: 'F', adresse: '45 Avenue Mohammed V, Rabat', pole: 'Marketing', division: 'Communication' },
-        { id_utilisateur: 3, prenom: 'Mohammed', nom: 'Tazi', email: 'mohammed.tazi@example.com', num_telephone: '0634567890', username: 'mohammedt', mot_de_passe: 'hashed_password', date_naissance: '1995-03-10', sexe: 'M', adresse: '78 Boulevard Zerktouni, Marrakech', pole: 'Finance', division: 'Comptabilité' },
-    ]);
+    const [users, setUsers] = useState([]);
+    const [poles, setPoles] = useState([]);
+    const [divisions, setDivisions] = useState([]);
+    const [pays, setPays] = useState([]);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [allDivisions, setAllDivisions] = useState([]);
+    const [filteredDivisions, setFilteredDivisions] = useState([]);
+
+    useEffect(() => {
+        fetchUsers();
+        fetchPoles();
+        fetchDivisions();
+        fetchPays();
+    }, []);
+
+    const fetchUsers = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('http://localhost:8080/api/utilisateurs');
+            setUsers(response.data);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fetchPoles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/poles');
+            setPoles(response.data);
+        } catch (error) {
+            console.error('Error fetching poles:', error);
+        }
+    };
+
+    const fetchDivisions = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/divisions');
+            setAllDivisions(response.data);
+        } catch (error) {
+            console.error('Error fetching divisions:', error);
+        }
+    };
+
+    const fetchPays = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/pays');
+            setPays(response.data);
+        } catch (error) {
+            console.error('Error fetching pays:', error);
+        }
+    };
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
 
     const handleShowDetails = (user) => {
         setSelectedUser(user);
@@ -35,7 +89,14 @@ const AfficherUser = () => {
     };
 
     const handleShowEdit = (user) => {
-        setSelectedUser({...user});
+        setSelectedUser({
+            ...user,
+            pole: user.pole ? user.pole.id_pole.toString() : '',
+            division: user.division ? user.division.id_division.toString() : '',
+            pays: user.pays ? user.pays.id_pays.toString() : ''
+        });
+        const relatedDivisions = allDivisions.filter(division => division.pole.id_pole === user.pole.id_pole);
+        setFilteredDivisions(relatedDivisions);
         setShowEditModal(true);
     };
 
@@ -44,16 +105,133 @@ const AfficherUser = () => {
         setShowDeleteModal(true);
     };
 
-    const handleEditUser = () => {
-        setUsers(users.map(user => 
-            user.id_utilisateur === selectedUser.id_utilisateur ? selectedUser : user
-        ));
-        setShowEditModal(false);
+    const handleEditUser = async () => {
+        try {
+            await axios.put(`http://localhost:8080/api/utilisateurs/${selectedUser.id_utilisateur}`, selectedUser);
+            fetchUsers();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
     };
 
-    const handleDeleteUser = () => {
-        setUsers(users.filter(user => user.id_utilisateur !== selectedUser.id_utilisateur));
-        setShowDeleteModal(false);
+    const handleDeleteUser = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/utilisateurs/${selectedUser.id_utilisateur}`);
+            fetchUsers();
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
+    };
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (columnName) => {
+        if (sortConfig.key === columnName) {
+            return sortConfig.direction === 'ascending' ? faSortUp : faSortDown;
+        }
+        return faSort;
+    };
+
+    const sortedUsers = React.useMemo(() => {
+        let sortableUsers = [...users];
+        if (sortConfig.key !== null) {
+            sortableUsers.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableUsers;
+    }, [users, sortConfig]);
+
+    const filteredUsers = React.useMemo(() => {
+        return sortedUsers.filter(user => 
+            user.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sortedUsers, searchTerm]);
+
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <tr>
+                    <td colSpan="5" className="text-center">Chargement...</td>
+                </tr>
+            );
+        }
+
+        if (users.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="5" className="text-center">
+                        <Alert variant="info">
+                            Aucun utilisateur n'existe dans la base de données.
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        if (filteredUsers.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="5" className="text-center">
+                        <Alert variant="warning">
+                            Aucun utilisateur ne correspond à la recherche "{searchTerm}".
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        return filteredUsers.map((user) => (
+            <tr key={user.id_utilisateur}>
+                <td>{`${user.prenom} ${user.nom}`}</td>
+                <td>{user.sexe === 'M' ? 'Homme' : 'Femme'}</td>
+                <td>{user.pole.libelle_pole}</td>
+                <td>{user.division.nom_division}</td>
+                <td>
+                    <Button variant="link" className="btn-info" onClick={() => handleShowDetails(user)}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                    </Button>
+                    <Button variant="link" className="btn-primary" onClick={() => handleShowEdit(user)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Button>
+                    <Button variant="link" className="btn-danger" onClick={() => handleShowDelete(user)}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </Button>
+                </td>
+            </tr>
+        ));
+    };
+
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedUser({ ...selectedUser, [name]: value });
+
+        if (name === 'pole') {
+            const selectedPoleId = parseInt(value);
+            const relatedDivisions = allDivisions.filter(division => division.pole.id_pole === selectedPoleId);
+            setFilteredDivisions(relatedDivisions);
+            setSelectedUser(prevState => ({ 
+                ...prevState, 
+                pole: poles.find(p => p.id_pole === selectedPoleId), 
+                division: null 
+            }));
+        }
     };
 
     return (
@@ -93,33 +271,23 @@ const AfficherUser = () => {
                                             <table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
-                                                        <th>Nom complet</th>
-                                                        <th>Sexe</th>
-                                                        <th>Pôle</th>
-                                                        <th>Division</th>
+                                                        <th onClick={() => requestSort('nom')}>
+                                                            Nom complet <FontAwesomeIcon icon={getSortIcon('nom')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('sexe')}>
+                                                            Sexe <FontAwesomeIcon icon={getSortIcon('sexe')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('pole.libelle_pole')}>
+                                                            Pôle <FontAwesomeIcon icon={getSortIcon('pole.libelle_pole')} />
+                                                        </th>
+                                                        <th onClick={() => requestSort('division.nom_division')}>
+                                                            Division <FontAwesomeIcon icon={getSortIcon('division.nom_division')} />
+                                                        </th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {users.map((user) => (
-                                                        <tr key={user.id_utilisateur}>
-                                                            <td>{`${user.prenom} ${user.nom}`}</td>
-                                                            <td>{user.sexe === 'M' ? 'Homme' : 'Femme'}</td>
-                                                            <td>{user.pole}</td>
-                                                            <td>{user.division}</td>
-                                                            <td>
-                                                                <Button variant="link" className="btn-info" onClick={() => handleShowDetails(user)}>
-                                                                    <FontAwesomeIcon icon={faInfoCircle} />
-                                                                </Button>
-                                                                <Button variant="link" className="btn-primary" onClick={() => handleShowEdit(user)}>
-                                                                    <FontAwesomeIcon icon={faEdit} />
-                                                                </Button>
-                                                                <Button variant="link" className="btn-danger" onClick={() => handleShowDelete(user)}>
-                                                                    <FontAwesomeIcon icon={faTimes} />
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    {renderTableContent()}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -151,8 +319,8 @@ const AfficherUser = () => {
                             <p><strong>Date de naissance:</strong> {selectedUser.date_naissance}</p>
                             <p><strong>Sexe:</strong> {selectedUser.sexe === 'M' ? 'Homme' : 'Femme'}</p>
                             <p><strong>Adresse:</strong> {selectedUser.adresse}</p>
-                            <p><strong>Pôle:</strong> {selectedUser.pole}</p>
-                            <p><strong>Division:</strong> {selectedUser.division}</p>
+                            <p><strong>Pôle:</strong> {selectedUser.pole.libelle_pole}</p>
+                            <p><strong>Division:</strong> {selectedUser.division.nom_division}</p>
                         </div>
                     )}
                 </Modal.Body>
@@ -247,11 +415,13 @@ const AfficherUser = () => {
                                 <Form.Label>Pôle</Form.Label>
                                 <Form.Control 
                                     as="select"
+                                    name="pole"
                                     value={selectedUser.pole}
-                                    onChange={(e) => setSelectedUser({...selectedUser, pole: e.target.value})}
+                                    onChange={handleEditInputChange}
                                 >
-                                    {poles.map((pole, index) => (
-                                        <option key={index} value={pole}>{pole}</option>
+                                    <option value="">Sélectionnez un pôle</option>
+                                    {poles.map((pole) => (
+                                        <option key={pole.id_pole} value={pole.id_pole.toString()}>{pole.libelle_pole}</option>
                                     ))}
                                 </Form.Control>
                             </Form.Group>
@@ -259,11 +429,14 @@ const AfficherUser = () => {
                                 <Form.Label>Division</Form.Label>
                                 <Form.Control 
                                     as="select"
+                                    name="division"
                                     value={selectedUser.division}
-                                    onChange={(e) => setSelectedUser({...selectedUser, division: e.target.value})}
+                                    onChange={handleEditInputChange}
+                                    disabled={!selectedUser.pole}
                                 >
-                                    {divisions.map((division, index) => (
-                                        <option key={index} value={division}>{division}</option>
+                                    <option value="">Sélectionnez une division</option>
+                                    {filteredDivisions.map((division) => (
+                                        <option key={division.id_division} value={division.id_division.toString()}>{division.nom_division}</option>
                                     ))}
                                 </Form.Control>
                             </Form.Group>

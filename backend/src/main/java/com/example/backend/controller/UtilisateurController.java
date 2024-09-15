@@ -28,8 +28,14 @@ public class UtilisateurController {
     }
 
     @PostMapping
-    public Utilisateur createUtilisateur(@RequestBody Utilisateur utilisateur) {
-        return utilisateurRepository.save(utilisateur);
+    public ResponseEntity<?> createUtilisateur(@RequestBody Utilisateur utilisateur) {
+        try {
+            Utilisateur savedUtilisateur = utilisateurRepository.save(utilisateur);
+            return ResponseEntity.ok(savedUtilisateur);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error creating user: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -61,6 +67,17 @@ public class UtilisateurController {
                     return ResponseEntity.noContent().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmailAvailability(@RequestParam String email) {
+        boolean isAvailable = !utilisateurRepository.findByEmail(email).isPresent();
+        return ResponseEntity.ok(isAvailable);
+    }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<Boolean> checkUsernameAvailability(@RequestParam String username) {
+        boolean isAvailable = !utilisateurRepository.findByUsername(username).isPresent();
+        return ResponseEntity.ok(isAvailable);
     }
 }
 
