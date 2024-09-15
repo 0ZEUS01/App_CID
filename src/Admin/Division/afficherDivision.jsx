@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Button, Modal, Form, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,28 +14,51 @@ import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
 const AfficherDivision = () => {
-    const [divisions, setDivisions] = useState([
-        { id: 1, libelle: 'IT' },
-        { id: 2, libelle: 'Communication' },
-        { id: 3, libelle: 'Comptabilité' },
-        { id: 4, libelle: 'Recrutement' }
-    ]);
+    const [divisions, setDivisions] = useState([]);
+    const [poles, setPoles] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [editingDivision, setEditingDivision] = useState(null);
     const [deletingDivision, setDeletingDivision] = useState(null);
-    const [newDivision, setNewDivision] = useState('');
+    const [newDivision, setNewDivision] = useState({ nom_division: '', pole: { id_pole: '' } });
+
+    useEffect(() => {
+        fetchDivisions();
+        fetchPoles();
+    }, []);
+
+    const fetchDivisions = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/divisions');
+            setDivisions(response.data);
+        } catch (error) {
+            console.error('Error fetching divisions:', error);
+        }
+    };
+
+    const fetchPoles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/poles');
+            setPoles(response.data);
+        } catch (error) {
+            console.error('Error fetching poles:', error);
+        }
+    };
 
     const handleEditDivision = (division) => {
         setEditingDivision(division);
         setShowEditModal(true);
     };
 
-    const handleUpdateDivision = () => {
-        setDivisions(divisions.map(division =>
-            division.id === editingDivision.id ? editingDivision : division
-        ));
-        setShowEditModal(false);
+    const handleUpdateDivision = async () => {
+        try {
+            await axios.put(`http://localhost:8080/api/divisions/${editingDivision.id_division}`, editingDivision);
+            fetchDivisions();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating division:', error);
+        }
     };
 
     const handleDeleteDivision = (division) => {
@@ -42,15 +66,24 @@ const AfficherDivision = () => {
         setShowDeleteModal(true);
     };
 
-    const confirmDeleteDivision = () => {
-        setDivisions(divisions.filter(division => division.id !== deletingDivision.id));
-        setShowDeleteModal(false);
+    const confirmDeleteDivision = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/divisions/${deletingDivision.id_division}`);
+            fetchDivisions();
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting division:', error);
+        }
     };
 
-    const handleAddDivision = () => {
-        if (newDivision.trim()) {
-            setDivisions([...divisions, { id: divisions.length + 1, libelle: newDivision.trim() }]);
-            setNewDivision('');
+    const handleAddDivision = async () => {
+        try {
+            await axios.post('http://localhost:8080/api/divisions', newDivision);
+            fetchDivisions();
+            setShowAddModal(false);
+            setNewDivision({ nom_division: '', pole: { id_pole: '' } });
+        } catch (error) {
+            console.error('Error adding division:', error);
         }
     };
 
@@ -78,26 +111,15 @@ const AfficherDivision = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
-                                    <div className="card-header">
-                                        <h4 className="card-title">Liste des Divisions</h4>
-                                        <div className="d-flex align-items-center mt-3">
-                                            <input
-                                                style={{marginRight:15}}
-                                                type="text"
-                                                value={newDivision}
-                                                onChange={(e) => setNewDivision(e.target.value)}
-                                                placeholder="Nouvelle division"
-                                                className="form-control flex-grow-1 mr-2"
-                                            />
-                                            <Button
-                                                variant="primary"
-                                                onClick={handleAddDivision}
-                                                className="btn-lg"
-                                                style={{ whiteSpace: 'nowrap' }}
-                                            >
-                                                <FontAwesomeIcon icon={faPlus} /> Ajouter une division
-                                            </Button>
-                                        </div>
+                                    <div className="card-header d-flex justify-content-between align-items-center">
+                                        <h4 className="card-title mb-0">Liste des Divisions</h4>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => setShowAddModal(true)}
+                                            className="btn-lg"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} /> Ajouter une division
+                                        </Button>
                                     </div>
                                     <div className="card-body">
                                         <div className="table-responsive">
@@ -105,15 +127,17 @@ const AfficherDivision = () => {
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Libellé</th>
+                                                        <th>Nom de la Division</th>
+                                                        <th>Pôle</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {divisions.map((division) => (
-                                                        <tr key={division.id}>
-                                                            <td>{division.id}</td>
-                                                            <td>{division.libelle}</td>
+                                                        <tr key={division.id_division}>
+                                                            <td>{division.id_division}</td>
+                                                            <td>{division.nom_division}</td>
+                                                            <td>{division.pole.libelle_pole}</td>
                                                             <td>
                                                                 <Button variant="link" className="btn-primary" onClick={() => handleEditDivision(division)}>
                                                                     <FontAwesomeIcon icon={faEdit} />
@@ -136,6 +160,50 @@ const AfficherDivision = () => {
                 </div>
             </div>
 
+            {/* Add Division Modal */}
+            <Modal 
+                show={showAddModal} 
+                onHide={() => setShowAddModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Ajouter une nouvelle division</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Nom de la division</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={newDivision.nom_division}
+                            onChange={(e) => setNewDivision({ ...newDivision, nom_division: e.target.value })}
+                        />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Pôle</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={newDivision.pole.id_pole}
+                            onChange={(e) => setNewDivision({ ...newDivision, pole: { id_pole: e.target.value } })}
+                        >
+                            <option value="">Sélectionnez un pôle</option>
+                            {poles.map((pole) => (
+                                <option key={pole.id_pole} value={pole.id_pole}>
+                                    {pole.libelle_pole}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+                        Annuler
+                    </Button>
+                    <Button variant="primary" onClick={handleAddDivision}>
+                        Ajouter
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
             {/* Edit Modal */}
             <Modal 
                 show={showEditModal} 
@@ -146,11 +214,29 @@ const AfficherDivision = () => {
                     <Modal.Title>Modifier la division</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Control
-                        type="text"
-                        value={editingDivision?.libelle || ''}
-                        onChange={(e) => setEditingDivision({ ...editingDivision, libelle: e.target.value })}
-                    />
+                    <Form.Group>
+                        <Form.Label>Nom de la division</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={editingDivision?.nom_division || ''}
+                            onChange={(e) => setEditingDivision({ ...editingDivision, nom_division: e.target.value })}
+                        />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Pôle</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={editingDivision?.pole?.id_pole || ''}
+                            onChange={(e) => setEditingDivision({ ...editingDivision, pole: { id_pole: e.target.value } })}
+                        >
+                            <option value="">Sélectionnez un pôle</option>
+                            {poles.map((pole) => (
+                                <option key={pole.id_pole} value={pole.id_pole}>
+                                    {pole.libelle_pole}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>

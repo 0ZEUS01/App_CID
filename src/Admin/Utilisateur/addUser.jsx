@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Form, Button, Card, Container, Row, Col, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faArrowRight, faUserPlus, faKey, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -32,12 +33,17 @@ const AddUser = () => {
         setNewUser({ ...newUser, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Here you would typically send the newUser data to your backend API
-        console.log('New user data:', newUser);
-        // After successful creation, navigate back to the user list
-        navigate('/users');
+        try {
+            const response = await axios.post('http://localhost:8080/api/utilisateurs', newUser);
+            console.log('New user created:', response.data);
+            // After successful creation, navigate back to the user list
+            navigate('/users');
+        } catch (error) {
+            console.error('Error creating user:', error);
+            // Handle error (e.g., show error message to user)
+        }
     };
 
     const generatePassword = () => {

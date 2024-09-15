@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button, Modal, Form, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faHome, 
-    faArrowRight, 
-    faEdit, 
+import {
+    faHome,
+    faArrowRight,
+    faEdit,
     faTimes,
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
@@ -13,28 +14,40 @@ import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
 const AfficherRole = () => {
-    const [roles, setRoles] = useState([
-        { id: 1, libelle: 'Chef de Projet' },
-        { id: 2, libelle: 'Chef de Division' },
-        { id: 3, libelle: 'Cadre Administratif' },
-        { id: 4, libelle: 'Chef de Pôle' }
-    ]);
+    const [roles, setRoles] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
     const [deletingRole, setDeletingRole] = useState(null);
-    const [newRole, setNewRole] = useState('');
+    const [newRole, setNewRole] = useState({ nom_role: '' });
+
+    useEffect(() => {
+        fetchRoles();
+    }, []);
+
+    const fetchRoles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/roles');
+            setRoles(response.data);
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+        }
+    };
 
     const handleEditRole = (role) => {
         setEditingRole(role);
         setShowEditModal(true);
     };
 
-    const handleUpdateRole = () => {
-        setRoles(roles.map(role => 
-            role.id === editingRole.id ? editingRole : role
-        ));
-        setShowEditModal(false);
+    const handleUpdateRole = async () => {
+        try {
+            await axios.put(`http://localhost:8080/api/roles/${editingRole.id_role}`, editingRole);
+            fetchRoles();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating role:', error);
+        }
     };
 
     const handleDeleteRole = (role) => {
@@ -42,15 +55,24 @@ const AfficherRole = () => {
         setShowDeleteModal(true);
     };
 
-    const confirmDeleteRole = () => {
-        setRoles(roles.filter(role => role.id !== deletingRole.id));
-        setShowDeleteModal(false);
+    const confirmDeleteRole = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/roles/${deletingRole.id_role}`);
+            fetchRoles();
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting role:', error);
+        }
     };
 
-    const handleAddRole = () => {
-        if (newRole.trim()) {
-            setRoles([...roles, { id: roles.length + 1, libelle: newRole.trim() }]);
-            setNewRole('');
+    const handleAddRole = async () => {
+        try {
+            await axios.post('http://localhost:8080/api/roles', newRole);
+            fetchRoles();
+            setShowAddModal(false);
+            setNewRole({ nom_role: '' });
+        } catch (error) {
+            console.error('Error adding role:', error);
         }
     };
 
@@ -78,41 +100,31 @@ const AfficherRole = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
-                                    <div className="card-header">
-                                        <h4 className="card-title">Liste des Rôles</h4>
-                                        <div className="d-flex align-items-center mt-3">
-                                            <input 
-                                                type="text" 
-                                                value={newRole}
-                                                onChange={(e) => setNewRole(e.target.value)}
-                                                placeholder="Nouveau rôle"
-                                                className="form-control flex-grow-1 mr-2"
-                                            />
-                                            <Button 
-                                                variant="primary" 
-                                                onClick={handleAddRole}
-                                                className="btn-lg"
-                                                style={{ whiteSpace: 'nowrap' }}
-                                            >
-                                                <FontAwesomeIcon icon={faPlus} /> Ajouter un rôle
-                                            </Button>
-                                        </div>
+                                    <div className="card-header d-flex justify-content-between align-items-center">
+                                        <h4 className="card-title mb-0">Liste des Rôles</h4>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => setShowAddModal(true)}
+                                            className="btn-lg"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} /> Ajouter un rôle
+                                        </Button>
                                     </div>
                                     <div className="card-body">
                                         <div className="table-responsive">
-                                            <table className="table table-striped table-hover mt-3">
+                                            <Table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Libellé</th>
+                                                        <th>Nom du Rôle</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {roles.map((role) => (
-                                                        <tr key={role.id}>
-                                                            <td>{role.id}</td>
-                                                            <td>{role.libelle}</td>
+                                                        <tr key={role.id_role}>
+                                                            <td>{role.id_role}</td>
+                                                            <td>{role.nom_role}</td>
                                                             <td>
                                                                 <Button variant="link" className="btn-primary" onClick={() => handleEditRole(role)}>
                                                                     <FontAwesomeIcon icon={faEdit} />
@@ -124,7 +136,7 @@ const AfficherRole = () => {
                                                         </tr>
                                                     ))}
                                                 </tbody>
-                                            </table>
+                                            </Table>
                                         </div>
                                     </div>
                                 </div>
@@ -134,6 +146,35 @@ const AfficherRole = () => {
                     <Footer />
                 </div>
             </div>
+
+            {/* Add Role Modal */}
+            <Modal 
+                show={showAddModal} 
+                onHide={() => setShowAddModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Ajouter un nouveau rôle</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Nom du rôle</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={newRole.nom_role}
+                            onChange={(e) => setNewRole({ ...newRole, nom_role: e.target.value })}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+                        Annuler
+                    </Button>
+                    <Button variant="primary" onClick={handleAddRole}>
+                        Ajouter
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* Edit Modal */}
             <Modal 
@@ -145,12 +186,14 @@ const AfficherRole = () => {
                     <Modal.Title>Modifier le rôle</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input 
-                        type="text" 
-                        className="form-control"
-                        value={editingRole?.libelle || ''}
-                        onChange={(e) => setEditingRole({...editingRole, libelle: e.target.value})}
-                    />
+                    <Form.Group>
+                        <Form.Label>Nom du rôle</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={editingRole?.nom_role || ''}
+                            onChange={(e) => setEditingRole({ ...editingRole, nom_role: e.target.value })}
+                        />
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>

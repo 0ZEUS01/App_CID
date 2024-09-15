@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Button, Modal, Form, Table } from 'react-bootstrap';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+import { Button, Modal, Form, Table, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -13,28 +14,55 @@ import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
 const AfficherPole = () => {
-    const [poles, setPoles] = useState([
-        { id: 1, libelle: 'Développement' },
-        { id: 2, libelle: 'Marketing' },
-        { id: 3, libelle: 'Finance' },
-        { id: 4, libelle: 'Ressources Humaines' }
-    ]);
+    const [poles, setPoles] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [editingPole, setEditingPole] = useState(null);
     const [deletingPole, setDeletingPole] = useState(null);
-    const [newPole, setNewPole] = useState('');
+    const [newPole, setNewPole] = useState({ libelle_pole: '' });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchPoles();
+    }, []);
+
+    const fetchPoles = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('http://localhost:8080/api/poles');
+            setPoles(response.data);
+        } catch (error) {
+            console.error('Error fetching poles:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
+
+    const filteredPoles = useMemo(() => {
+        return poles.filter(pole => 
+            pole.libelle_pole.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [poles, searchTerm]);
 
     const handleEditPole = (pole) => {
         setEditingPole(pole);
         setShowEditModal(true);
     };
 
-    const handleUpdatePole = () => {
-        setPoles(poles.map(pole =>
-            pole.id === editingPole.id ? editingPole : pole
-        ));
-        setShowEditModal(false);
+    const handleUpdatePole = async () => {
+        try {
+            await axios.put(`http://localhost:8080/api/poles/${editingPole.id_pole}`, editingPole);
+            fetchPoles();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating pole:', error);
+        }
     };
 
     const handleDeletePole = (pole) => {
@@ -42,23 +70,81 @@ const AfficherPole = () => {
         setShowDeleteModal(true);
     };
 
-    const confirmDeletePole = () => {
-        setPoles(poles.filter(pole => pole.id !== deletingPole.id));
-        setShowDeleteModal(false);
+    const confirmDeletePole = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/poles/${deletingPole.id_pole}`);
+            fetchPoles();
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting pole:', error);
+        }
     };
 
-    const handleAddPole = () => {
-        if (newPole.trim()) {
-            setPoles([...poles, { id: poles.length + 1, libelle: newPole.trim() }]);
-            setNewPole('');
+    const handleAddPole = async () => {
+        try {
+            await axios.post('http://localhost:8080/api/poles', newPole);
+            fetchPoles();
+            setShowAddModal(false);
+            setNewPole({ libelle_pole: '' });
+        } catch (error) {
+            console.error('Error adding pole:', error);
         }
+    };
+
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">Chargement...</td>
+                </tr>
+            );
+        }
+
+        if (poles.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">
+                        <Alert variant="info">
+                            Aucun pôle n'existe dans la base de données.
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        if (filteredPoles.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="3" className="text-center">
+                        <Alert variant="warning">
+                            Aucun pôle n'existe avec le nom "{searchTerm}".
+                        </Alert>
+                    </td>
+                </tr>
+            );
+        }
+
+        return filteredPoles.map((pole) => (
+            <tr key={pole.id_pole}>
+                <td>{pole.id_pole}</td>
+                <td>{pole.libelle_pole}</td>
+                <td>
+                    <Button variant="link" className="btn-primary" onClick={() => handleEditPole(pole)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Button>
+                    <Button variant="link" className="btn-danger" onClick={() => handleDeletePole(pole)}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </Button>
+                </td>
+            </tr>
+        ));
     };
 
     return (
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
@@ -78,26 +164,15 @@ const AfficherPole = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
-                                    <div className="card-header">
-                                        <h4 className="card-title">Liste des Pôles</h4>
-                                        <div className="d-flex align-items-center mt-3">
-                                            <input
-                                                style={{marginRight:15}}
-                                                type="text"
-                                                value={newPole}
-                                                onChange={(e) => setNewPole(e.target.value)}
-                                                placeholder="Nouveau pôle"
-                                                className="form-control flex-grow-1 mr-2"
-                                            />
-                                            <Button
-                                                variant="primary"
-                                                onClick={handleAddPole}
-                                                className="btn-lg"
-                                                style={{ whiteSpace: 'nowrap' }}
-                                            >
-                                                <FontAwesomeIcon icon={faPlus} /> Ajouter un pôle
-                                            </Button>
-                                        </div>
+                                    <div className="card-header d-flex justify-content-between align-items-center">
+                                        <h4 className="card-title mb-0">Liste des Pôles</h4>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => setShowAddModal(true)}
+                                            className="btn-lg"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} /> Ajouter un pôle
+                                        </Button>
                                     </div>
                                     <div className="card-body">
                                         <div className="table-responsive">
@@ -105,25 +180,12 @@ const AfficherPole = () => {
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Libellé</th>
+                                                        <th>Libellé du Pôle</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {poles.map((pole) => (
-                                                        <tr key={pole.id}>
-                                                            <td>{pole.id}</td>
-                                                            <td>{pole.libelle}</td>
-                                                            <td>
-                                                                <Button variant="link" className="btn-primary" onClick={() => handleEditPole(pole)}>
-                                                                    <FontAwesomeIcon icon={faEdit} />
-                                                                </Button>
-                                                                <Button variant="link" className="btn-danger" onClick={() => handleDeletePole(pole)}>
-                                                                    <FontAwesomeIcon icon={faTimes} />
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    {renderTableContent()}
                                                 </tbody>
                                             </Table>
                                         </div>
@@ -134,55 +196,87 @@ const AfficherPole = () => {
                     </div>
                     <Footer />
                 </div>
+
+                {/* Add Pole Modal */}
+                <Modal 
+                    show={showAddModal} 
+                    onHide={() => setShowAddModal(false)}
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Ajouter un nouveau pôle</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group>
+                            <Form.Label>Libellé du pôle</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newPole.libelle_pole}
+                                onChange={(e) => setNewPole({ ...newPole, libelle_pole: e.target.value })}
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+                            Annuler
+                        </Button>
+                        <Button variant="primary" onClick={handleAddPole}>
+                            Ajouter
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                {/* Edit Modal */}
+                <Modal 
+                    show={showEditModal} 
+                    onHide={() => setShowEditModal(false)}
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Modifier le pôle</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group>
+                            <Form.Label>Libellé du pôle</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editingPole?.libelle_pole || ''}
+                                onChange={(e) => setEditingPole({ ...editingPole, libelle_pole: e.target.value })}
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                            Annuler
+                        </Button>
+                        <Button variant="primary" onClick={handleUpdatePole}>
+                            Sauvegarder
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                {/* Delete Confirmation Modal */}
+                <Modal 
+                    show={showDeleteModal} 
+                    onHide={() => setShowDeleteModal(false)}
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirmer la suppression</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Êtes-vous sûr de vouloir supprimer ce pôle ?
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                            Annuler
+                        </Button>
+                        <Button variant="danger" onClick={confirmDeletePole}>
+                            Supprimer
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
-
-            {/* Edit Modal */}
-            <Modal 
-                show={showEditModal} 
-                onHide={() => setShowEditModal(false)}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Modifier le pôle</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Control
-                        type="text"
-                        value={editingPole?.libelle || ''}
-                        onChange={(e) => setEditingPole({ ...editingPole, libelle: e.target.value })}
-                    />
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-                        Annuler
-                    </Button>
-                    <Button variant="primary" onClick={handleUpdatePole}>
-                        Sauvegarder
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
-            {/* Delete Confirmation Modal */}
-            <Modal 
-                show={showDeleteModal} 
-                onHide={() => setShowDeleteModal(false)}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirmer la suppression</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Êtes-vous sûr de vouloir supprimer ce pôle ?
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Annuler
-                    </Button>
-                    <Button variant="danger" onClick={confirmDeletePole}>
-                        Supprimer
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </div>
     );
 };

@@ -2,15 +2,22 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
-const SearchBar = ({ className }) => (
+const SearchBar = ({ className, onSearch }) => (
     <div className={`input-group ${className}`}>
         <div className="input-group-prepend">
             <button type="submit" className="btn btn-search pe-1">
                 <i className="fa fa-search search-icon" />
             </button>
         </div>
-        <input type="text" placeholder="Search ..." className="form-control" />
+        <input
+            type="text"
+            placeholder="Search ..."
+            className="form-control"
+            onChange={(e) => onSearch(e.target.value)}
+        />
     </div>
 );
 
@@ -65,7 +72,7 @@ const UserDropdown = ({ username, email, avatarSrc }) => (
     </li>
 );
 
-const MainHeader = () => (
+const MainHeader = ({ onSearch }) => (
     <div className="main-header">
         <div className="main-header-logo">
             <div className="logo-header" data-background-color="dark">
@@ -88,7 +95,7 @@ const MainHeader = () => (
         <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
             <div className="container-fluid">
                 <nav className="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-                    <SearchBar />
+                    <SearchBar onSearch={onSearch} />
                 </nav>
                 <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
                     <li className="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">

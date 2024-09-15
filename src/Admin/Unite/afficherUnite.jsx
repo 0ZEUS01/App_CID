@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button, Modal, Form, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faHome,
@@ -13,29 +14,40 @@ import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
 
 const AfficherUnite = () => {
-    const [unites, setUnites] = useState([
-        { id: 1, libelle: 'Forfait' },
-        { id: 2, libelle: 'Kilomètre' },
-        { id: 3, libelle: 'Mètre' },
-        { id: 4, libelle: 'Mètre cube' },
-        { id: 5, libelle: 'Mètre carré' }
-    ]);
+    const [unites, setUnites] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [editingUnite, setEditingUnite] = useState(null);
     const [deletingUnite, setDeletingUnite] = useState(null);
-    const [newUnite, setNewUnite] = useState('');
+    const [newUnite, setNewUnite] = useState({ nom_unite: '' });
+
+    useEffect(() => {
+        fetchUnites();
+    }, []);
+
+    const fetchUnites = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/unites');
+            setUnites(response.data);
+        } catch (error) {
+            console.error('Error fetching unites:', error);
+        }
+    };
 
     const handleEditUnite = (unite) => {
         setEditingUnite(unite);
         setShowEditModal(true);
     };
 
-    const handleUpdateUnite = () => {
-        setUnites(unites.map(unite =>
-            unite.id === editingUnite.id ? editingUnite : unite
-        ));
-        setShowEditModal(false);
+    const handleUpdateUnite = async () => {
+        try {
+            await axios.put(`http://localhost:8080/api/unites/${editingUnite.id}`, editingUnite);
+            fetchUnites();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating unite:', error);
+        }
     };
 
     const handleDeleteUnite = (unite) => {
@@ -43,15 +55,24 @@ const AfficherUnite = () => {
         setShowDeleteModal(true);
     };
 
-    const confirmDeleteUnite = () => {
-        setUnites(unites.filter(unite => unite.id !== deletingUnite.id));
-        setShowDeleteModal(false);
+    const confirmDeleteUnite = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/unites/${deletingUnite.id}`);
+            fetchUnites();
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting unite:', error);
+        }
     };
 
-    const handleAddUnite = () => {
-        if (newUnite.trim()) {
-            setUnites([...unites, { id: unites.length + 1, libelle: newUnite.trim() }]);
-            setNewUnite('');
+    const handleAddUnite = async () => {
+        try {
+            await axios.post('http://localhost:8080/api/unites', newUnite);
+            fetchUnites();
+            setShowAddModal(false);
+            setNewUnite({ nom_unite: '' });
+        } catch (error) {
+            console.error('Error adding unite:', error);
         }
     };
 
@@ -79,34 +100,23 @@ const AfficherUnite = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
-                                    <div className="card-header">
-                                        <h4 className="card-title">Liste des Unités</h4>
-                                        <div className="d-flex align-items-center mt-3">
-                                            <input
-                                                style={{ marginRight: 15 }}
-                                                type="text"
-                                                value={newUnite}
-                                                onChange={(e) => setNewUnite(e.target.value)}
-                                                placeholder="Nouvelle unité"
-                                                className="form-control flex-grow-1 mr-2"
-                                            />
-                                            <Button
-                                                variant="primary"
-                                                onClick={handleAddUnite}
-                                                className="btn-lg"
-                                                style={{ whiteSpace: 'nowrap' }}
-                                            >
-                                                <FontAwesomeIcon icon={faPlus} /> Ajouter une unité
-                                            </Button>
-                                        </div>
+                                    <div className="card-header d-flex justify-content-between align-items-center">
+                                        <h4 className="card-title mb-0">Liste des Unités</h4>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => setShowAddModal(true)}
+                                            className="btn-lg"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} /> Ajouter une unité
+                                        </Button>
                                     </div>
                                     <div className="card-body">
                                         <div className="table-responsive">
-                                            <table className="table table-striped table-hover mt-3">
+                                            <Table className="table table-striped table-hover mt-3">
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
-                                                        <th>Libellé</th>
+                                                        <th>Nom de l'Unité</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
@@ -114,7 +124,7 @@ const AfficherUnite = () => {
                                                     {unites.map((unite) => (
                                                         <tr key={unite.id}>
                                                             <td>{unite.id}</td>
-                                                            <td>{unite.libelle}</td>
+                                                            <td>{unite.nom_unite}</td>
                                                             <td>
                                                                 <Button variant="link" className="btn-primary" onClick={() => handleEditUnite(unite)}>
                                                                     <FontAwesomeIcon icon={faEdit} />
@@ -126,7 +136,7 @@ const AfficherUnite = () => {
                                                         </tr>
                                                     ))}
                                                 </tbody>
-                                            </table>
+                                            </Table>
                                         </div>
                                     </div>
                                 </div>
@@ -136,6 +146,35 @@ const AfficherUnite = () => {
                     <Footer />
                 </div>
             </div>
+
+            {/* Add Unite Modal */}
+            <Modal 
+                show={showAddModal} 
+                onHide={() => setShowAddModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Ajouter une nouvelle unité</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Nom de l'unité</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={newUnite.nom_unite}
+                            onChange={(e) => setNewUnite({ ...newUnite, nom_unite: e.target.value })}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+                        Annuler
+                    </Button>
+                    <Button variant="primary" onClick={handleAddUnite}>
+                        Ajouter
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* Edit Modal */}
             <Modal 
@@ -147,12 +186,14 @@ const AfficherUnite = () => {
                     <Modal.Title>Modifier l'unité</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={editingUnite?.libelle || ''}
-                        onChange={(e) => setEditingUnite({ ...editingUnite, libelle: e.target.value })}
-                    />
+                    <Form.Group>
+                        <Form.Label>Nom de l'unité</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={editingUnite?.nom_unite || ''}
+                            onChange={(e) => setEditingUnite({ ...editingUnite, nom_unite: e.target.value })}
+                        />
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditModal(false)}>
