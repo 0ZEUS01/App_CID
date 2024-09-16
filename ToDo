@@ -1,0 +1,7 @@
+fix search in afficherUser problem on Homme and Femme
+add role to the user and keep poile and division just as infos 
+after that update user add system for the role  and that pole and divisions can be null if the user have certain roles
+add add ST and add partenaire and all CRUD like client
+
+
+FAAAAST MAN
