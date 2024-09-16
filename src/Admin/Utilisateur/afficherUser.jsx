@@ -186,19 +186,18 @@ const AfficherUser = () => {
     const filteredUsers = useMemo(() => {
         return sortedUsers.filter(user => {
             const searchString = searchTerm.toLowerCase();
+            const fullName = `${user.nom} ${user.prenom}`.toLowerCase();
+            const sexeMatch = 
+                (user.sexe === 'M' && ('homme'.includes(searchString) || 'male'.includes(searchString))) ||
+                (user.sexe === 'F' && ('femme'.includes(searchString) || 'female'.includes(searchString)));
+            
             return (
+                fullName.includes(searchString) ||
                 user.nom.toLowerCase().includes(searchString) ||
                 user.prenom.toLowerCase().includes(searchString) ||
-                `${user.nom} ${user.prenom}`.toLowerCase().includes(searchString) ||
-                user.email.toLowerCase().includes(searchString) ||
-                user.username.toLowerCase().includes(searchString) ||
-                user.num_telephone.toLowerCase().includes(searchString) ||
-                user.sexe.toLowerCase().includes(searchString) ||
+                sexeMatch ||
                 (user.pole && user.pole.libelle_pole.toLowerCase().includes(searchString)) ||
-                (user.division && user.division.nom_division.toLowerCase().includes(searchString)) ||
-                (user.pays && user.pays.libelle_pays.toLowerCase().includes(searchString)) ||
-                user.adresse.toLowerCase().includes(searchString) ||
-                user.date_naissance.toLowerCase().includes(searchString)
+                (user.division && user.division.nom_division.toLowerCase().includes(searchString))
             );
         });
     }, [sortedUsers, searchTerm]);
