@@ -506,7 +506,7 @@ const AfficherUser = () => {
                     <Modal.Title>Modifier l'utilisateur</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                {validationError && <Alert variant="danger">{validationError}</Alert>}
+                    {validationError && <Alert variant="danger">{validationError}</Alert>}
                     {selectedUser && (
                         <Form>
                             <Form.Group>
@@ -618,8 +618,8 @@ const AfficherUser = () => {
                                         options={poles.map(pole => ({ value: pole.id_pole, label: pole.libelle_pole }))}
                                         value={selectedUser.pole}
                                         onChange={(selectedOption) => {
-                                            handleEditInputChange({ target: { name: 'pole', value: selectedOption ? selectedOption.value : '' } });
-                                            setSelectedUser(prev => ({ ...prev, pole: selectedOption }));
+                                            setSelectedUser(prev => ({ ...prev, pole: selectedOption, division: null }));
+                                            updateFilteredDivisions(selectedOption ? selectedOption.value : null);
                                         }}
                                         isClearable
                                     />
@@ -633,7 +633,6 @@ const AfficherUser = () => {
                                         options={filteredDivisions.map(division => ({ value: division.id_division, label: division.nom_division }))}
                                         value={selectedUser.division}
                                         onChange={(selectedOption) => {
-                                            handleEditInputChange({ target: { name: 'division', value: selectedOption ? selectedOption.value : '' } });
                                             setSelectedUser(prev => ({ ...prev, division: selectedOption }));
                                         }}
                                         isDisabled={!selectedUser.pole}
@@ -641,6 +640,18 @@ const AfficherUser = () => {
                                     />
                                 </Form.Group>
                             )}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Pays</Form.Label>
+                                <Select
+                                    name="pays"
+                                    options={pays.map(p => ({ value: p.id_pays, label: p.libelle_pays }))}
+                                    value={selectedUser.pays}
+                                    onChange={(selectedOption) => {
+                                        setSelectedUser(prev => ({ ...prev, pays: selectedOption }));
+                                    }}
+                                    isClearable
+                                />
+                            </Form.Group>
                         </Form>
                     )}
                 </Modal.Body>
