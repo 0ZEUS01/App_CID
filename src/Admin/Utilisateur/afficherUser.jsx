@@ -468,6 +468,7 @@ const AfficherUser = () => {
             <Modal
                 show={showDetailsModal}
                 onHide={() => setShowDetailsModal(false)}
+                size="lg"
                 centered
             >
                 <Modal.Header closeButton>
@@ -476,15 +477,20 @@ const AfficherUser = () => {
                 <Modal.Body>
                     {selectedUser && (
                         <div>
-                            <p><strong>Nom complet:</strong> {selectedUser.prenom} {selectedUser.nom}</p>
+                            <p><strong>ID:</strong> {selectedUser.id_utilisateur}</p>
+                            <p><strong>Prénom:</strong> {selectedUser.prenom}</p>
+                            <p><strong>Nom:</strong> {selectedUser.nom}</p>
                             <p><strong>Email:</strong> {selectedUser.email}</p>
-                            <p><strong>Téléphone:</strong> {selectedUser.num_telephone}</p>
+                            <p><strong>Numéro de téléphone:</strong> {selectedUser.num_telephone || 'Non renseigné'}</p>
                             <p><strong>Nom d'utilisateur:</strong> {selectedUser.username}</p>
-                            <p><strong>Date de naissance:</strong> {selectedUser.date_naissance}</p>
+                            <p><strong>Date de naissance:</strong> {new Date(selectedUser.date_naissance).toLocaleDateString()}</p>
                             <p><strong>Sexe:</strong> {selectedUser.sexe === 'M' ? 'Homme' : 'Femme'}</p>
                             <p><strong>Adresse:</strong> {selectedUser.adresse}</p>
-                            <p><strong>Pôle:</strong> {selectedUser.pole ? selectedUser.pole.libelle_pole : 'N/A'}</p>
-                            <p><strong>Division:</strong> {selectedUser.division ? selectedUser.division.nom_division : 'N/A'}</p>
+                            <p><strong>Statut:</strong> {selectedUser.isDeleted ? 'Supprimé' : 'Actif'}</p>
+                            <p><strong>Pôle:</strong> {selectedUser.pole ? selectedUser.pole.libelle_pole : 'Non assigné'}</p>
+                            <p><strong>Division:</strong> {selectedUser.division ? selectedUser.division.nom_division : 'Non assigné'}</p>
+                            <p><strong>Rôles:</strong> {selectedUser.roles.map(role => role.nom_role).join(', ')}</p>
+                            <p><strong>Pays:</strong> {selectedUser.pays ? selectedUser.pays.libelle_pays : 'Non renseigné'}</p>
                         </div>
                     )}
                 </Modal.Body>
