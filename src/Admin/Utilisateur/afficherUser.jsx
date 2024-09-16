@@ -169,6 +169,28 @@ const AfficherUser = () => {
                         return sortConfig.direction === 'ascending' ? 1 : -1;
                     }
                     return 0;
+                } else if (sortConfig.key === 'pole.libelle_pole') {
+                    // Sort by pole name
+                    const poleA = a.pole ? a.pole.libelle_pole.toLowerCase() : '';
+                    const poleB = b.pole ? b.pole.libelle_pole.toLowerCase() : '';
+                    if (poleA < poleB) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (poleA > poleB) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    return 0;
+                } else if (sortConfig.key === 'division.nom_division') {
+                    // Sort by division name
+                    const divisionA = a.division ? a.division.nom_division.toLowerCase() : '';
+                    const divisionB = b.division ? b.division.nom_division.toLowerCase() : '';
+                    if (divisionA < divisionB) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (divisionA > divisionB) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    return 0;
                 } else {
                     if (a[sortConfig.key] < b[sortConfig.key]) {
                         return sortConfig.direction === 'ascending' ? -1 : 1;
