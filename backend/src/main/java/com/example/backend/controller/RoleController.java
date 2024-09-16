@@ -37,6 +37,8 @@ public class RoleController {
         return roleRepository.findById(id)
                 .map(existingRole -> {
                     existingRole.setNom_role(role.getNom_role());
+                    existingRole.setRequiresDivision(role.isRequiresDivision());
+                    existingRole.setRequiresPole(role.isRequiresPole());
                     return ResponseEntity.ok().body(roleRepository.save(existingRole));
                 })
                 .orElse(ResponseEntity.notFound().build());

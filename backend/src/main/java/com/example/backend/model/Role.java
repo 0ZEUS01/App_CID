@@ -1,6 +1,5 @@
 package com.example.backend.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +17,10 @@ public class Role {
 
     @Column(nullable = false)
     private String nom_role;
+
+    @Column(nullable = false)
+    private boolean requiresDivision;
+
+    @Column(nullable = false)
+    private boolean requiresPole;
 }

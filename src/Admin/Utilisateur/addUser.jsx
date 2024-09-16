@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Container, Row, Col, InputGroup, Modal } from 'react-bootstrap';
+import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faArrowRight, faUserPlus, faKey, faEye, faEyeSlash, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../components/sideBar';
@@ -20,7 +21,8 @@ const AddUser = () => {
         adresse: '',
         pole: '',
         division: '',
-        pays: ''
+        pays: '',
+        roles: []
     };
 
     const [newUser, setNewUser] = useState(initialUserState);
@@ -29,9 +31,25 @@ const AddUser = () => {
     const [allDivisions, setAllDivisions] = useState([]);
     const [filteredDivisions, setFilteredDivisions] = useState([]);
     const [pays, setPays] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [emailValid, setEmailValid] = useState(null);
     const [usernameValid, setUsernameValid] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showPoleInput, setShowPoleInput] = useState(false);
+    const [showDivisionInput, setShowDivisionInput] = useState(false);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/roles');
+                console.log('Fetched roles:', response.data);
+                setRoles(response.data);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+            }
+        };
+        fetchRoles();
+    }, []);
 
     useEffect(() => {
         fetchPoles();
@@ -86,6 +104,34 @@ const AddUser = () => {
         }
     };
 
+    const handleRoleChange = (selectedOptions) => {
+        const selectedRoles = selectedOptions.map(option => ({
+            id_role: option.value,
+            nom_role: option.label,
+            requiresPole: roles.find(r => r.id_role === option.value).requiresPole,
+            requiresDivision: roles.find(r => r.id_role === option.value).requiresDivision
+        }));
+        console.log('Selected roles:', selectedRoles);
+        setNewUser({ ...newUser, roles: selectedRoles });
+        updateInputVisibility(selectedRoles);
+    };
+
+    const updateInputVisibility = (selectedRoles) => {
+        const requiresPole = selectedRoles.some(role => role.requiresPole);
+        const requiresDivision = selectedRoles.some(role => role.requiresDivision);
+        
+        console.log('Visibility update:', { requiresPole, requiresDivision });
+        
+        setShowPoleInput(requiresPole);
+        setShowDivisionInput(requiresDivision);
+        
+        if (!requiresPole) {
+            setNewUser(prevState => ({ ...prevState, pole: '', division: '' }));
+        } else if (!requiresDivision) {
+            setNewUser(prevState => ({ ...prevState, division: '' }));
+        }
+    };
+
     const validateEmail = async (email) => {
         if (email.length > 0) {
             try {
@@ -122,7 +168,8 @@ const AddUser = () => {
                 pole: newUser.pole ? { id_pole: parseInt(newUser.pole) } : null,
                 division: newUser.division ? { id_division: parseInt(newUser.division) } : null,
                 pays: newUser.pays ? { id_pays: parseInt(newUser.pays) } : null,
-                date_naissance: newUser.date_naissance || null
+                date_naissance: newUser.date_naissance || null,
+                roles: newUser.roles
             };
             console.log('Sending user data:', userToSend);
             const response = await axios.post('http://localhost:8080/api/utilisateurs', userToSend);
@@ -151,6 +198,10 @@ const AddUser = () => {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+
+    useEffect(() => {
+        console.log('State updated:', { showPoleInput, showDivisionInput });
+    }, [showPoleInput, showDivisionInput]);
 
     return (
         <div className="wrapper">
@@ -315,43 +366,61 @@ const AddUser = () => {
                                                     required
                                                 />
                                             </Form.Group>
-                                            <Row>
-                                                <Col md={6}>
-                                                    <Form.Group className="mb-3">
-                                                        <Form.Label>Pôle</Form.Label>
-                                                        <Form.Control 
-                                                            as="select"
-                                                            name="pole"
-                                                            value={newUser.pole}
-                                                            onChange={handleInputChange}
-                                                            required
-                                                        >
-                                                            <option value="">Sélectionnez un pôle</option>
-                                                            {poles.map((pole) => (
-                                                                <option key={pole.id_pole} value={pole.id_pole}>{pole.libelle_pole}</option>
-                                                            ))}
-                                                        </Form.Control>
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col md={6}>
-                                                    <Form.Group className="mb-3">
-                                                        <Form.Label>Division</Form.Label>
-                                                        <Form.Control 
-                                                            as="select"
-                                                            name="division"
-                                                            value={newUser.division}
-                                                            onChange={handleInputChange}
-                                                            required
-                                                            disabled={!newUser.pole}
-                                                        >
-                                                            <option value="">Sélectionnez une division</option>
-                                                            {filteredDivisions.map((division) => (
-                                                                <option key={division.id_division} value={division.id_division}>{division.nom_division}</option>
-                                                            ))}
-                                                        </Form.Control>
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Rôles</Form.Label>
+                                                <Select
+                                                    isMulti
+                                                    name="roles"
+                                                    options={roles.map(role => ({ 
+                                                        value: role.id_role, 
+                                                        label: role.nom_role,
+                                                        requiresPole: role.requiresPole,
+                                                        requiresDivision: role.requiresDivision
+                                                    }))}
+                                                    className="basic-multi-select"
+                                                    classNamePrefix="select"
+                                                    onChange={handleRoleChange}
+                                                    value={newUser.roles.map(role => ({ 
+                                                        value: role.id_role, 
+                                                        label: role.nom_role
+                                                    }))}
+                                                />
+                                            </Form.Group>
+                                            {showPoleInput && (
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Pôle</Form.Label>
+                                                    <Form.Control 
+                                                        as="select"
+                                                        name="pole"
+                                                        value={newUser.pole}
+                                                        onChange={handleInputChange}
+                                                        required={showPoleInput}
+                                                    >
+                                                        <option value="">Sélectionnez un pôle</option>
+                                                        {poles.map((pole) => (
+                                                            <option key={pole.id_pole} value={pole.id_pole}>{pole.libelle_pole}</option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            )}
+                                            {showDivisionInput && (
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Division</Form.Label>
+                                                    <Form.Control 
+                                                        as="select"
+                                                        name="division"
+                                                        value={newUser.division}
+                                                        onChange={handleInputChange}
+                                                        required={showDivisionInput}
+                                                        disabled={!newUser.pole}
+                                                    >
+                                                        <option value="">Sélectionnez une division</option>
+                                                        {filteredDivisions.map((division) => (
+                                                            <option key={division.id_division} value={division.id_division}>{division.nom_division}</option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            )}
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Pays</Form.Label>
                                                 <Form.Control 

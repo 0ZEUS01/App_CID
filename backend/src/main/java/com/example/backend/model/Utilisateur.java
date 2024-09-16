@@ -1,11 +1,13 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "Utilisateur")
@@ -49,12 +51,21 @@ public class Utilisateur {
     private boolean isDeleted;
 
     @ManyToOne
-    @JoinColumn(name = "pole")
+    @JoinColumn(name = "pole", nullable = true)
     private Pole pole;
 
     @ManyToOne
-    @JoinColumn(name = "division")
+    @JoinColumn(name = "division", nullable = true)
     private Division division;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "utilisateur_roles",
+        joinColumns = @JoinColumn(name = "utilisateur_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Column(nullable = false)
+    private Set<Role> roles = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "pays")

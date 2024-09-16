@@ -1,12 +1,16 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.Role;
 import com.example.backend.model.Utilisateur;
+import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
@@ -14,6 +18,9 @@ public class UtilisateurController {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+    
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping
     public List<Utilisateur> getAllUtilisateurs() {
@@ -53,14 +60,20 @@ public class UtilisateurController {
                     existingUtilisateur.setAdresse(utilisateur.getAdresse());
 
                     // Handle Pole, Division, and Pays
-                    if (utilisateur.getPole() != null && utilisateur.getPole().getId_pole() != null) {
-                        existingUtilisateur.setPole(utilisateur.getPole());
-                    }
-                    if (utilisateur.getDivision() != null && utilisateur.getDivision().getId_division() != null) {
-                        existingUtilisateur.setDivision(utilisateur.getDivision());
-                    }
-                    if (utilisateur.getPays() != null && utilisateur.getPays().getId_pays() != null) {
-                        existingUtilisateur.setPays(utilisateur.getPays());
+                    existingUtilisateur.setPole(utilisateur.getPole());
+                    existingUtilisateur.setDivision(utilisateur.getDivision());
+                    existingUtilisateur.setPays(utilisateur.getPays());
+
+                    // Handle Roles
+                    if (utilisateur.getRoles() != null) {
+                        Set<Role> updatedRoles = utilisateur.getRoles().stream()
+                                .filter(role -> role != null && role.getId_role() != null)
+                                .map(role -> roleRepository.findById(role.getId_role())
+                                        .orElseThrow(() -> new RuntimeException("Role not found with id: " + role.getId_role())))
+                                .collect(Collectors.toSet());
+                        existingUtilisateur.setRoles(updatedRoles);
+                    } else {
+                        existingUtilisateur.setRoles(null);
                     }
 
                     return ResponseEntity.ok().body(utilisateurRepository.save(existingUtilisateur));

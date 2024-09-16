@@ -23,7 +23,7 @@ const AfficherRole = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
     const [deletingRole, setDeletingRole] = useState(null);
-    const [newRole, setNewRole] = useState({ nom_role: '' });
+    const [newRole, setNewRole] = useState({ nom_role: '', requiresDivision: false, requiresPole: false });
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -120,9 +120,32 @@ const AfficherRole = () => {
             await axios.post('http://localhost:8080/api/roles', newRole);
             fetchRoles();
             setShowAddModal(false);
-            setNewRole({ nom_role: '' });
+            setNewRole({ nom_role: '', requiresDivision: false, requiresPole: false });
         } catch (error) {
             console.error('Error adding role:', error);
+        }
+    };
+
+    const handleInputChange = (e, isEditing = false) => {
+        const { name, value, type, checked } = e.target;
+        const newValue = type === 'checkbox' ? checked : value;
+        
+        if (isEditing) {
+            setEditingRole(prev => {
+                const updatedRole = { ...prev, [name]: newValue };
+                if (name === 'requiresDivision' && newValue) {
+                    updatedRole.requiresPole = true;
+                }
+                return updatedRole;
+            });
+        } else {
+            setNewRole(prev => {
+                const updatedRole = { ...prev, [name]: newValue };
+                if (name === 'requiresDivision' && newValue) {
+                    updatedRole.requiresPole = true;
+                }
+                return updatedRole;
+            });
         }
     };
 
@@ -251,8 +274,28 @@ const AfficherRole = () => {
                         <Form.Label>Nom du rôle</Form.Label>
                         <Form.Control
                             type="text"
+                            name="nom_role"
                             value={newRole.nom_role}
-                            onChange={(e) => setNewRole({ ...newRole, nom_role: e.target.value })}
+                            onChange={(e) => handleInputChange(e)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Check 
+                            type="checkbox"
+                            label="Appartient à une division"
+                            name="requiresDivision"
+                            checked={newRole.requiresDivision}
+                            onChange={(e) => handleInputChange(e)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Check 
+                            type="checkbox"
+                            label="Appartient à un pôle"
+                            name="requiresPole"
+                            checked={newRole.requiresPole}
+                            onChange={(e) => handleInputChange(e)}
+                            disabled={newRole.requiresDivision}
                         />
                     </Form.Group>
                 </Modal.Body>
@@ -280,8 +323,28 @@ const AfficherRole = () => {
                         <Form.Label>Nom du rôle</Form.Label>
                         <Form.Control
                             type="text"
+                            name="nom_role"
                             value={editingRole?.nom_role || ''}
-                            onChange={(e) => setEditingRole({ ...editingRole, nom_role: e.target.value })}
+                            onChange={(e) => handleInputChange(e, true)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Check 
+                            type="checkbox"
+                            label="Appartient à une division"
+                            name="requiresDivision"
+                            checked={editingRole?.requiresDivision || false}
+                            onChange={(e) => handleInputChange(e, true)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Check 
+                            type="checkbox"
+                            label="Appartient à un pôle"
+                            name="requiresPole"
+                            checked={editingRole?.requiresPole || false}
+                            onChange={(e) => handleInputChange(e, true)}
+                            disabled={editingRole?.requiresDivision}
                         />
                     </Form.Group>
                 </Modal.Body>
