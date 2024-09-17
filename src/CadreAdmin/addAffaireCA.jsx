@@ -14,14 +14,29 @@ import Footer from './components/footer';
 const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options, disabled, error, suggestion, onSuggestionClick }) => (
     <div className="mb-3 col-md-6 form-group">
         <label htmlFor={id} className="form-label" style={{ textAlign: 'left', display: 'block' }}>{label}</label>
-        <input
-            type={type}
-            className={`form-control ${error ? 'is-invalid' : ''}`}
-            id={id}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-        />
+        {type === 'select' ? (
+            <select
+                className={`form-select form-control ${error ? 'is-invalid' : ''}`}
+                id={id}
+                value={value}
+                onChange={onChange}
+                disabled={disabled}
+            >
+                <option value="">Sélectionnez une option</option>
+                {options && options.map((option, index) => (
+                    <option key={index} value={option.value || option}>{option.label || option}</option>
+                ))}
+            </select>
+        ) : (
+            <input
+                type={type}
+                className={`form-control ${error ? 'is-invalid' : ''}`}
+                id={id}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+            />
+        )}
         {suggestion && (
             <small className="form-text text-muted">
                 Suggestion: <a href="#" onClick={onSuggestionClick}>{suggestion}</a>
@@ -74,42 +89,58 @@ const AddAffaire = () => {
     const [suggestedId, setSuggestedId] = useState('');
 
     useEffect(() => {
-        const currentYear = new Date().getFullYear();
+        const fetchClients = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/clients');
+                console.log('Clients:', response.data);
+                setClients(response.data);
+            } catch (error) {
+                console.error('Error fetching clients:', error);
+            }
+        };
 
-        // Fetch the last affaire ID from the database
+        const fetchPoles = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/poles');
+                console.log('Poles:', response.data);
+                setPoles(response.data);
+            } catch (error) {
+                console.error('Error fetching poles:', error);
+            }
+        };
+
+        const fetchDivisions = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/divisions');
+                console.log('Divisions:', response.data);
+                setAllDivisions(response.data);
+            } catch (error) {
+                console.error('Error fetching divisions:', error);
+            }
+        };
+
+        fetchClients();
+        fetchPoles();
+        fetchDivisions();
+
+        // Generate suggested ID
+        const currentYear = new Date().getFullYear();
         axios.get('http://localhost:8080/api/affaires/last-id')
             .then(response => {
                 const lastId = response.data;
                 let newId;
-
                 if (lastId && lastId.startsWith(currentYear.toString())) {
-                    // If there's a last ID for the current year, increment it
                     const lastNumber = parseInt(lastId.slice(-5));
                     newId = `${currentYear}${(lastNumber + 1).toString().padStart(5, '0')}`;
                 } else {
-                    // If there's no ID for the current year, start with 00001
                     newId = `${currentYear}00001`;
                 }
-
                 setSuggestedId(newId);
             })
             .catch(error => {
                 console.error('Error fetching last affaire ID:', error);
-                // Fallback to a default ID if there's an error
                 setSuggestedId(`${currentYear}00001`);
             });
-
-        Promise.all([
-            axios.get('http://localhost:8080/api/clients'),
-            axios.get('http://localhost:8080/api/poles'),
-            axios.get('http://localhost:8080/api/divisions'),
-        ]).then(([clientsRes, polesRes, divisionsRes]) => {
-            setClients(clientsRes.data);
-            setPoles(polesRes.data);
-            setAllDivisions(divisionsRes.data);
-        }).catch(error => {
-            console.error('Error fetching data:', error);
-        });
     }, []);
 
     const validateForm = useCallback(() => {
