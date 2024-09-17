@@ -14,7 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class Affaire {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_affaire")
     private Long idAffaire;
 

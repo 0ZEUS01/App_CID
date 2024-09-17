@@ -123,22 +123,14 @@ const AddAffaire = () => {
         fetchPoles();
         fetchDivisions();
 
-        // Generate suggested ID
-        const currentYear = new Date().getFullYear();
+        // Fetch suggested ID
         axios.get('http://localhost:8080/api/affaires/last-id')
             .then(response => {
-                const lastId = response.data;
-                let newId;
-                if (lastId && lastId.startsWith(currentYear.toString())) {
-                    const lastNumber = parseInt(lastId.slice(-5));
-                    newId = `${currentYear}${(lastNumber + 1).toString().padStart(5, '0')}`;
-                } else {
-                    newId = `${currentYear}00001`;
-                }
-                setSuggestedId(newId);
+                setSuggestedId(response.data);
             })
             .catch(error => {
                 console.error('Error fetching last affaire ID:', error);
+                const currentYear = new Date().getFullYear();
                 setSuggestedId(`${currentYear}00001`);
             });
     }, []);
@@ -190,8 +182,12 @@ const AddAffaire = () => {
         if (validateForm()) {
             try {
                 const dataToSend = {
-                    ...formData,
+                    idAffaire: parseInt(formData.id_affaire), 
+                    libelle_affaire: formData.libelle_affaire,
                     prixGlobal: parseFloat(formData.prixGlobal),
+                    marche: formData.marche,
+                    dateDebut: formData.dateDebut,
+                    dateFin: formData.dateFin,
                     client: { id_client: parseInt(formData.client) },
                     polePrincipale: { id_pole: parseInt(formData.polePrincipale) },
                     divisionPrincipale: { id_division: parseInt(formData.divisionPrincipale) },
@@ -201,7 +197,7 @@ const AddAffaire = () => {
                 setShowSuccessModal(true);
             } catch (error) {
                 console.error('Error adding affaire:', error);
-                alert('Erreur lors de l\'ajout de l\'affaire: ' + error.response?.data?.message || error.message);
+                alert('Erreur lors de l\'ajout de l\'affaire: ' + error.response?.data || error.message);
             }
         }
     };
@@ -242,7 +238,7 @@ const AddAffaire = () => {
                                                 <FormField
                                                     label="ID Affaire"
                                                     id="id_affaire"
-                                                    placeholder="Entrer l'ID de l'affaire (ex: 202400001)"
+                                                    placeholder={`Entrer l'ID de l'affaire (ex: ${suggestedId})`}
                                                     value={formData.id_affaire}
                                                     onChange={handleInputChange}
                                                     suggestion={suggestedId}
@@ -269,7 +265,6 @@ const AddAffaire = () => {
 
                                                 <FormField label="Date de début" id="dateDebut" type="date" value={formData.dateDebut} onChange={handleInputChange} />
                                                 <FormField label="Date de fin" id="dateFin" type="date" value={formData.dateFin} onChange={handleInputChange} error={errors.dateFin} />
-
 
                                                 <FormField
                                                     label="Pôle Principale"

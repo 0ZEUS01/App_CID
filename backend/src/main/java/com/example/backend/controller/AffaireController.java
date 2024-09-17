@@ -30,8 +30,16 @@ public class AffaireController {
     }
 
     @PostMapping
-    public Affaire createAffaire(@RequestBody Affaire affaire) {
-        return affaireRepository.save(affaire);
+    public ResponseEntity<?> createAffaire(@RequestBody Affaire affaire) {
+        if (affaire.getIdAffaire() == null) {
+            return ResponseEntity.badRequest().body("ID Affaire must be provided");
+        }
+        if (affaireRepository.existsById(affaire.getIdAffaire())) {
+            return ResponseEntity.badRequest().body("An affaire with this ID already exists");
+        }
+        affaire.setStatusAffaire(StatusAffaire.EN_CREATION); // Set initial status
+        Affaire savedAffaire = affaireRepository.save(affaire);
+        return ResponseEntity.ok(savedAffaire);
     }
 
     @PutMapping("/{id}")
@@ -71,9 +79,18 @@ public class AffaireController {
     }
     @GetMapping("/last-id")
     public ResponseEntity<String> getLastAffaireId() {
-        String lastId = affaireRepository.findTopByOrderByIdAffaireDesc()
-                .map(affaire -> String.valueOf(affaire.getIdAffaire()))
-                .orElse(null);
-        return ResponseEntity.ok(lastId);
+        return affaireRepository.findTopByOrderByIdAffaireDesc()
+                .map(affaire -> {
+                    Long lastId = affaire.getIdAffaire();
+                    int currentYear = java.time.Year.now().getValue();
+                    long nextId;
+                    if (lastId / 100000 == currentYear) {
+                        nextId = lastId + 1;
+                    } else {
+                        nextId = (long) currentYear * 100000 + 1;
+                    }
+                    return ResponseEntity.ok(String.valueOf(nextId));
+                })
+                .orElse(ResponseEntity.ok(String.valueOf(java.time.Year.now().getValue() * 100000 + 1)));
     }
 }
