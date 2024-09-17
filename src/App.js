@@ -27,7 +27,7 @@ import AfficherUser from './Admin/Utilisateur/afficherUser';
 import AddUser from './Admin/Utilisateur/addUser';
 import AfficherPole from './Admin/Pole/afficherPole';
 import AfficherDivision from './Admin/Division/afficherDivision'
-import AfficherClient from './Admin/Client/afficherClient'
+import AfficherClient from './CadreAdmin/Client/afficherClient'
 import AfficherPays from './Admin/Pays/afficherPays'
 import AfficherSousTraitant from './Admin/SousTraitant/afficherST'
 import AfficherPartenaire from './Admin/Partenaire/afficherPartenaire'

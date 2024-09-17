@@ -1,11 +1,12 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
-import Footer from'./components/footer'
+import Footer from './components/footer';
 
 const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options }) => (
     <div className="mb-3 col-md-6 form-group">
@@ -17,8 +18,9 @@ const FormField = ({ label, id, type = 'text', placeholder, value, onChange, opt
                 value={value}
                 onChange={onChange}
             >
+                <option value="">Sélectionnez une option</option>
                 {options.map((option, index) => (
-                    <option key={index} value={option.value}>{option.label}</option>
+                    <option key={index} value={option.value || option}>{option.label || option}</option>
                 ))}
             </select>
         ) : (
@@ -53,19 +55,37 @@ const Breadcrumb = ({ items }) => (
     </ul>
 );
 
-
 const AddAffaire = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        libelleAffaire: '',
-        nomClient: '',
-        numeroMarche: '',
+        libelle_affaire: '',
+        prixGlobal: '',
+        marche: '',
+        dateDebut: '',
+        dateFin: '',
+        client: '',
         polePrincipale: '',
         divisionPrincipale: '',
-        groupment: '1',
-        nomMandataireGroupment: '',
-        partTotaleMarche: '',
         partCID: ''
     });
+
+    const [clients, setClients] = useState([]);
+    const [poles, setPoles] = useState([]);
+    const [divisions, setDivisions] = useState([]);
+
+    useEffect(() => {
+        Promise.all([
+            axios.get('http://localhost:8080/api/clients'),
+            axios.get('http://localhost:8080/api/poles'),
+            axios.get('http://localhost:8080/api/divisions'),
+        ]).then(([clientsRes, polesRes, divisionsRes]) => {
+            setClients(clientsRes.data);
+            setPoles(polesRes.data);
+            setDivisions(divisionsRes.data);
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }, []);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -75,9 +95,29 @@ const AddAffaire = () => {
         }));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const dataToSend = {
+                ...formData,
+                prixGlobal: parseFloat(formData.prixGlobal),
+                client: { id_client: parseInt(formData.client) },
+                polePrincipale: { id_pole: parseInt(formData.polePrincipale) },
+                divisionPrincipale: { id_division: parseInt(formData.divisionPrincipale) },
+                partCID: parseFloat(formData.partCID)
+            };
+            await axios.post('http://localhost:8080/api/affaires', dataToSend);
+            alert('Affaire ajoutée avec succès');
+            navigate('/afficherAffaireCA');
+        } catch (error) {
+            console.error('Error adding affaire:', error);
+            alert('Erreur lors de l\'ajout de l\'affaire: ' + error.response?.data?.message || error.message);
+        }
+    };
+
     const breadcrumbItems = [
         { icon: "icon-home", link: "#" },
-        { text: "Gestion des Affaire", link: "#" },
+        { text: "Gestion des Affaires", link: "#" },
         { text: "Ajouter une nouvelle Affaire", link: "#" }
     ];
 
@@ -89,7 +129,7 @@ const AddAffaire = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h3 className="fw-bold mb-3">Gestion des Affaire</h3>
+                            <h3 className="fw-bold mb-3">Gestion des Affaires</h3>
                             <Breadcrumb items={breadcrumbItems} />
                         </div>
                         <div className="row">
@@ -99,24 +139,47 @@ const AddAffaire = () => {
                                         <div className="card-title">Ajouter une nouvelle Affaire</div>
                                     </div>
                                     <div className="card-body">
-                                        <div className="row">
-                                            <FormField label="Libelle de l'affaire" id="libelleAffaire" placeholder="Entrer le libelle de l'affaire" value={formData.libelleAffaire} onChange={handleInputChange} />
-                                            <FormField label="Nom de Client" id="nomClient" placeholder="Entrer le nom du client" value={formData.nomClient} onChange={handleInputChange} />
-                                            <FormField label="Numéro de marché" id="numeroMarche" placeholder="Entrer le Numéro de marché" value={formData.numeroMarche} onChange={handleInputChange} />
-                                            <FormField label="Pole Principale" id="polePrincipale" placeholder="Entrer le nom de pole" value={formData.polePrincipale} onChange={handleInputChange} />
-                                            <FormField label="Division Principale" id="divisionPrincipale" placeholder="Entrer le nom de division principale" value={formData.divisionPrincipale} onChange={handleInputChange} />
-                                            <FormField label="Groupment" id="groupment" type="select" value={formData.groupment} onChange={handleInputChange} options={[
-                                                { value: '1', label: 'Oui' },
-                                                { value: '2', label: 'Non' }
-                                            ]} />
-                                            <FormField label="Nom de mandataire de groupment" id="nomMandataireGroupment" placeholder="Entrer le nom de mandataire de groupment" value={formData.nomMandataireGroupment} onChange={handleInputChange} />
-                                            <FormField label="Part totale de marché (HT)" id="partTotaleMarche" placeholder="Entrer la part totale de marché en DH" value={formData.partTotaleMarche} onChange={handleInputChange} />
-                                            <FormField label="Part de CID (HT)" id="partCID" placeholder="Entrer la part de CID en DH" value={formData.partCID} onChange={handleInputChange} />
-                                            <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
-                                                <Link className="btn btn-primary" to='/AddMissionCA'>Suivant</Link>
-                                                <button className="btn btn-black btn-border">Annuler</button>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="row">
+                                                <FormField label="Libellé de l'affaire" id="libelle_affaire" placeholder="Entrer le libellé de l'affaire" value={formData.libelle_affaire} onChange={handleInputChange} />
+                                                <FormField label="Numéro de marché" id="marche" placeholder="Entrer le numéro de marché" value={formData.marche} onChange={handleInputChange} />
+
+                                                <FormField label="Prix Global" id="prixGlobal" type="number" placeholder="Entrer le prix global" value={formData.prixGlobal} onChange={handleInputChange} />
+                                                <FormField label="Part CID" id="partCID" type="number" placeholder="Entrer la part CID" value={formData.partCID} onChange={handleInputChange} />
+                                                
+                                                <FormField label="Date de début" id="dateDebut" type="date" value={formData.dateDebut} onChange={handleInputChange} />
+                                                <FormField label="Date de fin" id="dateFin" type="date" value={formData.dateFin} onChange={handleInputChange} />
+                                                
+                                                <FormField 
+                                                    label="Client" 
+                                                    id="client" 
+                                                    type="select" 
+                                                    value={formData.client} 
+                                                    onChange={handleInputChange}
+                                                    options={clients.map(client => ({ value: client.id_client, label: client.nom_client }))}
+                                                />
+                                                <FormField 
+                                                    label="Pôle Principale" 
+                                                    id="polePrincipale" 
+                                                    type="select" 
+                                                    value={formData.polePrincipale} 
+                                                    onChange={handleInputChange}
+                                                    options={poles.map(pole => ({ value: pole.id_pole, label: pole.libelle_pole }))}
+                                                />
+                                                <FormField 
+                                                    label="Division Principale" 
+                                                    id="divisionPrincipale" 
+                                                    type="select" 
+                                                    value={formData.divisionPrincipale} 
+                                                    onChange={handleInputChange}
+                                                    options={divisions.map(division => ({ value: division.id_division, label: division.nom_division }))}
+                                                />
                                             </div>
-                                        </div>
+                                            <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
+                                                <button type="submit" className="btn btn-primary">Ajouter</button>
+                                                <Link className="btn btn-danger" to='/afficherAffaireCA'>Annuler</Link>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

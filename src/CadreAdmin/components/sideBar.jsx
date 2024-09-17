@@ -59,18 +59,9 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                         </span>
                         <h4 className="text-section">Components</h4>
                     </li>
-                    <SidebarItem href="#" icon="fas fa-layer-group" text="Gestion des Affaires">
-                        <li>
-                            <Link to="/AddAffaireCA">
-                                <span className="sub-item">Ajouter une nouvelle Affaire</span>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/afficherAffaireCA">
-                                <span className="sub-item">Liste des affaires</span>
-                            </Link>
-                        </li>
-                    </SidebarItem>
+                    <SidebarItem href="/afficherClient" icon="fas fa-user-tie" text="Nouveau Client" />
+                    <SidebarItem href="/AddAffaireCA" icon="fas fa-plus-circle" text="Ajouter une Affaire" />
+                    <SidebarItem href="/afficherAffaireCA" icon="fas fa-list" text="Liste des affaires" />
                 </ul>
                 <ul className="nav">
                     {menuItems.map((item, index) => (

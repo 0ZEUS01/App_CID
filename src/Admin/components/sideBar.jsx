@@ -61,7 +61,6 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                     </li>
                     <SidebarItem href="/afficherPole" icon="fas fa-sitemap" text="Gestion des Pôles" />
                     <SidebarItem href="/afficherDivision" icon="fas fa-building" text="Gestion des Divisions" />
-                    <SidebarItem href="/afficherClient" icon="fas fa-user-tie" text="Gestion des Clients" />
                     <SidebarItem href="/afficherRole" icon="fas fa-user-tag" text="Gestion des Rôles" />
                     <SidebarItem href="#" icon="fas fa-users" text="Gestion des Utilisateurs">
                         <li>

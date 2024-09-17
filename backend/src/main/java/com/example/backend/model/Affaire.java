@@ -23,12 +23,12 @@ public class Affaire {
     @Column(name = "prix_global", nullable = false)
     private Double prixGlobal;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status_affaire", nullable = false)
-    private String statusAffaire;
+    private StatusAffaire statusAffaire = StatusAffaire.DEFAULT;
 
-    @ManyToOne
-    @JoinColumn(name = "num_marche")
-    private Marche marche;
+    @Column(name = "num_marche", nullable = false)
+    private String marche;
 
     @Column(name = "date_debut", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -46,6 +46,25 @@ public class Affaire {
     @Temporal(TemporalType.DATE)
     private Date dateRecommencement;
 
-    @Column(name = "pourcentage_assurance")
-    private Double pourcentageAssurance;
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "pole_principale_id", nullable = false)
+    private Pole polePrincipale;
+
+    @ManyToOne
+    @JoinColumn(name = "division_principale_id", nullable = false)
+    private Division divisionPrincipale;
+
+    @Column(name = "part_cid", nullable = false)
+    private Double partCID;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.statusAffaire == null) {
+            this.statusAffaire = StatusAffaire.DEFAULT;
+        }
+    }
 }

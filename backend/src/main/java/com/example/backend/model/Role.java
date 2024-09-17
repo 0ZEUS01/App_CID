@@ -24,6 +24,6 @@ public class Role {
     @Column(nullable = false)
     private boolean requiresPole;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String redirectionLink;
 }
