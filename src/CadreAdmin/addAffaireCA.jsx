@@ -4,11 +4,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Modal, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 
-const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options }) => (
+const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options, disabled }) => (
     <div className="mb-3 col-md-6 form-group">
         <label htmlFor={id} className="form-label" style={{ textAlign: 'left', display: 'block' }}>{label}</label>
         {type === 'select' ? (
@@ -17,6 +20,7 @@ const FormField = ({ label, id, type = 'text', placeholder, value, onChange, opt
                 id={id}
                 value={value}
                 onChange={onChange}
+                disabled={disabled}
             >
                 <option value="">Sélectionnez une option</option>
                 {options.map((option, index) => (
@@ -71,7 +75,9 @@ const AddAffaire = () => {
 
     const [clients, setClients] = useState([]);
     const [poles, setPoles] = useState([]);
-    const [divisions, setDivisions] = useState([]);
+    const [allDivisions, setAllDivisions] = useState([]);
+    const [filteredDivisions, setFilteredDivisions] = useState([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     useEffect(() => {
         Promise.all([
@@ -81,7 +87,7 @@ const AddAffaire = () => {
         ]).then(([clientsRes, polesRes, divisionsRes]) => {
             setClients(clientsRes.data);
             setPoles(polesRes.data);
-            setDivisions(divisionsRes.data);
+            setAllDivisions(divisionsRes.data);
         }).catch(error => {
             console.error('Error fetching data:', error);
         });
@@ -93,6 +99,13 @@ const AddAffaire = () => {
             ...prevState,
             [id]: value
         }));
+
+        if (id === 'polePrincipale') {
+            const selectedPoleId = value;
+            const relatedDivisions = allDivisions.filter(division => division.pole.id_pole.toString() === selectedPoleId);
+            setFilteredDivisions(relatedDivisions);
+            setFormData(prevState => ({ ...prevState, polePrincipale: selectedPoleId, divisionPrincipale: '' }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -107,12 +120,16 @@ const AddAffaire = () => {
                 partCID: parseFloat(formData.partCID)
             };
             await axios.post('http://localhost:8080/api/affaires', dataToSend);
-            alert('Affaire ajoutée avec succès');
-            navigate('/afficherAffaireCA');
+            setShowSuccessModal(true);
         } catch (error) {
             console.error('Error adding affaire:', error);
             alert('Erreur lors de l\'ajout de l\'affaire: ' + error.response?.data?.message || error.message);
         }
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        navigate('/afficherAffaireCA');
     };
 
     const breadcrumbItems = [
@@ -172,7 +189,8 @@ const AddAffaire = () => {
                                                     type="select" 
                                                     value={formData.divisionPrincipale} 
                                                     onChange={handleInputChange}
-                                                    options={divisions.map(division => ({ value: division.id_division, label: division.nom_division }))}
+                                                    options={filteredDivisions.map(division => ({ value: division.id_division, label: division.nom_division }))}
+                                                    disabled={!formData.polePrincipale}
                                                 />
                                             </div>
                                             <div className="card-action" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
@@ -188,6 +206,24 @@ const AddAffaire = () => {
                     <Footer />
                 </div>
             </div>
+
+            {/* Success Modal */}
+            <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Succès</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-success mr-2" />&nbsp;
+                        L'affaire a été ajoutée avec succès!
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseSuccessModal}>
+                        Fermer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
