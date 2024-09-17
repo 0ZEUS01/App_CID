@@ -77,6 +77,8 @@ const Sidebar = ({ logo, menuItems = [] }) => (
                     </SidebarItem>
                     <SidebarItem href="/afficherUnite" icon="fas fa-tags" text="Gestion des Unités" />
                     <SidebarItem href="/afficherPays" icon="fas fa-globe-americas" text="Gestion des Pays" />
+                    <SidebarItem href="/afficherSousTraitant" icon="fas fa-users" text="Gestion des Sous Traitants" />
+                    <SidebarItem href="/afficherPartenaire" icon="fas fa-handshake" text="Gestion des Partenaire" />
                 </ul>
                 <ul className="nav">
                     {menuItems.map((item, index) => (

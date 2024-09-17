@@ -29,7 +29,8 @@ import AfficherPole from './Admin/Pole/afficherPole';
 import AfficherDivision from './Admin/Division/afficherDivision'
 import AfficherClient from './Admin/Client/afficherClient'
 import AfficherPays from './Admin/Pays/afficherPays'
-
+import AfficherSousTraitant from './Admin/SousTraitant/afficherST'
+import AfficherPartenaire from './Admin/Partenaire/afficherPartenaire'
 // Update the routes array with French titles
 const routes = [
   { path: '/', element: Home, title: 'Accueil' },
@@ -58,6 +59,8 @@ const routes = [
   { path: '/afficherDivision', element: AfficherDivision, title: 'Gestion des Divisions - CID' },
   { path: '/afficherClient', element: AfficherClient, title: 'Gestion des Clients - CID' },
   { path: '/afficherPays', element: AfficherPays, title: 'Gestion des Pays - CID' },
+  { path: '/afficherSousTraitant', element: AfficherSousTraitant, title: 'Gestion des Sous-traitants - CID' },
+  { path: '/afficherPartenaire', element: AfficherPartenaire, title: 'Gestion des Partenaires - CID' },
 ];
 
 function App() {
