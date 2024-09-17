@@ -105,7 +105,9 @@ public class UtilisateurController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        Utilisateur utilisateur = utilisateurRepository.findByEmailOrUsername(loginRequest.getIdentifier(), loginRequest.getIdentifier())
+        String lowercaseIdentifier = loginRequest.getIdentifier().trim().toLowerCase();
+        
+        Utilisateur utilisateur = utilisateurRepository.findByEmailIgnoreCaseOrUsernameIgnoreCase(lowercaseIdentifier, lowercaseIdentifier)
                 .orElse(null);
 
         if (utilisateur == null || !utilisateur.getMot_de_passe().equals(loginRequest.getPassword())) {

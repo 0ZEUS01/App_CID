@@ -15,17 +15,18 @@ const Login = () => {
         e.preventDefault();
         setError('');
         try {
+            const trimmedLowercaseIdentifier = identifier.trim().toLowerCase();
             const response = await axios.post('http://localhost:8080/api/utilisateurs/login', {
-                identifier,
+                identifier: trimmedLowercaseIdentifier,
                 password
             });
             if (response.data.redirectionLink) {
                 navigate(response.data.redirectionLink);
             } else {
-                setError('Login successful but no redirection link provided.');
+                setError('Connexion réussie mais aucun lien de redirection fourni.');
             }
         } catch (error) {
-            setError('Invalid credentials. Please try again.');
+            setError('Identifiants invalides. Veuillez réessayer.');
         }
     };
 
