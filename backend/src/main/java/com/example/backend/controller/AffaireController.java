@@ -69,4 +69,11 @@ public class AffaireController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+    @GetMapping("/last-id")
+    public ResponseEntity<String> getLastAffaireId() {
+        String lastId = affaireRepository.findTopByOrderByIdAffaireDesc()
+                .map(affaire -> String.valueOf(affaire.getIdAffaire()))
+                .orElse(null);
+        return ResponseEntity.ok(lastId);
+    }
 }

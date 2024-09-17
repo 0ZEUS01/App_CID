@@ -15,7 +15,8 @@ import java.util.Date;
 public class Affaire {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_affaire;
+    @Column(name = "id_affaire")
+    private Long idAffaire;
 
     @Column(nullable = false)
     private String libelle_affaire;
