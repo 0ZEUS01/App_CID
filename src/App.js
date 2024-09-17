@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageMeta from './PageMeta';
 
 // Import views
-import Home from './views/home';
+import Login from './views/login';
 import HomeCA from './CadreAdmin/homeCA';
 import AddAffaireCA from './CadreAdmin/addAffaireCA';
 import AfficherAffaireCA from './CadreAdmin/afficherAffaireCA';
@@ -31,9 +31,10 @@ import AfficherClient from './Admin/Client/afficherClient'
 import AfficherPays from './Admin/Pays/afficherPays'
 import AfficherSousTraitant from './Admin/SousTraitant/afficherST'
 import AfficherPartenaire from './Admin/Partenaire/afficherPartenaire'
+import HomeAdmin from './Admin/HomeAdmin';
 // Update the routes array with French titles
 const routes = [
-  { path: '/', element: Home, title: 'Accueil' },
+  { path: '/', element: Login, title: 'Login' },
   { path: '/HomeCA', element: HomeCA, title: 'Accueil - CID' },
   { path: '/addAffaireCA', element: AddAffaireCA, title: 'Ajouter Affaire - CID' },
   { path: '/afficherAffaireCA', element: AfficherAffaireCA, title: 'Afficher Affaire - CID' },
@@ -61,6 +62,7 @@ const routes = [
   { path: '/afficherPays', element: AfficherPays, title: 'Gestion des Pays - CID' },
   { path: '/afficherSousTraitant', element: AfficherSousTraitant, title: 'Gestion des Sous-traitants - CID' },
   { path: '/afficherPartenaire', element: AfficherPartenaire, title: 'Gestion des Partenaires - CID' },
+  { path: '/HomeAdmin', element: HomeAdmin, title: 'Accueil - CID' },
 ];
 
 function App() {

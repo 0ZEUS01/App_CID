@@ -4,6 +4,7 @@ import com.example.backend.model.Role;
 import com.example.backend.model.Utilisateur;
 import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.UtilisateurRepository;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +101,45 @@ public class UtilisateurController {
     public ResponseEntity<Boolean> checkUsernameAvailability(@RequestParam String username) {
         boolean isAvailable = !utilisateurRepository.findByUsername(username).isPresent();
         return ResponseEntity.ok(isAvailable);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Utilisateur utilisateur = utilisateurRepository.findByEmailOrUsername(loginRequest.getIdentifier(), loginRequest.getIdentifier())
+                .orElse(null);
+
+        if (utilisateur == null || !utilisateur.getMot_de_passe().equals(loginRequest.getPassword())) {
+            return ResponseEntity.badRequest().body("Invalid credentials");
+        }
+
+        // User authenticated successfully
+        Set<Role> roles = utilisateur.getRoles();
+        if (roles == null || roles.isEmpty()) {
+            return ResponseEntity.ok().body(new LoginResponse("No role assigned", null));
+        }
+
+        // For simplicity, we'll use the first role's redirection link
+        // You might want to implement more complex logic if a user can have multiple roles
+        String redirectionLink = roles.iterator().next().getRedirectionLink();
+
+        return ResponseEntity.ok().body(new LoginResponse("Login successful", redirectionLink));
+    }
+}
+
+@Data
+class LoginRequest {
+    private String identifier; // This can be either email or username
+    private String password;
+}
+
+@Data
+class LoginResponse {
+    private String message;
+    private String redirectionLink;
+
+    public LoginResponse(String message, String redirectionLink) {
+        this.message = message;
+        this.redirectionLink = redirectionLink;
     }
 }
 

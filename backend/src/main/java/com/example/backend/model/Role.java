@@ -23,4 +23,7 @@ public class Role {
 
     @Column(nullable = false)
     private boolean requiresPole;
+
+    @Column(nullable = true)
+    private String redirectionLink;
 }

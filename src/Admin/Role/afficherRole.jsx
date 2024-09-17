@@ -15,6 +15,12 @@ import {
 import Sidebar from '../components/sideBar';
 import MainHeader from '../components/mainHeader';
 import Footer from '../components/footer';
+import { useNavigate } from 'react-router-dom';
+import HomeCA from '../../CadreAdmin/homeCA.jsx';
+import HomeCP from '../../ChefPole/homeCP.jsx';
+import HomeCD from '../../ChefDiv/homeCD.jsx';
+import HomeCDP from '../../ChefProjet/homeCDP.jsx';
+import HomeAdmin from '../HomeAdmin';
 
 const AfficherRole = () => {
     const [roles, setRoles] = useState([]);
@@ -23,13 +29,16 @@ const AfficherRole = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
     const [deletingRole, setDeletingRole] = useState(null);
-    const [newRole, setNewRole] = useState({ nom_role: '', requiresDivision: false, requiresPole: false });
+    const [newRole, setNewRole] = useState({ nom_role: '', requiresDivision: false, requiresPole: false, redirectionLink: '' });
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [routes, setRoutes] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchRoles();
+        fetchRoutes();
     }, []);
 
     const fetchRoles = async () => {
@@ -42,6 +51,17 @@ const AfficherRole = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const fetchRoutes = () => {
+        const appRoutes = [
+            { path: '/HomeAdmin', element: HomeAdmin, title: 'Accueil d\'admin' },
+            { path: '/HomeCA', element: HomeCA, title: 'Accueil de Cadre Administratif' },
+            { path: '/HomeCP', element: HomeCP, title: 'Accueil de Chef de Pôle' },
+            { path: '/HomeCD', element: HomeCD, title: 'Accueil de Chef de Division' },
+            { path: '/HomeCDP', element: HomeCDP, title: 'Accueil de Chef de Projet' },
+        ];
+        setRoutes(appRoutes);
     };
 
     const handleSearch = (term) => {
@@ -65,7 +85,7 @@ const AfficherRole = () => {
     }, [roles, sortConfig]);
 
     const filteredRoles = useMemo(() => {
-        return sortedRoles.filter(role => 
+        return sortedRoles.filter(role =>
             role.nom_role.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [sortedRoles, searchTerm]);
@@ -120,7 +140,7 @@ const AfficherRole = () => {
             await axios.post('http://localhost:8080/api/roles', newRole);
             fetchRoles();
             setShowAddModal(false);
-            setNewRole({ nom_role: '', requiresDivision: false, requiresPole: false });
+            setNewRole({ nom_role: '', requiresDivision: false, requiresPole: false, redirectionLink: '' });
         } catch (error) {
             console.error('Error adding role:', error);
         }
@@ -129,7 +149,7 @@ const AfficherRole = () => {
     const handleInputChange = (e, isEditing = false) => {
         const { name, value, type, checked } = e.target;
         const newValue = type === 'checkbox' ? checked : value;
-        
+
         if (isEditing) {
             setEditingRole(prev => {
                 const updatedRole = { ...prev, [name]: newValue };
@@ -261,8 +281,8 @@ const AfficherRole = () => {
             </div>
 
             {/* Add Role Modal */}
-            <Modal 
-                show={showAddModal} 
+            <Modal
+                show={showAddModal}
                 onHide={() => setShowAddModal(false)}
                 centered
             >
@@ -280,7 +300,7 @@ const AfficherRole = () => {
                         />
                     </Form.Group>
                     <Form.Group className="mt-3">
-                        <Form.Check 
+                        <Form.Check
                             type="checkbox"
                             label="Appartient à une division"
                             name="requiresDivision"
@@ -289,7 +309,7 @@ const AfficherRole = () => {
                         />
                     </Form.Group>
                     <Form.Group className="mt-3">
-                        <Form.Check 
+                        <Form.Check
                             type="checkbox"
                             label="Appartient à un pôle"
                             name="requiresPole"
@@ -297,6 +317,22 @@ const AfficherRole = () => {
                             onChange={(e) => handleInputChange(e)}
                             disabled={newRole.requiresDivision}
                         />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Label>Lien de redirection</Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="redirectionLink"
+                            value={newRole.redirectionLink}
+                            onChange={(e) => handleInputChange(e)}
+                        >
+                            <option value="">Sélectionnez un lien</option>
+                            {routes.map((route) => (
+                                <option key={route.path} value={route.path}>
+                                    {route.title}
+                                </option>
+                            ))}
+                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
@@ -310,8 +346,8 @@ const AfficherRole = () => {
             </Modal>
 
             {/* Edit Modal */}
-            <Modal 
-                show={showEditModal} 
+            <Modal
+                show={showEditModal}
                 onHide={() => setShowEditModal(false)}
                 centered
             >
@@ -329,7 +365,7 @@ const AfficherRole = () => {
                         />
                     </Form.Group>
                     <Form.Group className="mt-3">
-                        <Form.Check 
+                        <Form.Check
                             type="checkbox"
                             label="Appartient à une division"
                             name="requiresDivision"
@@ -338,7 +374,7 @@ const AfficherRole = () => {
                         />
                     </Form.Group>
                     <Form.Group className="mt-3">
-                        <Form.Check 
+                        <Form.Check
                             type="checkbox"
                             label="Appartient à un pôle"
                             name="requiresPole"
@@ -346,6 +382,22 @@ const AfficherRole = () => {
                             onChange={(e) => handleInputChange(e, true)}
                             disabled={editingRole?.requiresDivision}
                         />
+                    </Form.Group>
+                    <Form.Group className="mt-3">
+                        <Form.Label>Lien de redirection</Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="redirectionLink"
+                            value={editingRole?.redirectionLink || ''}
+                            onChange={(e) => handleInputChange(e, true)}
+                        >
+                            <option value="">Sélectionnez un lien</option>
+                            {routes.map((route) => (
+                                <option key={route.path} value={route.path}>
+                                    {route.title}
+                                </option>
+                            ))}
+                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
@@ -359,8 +411,8 @@ const AfficherRole = () => {
             </Modal>
 
             {/* Delete Confirmation Modal */}
-            <Modal 
-                show={showDeleteModal} 
+            <Modal
+                show={showDeleteModal}
                 onHide={() => setShowDeleteModal(false)}
                 centered
             >
