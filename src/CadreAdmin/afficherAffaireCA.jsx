@@ -86,9 +86,17 @@ const AfficherAffaire = () => {
     const [affaires, setAffaires] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [statuses, setStatuses] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [poles, setPoles] = useState([]);
+    const [divisions, setDivisions] = useState([]);
 
     useEffect(() => {
         fetchAffaires();
+        fetchStatuses();
+        fetchClients();
+        fetchPoles();
+        fetchDivisions();
     }, []);
 
     const fetchAffaires = async () => {
@@ -102,6 +110,42 @@ const AfficherAffaire = () => {
             console.error('Error fetching affaires:', err);
             setError('Error fetching affaires');
             setLoading(false);
+        }
+    };
+
+    const fetchStatuses = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/affaires/statuses');
+            setStatuses(response.data);
+        } catch (err) {
+            console.error('Error fetching statuses:', err);
+        }
+    };
+
+    const fetchClients = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/clients');
+            setClients(response.data);
+        } catch (err) {
+            console.error('Error fetching clients:', err);
+        }
+    };
+
+    const fetchPoles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/poles');
+            setPoles(response.data);
+        } catch (err) {
+            console.error('Error fetching poles:', err);
+        }
+    };
+
+    const fetchDivisions = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/divisions');
+            setDivisions(response.data);
+        } catch (err) {
+            console.error('Error fetching divisions:', err);
         }
     };
 
@@ -149,13 +193,38 @@ const AfficherAffaire = () => {
     };
 
     const handleEditChange = (e) => {
-        setEditedAffaire({ ...editedAffaire, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setEditedAffaire(prevState => {
+            const newState = { ...prevState };
+            if (name.includes('.')) {
+                const [objName, objProp] = name.split('.');
+                newState[objName] = { ...newState[objName], [objProp]: value };
+            } else {
+                newState[name] = value;
+            }
+            return newState;
+        });
+
+        // Reset division when pole changes
+        if (name === 'polePrincipale.id') {
+            setEditedAffaire(prevState => ({
+                ...prevState,
+                divisionPrincipale: { id: '' }
+            }));
+        }
+    };
+
+    const handleDateChange = (field, date) => {
+        setEditedAffaire(prevState => ({
+            ...prevState,
+            [field]: date
+        }));
     };
 
     const handleEditSubmit = async () => {
         try {
             await axios.put(`/api/affaires/${editedAffaire.idAffaire}`, editedAffaire);
-            fetchAffaires(); // Refresh the list after edit
+            fetchAffaires(); 
             handleCloseModal();
         } catch (err) {
             setError('Error updating affaire');
@@ -166,7 +235,7 @@ const AfficherAffaire = () => {
         { key: 'idAffaire', label: 'ID Affaire' },
         { key: 'libelle_affaire', label: 'Libellé Affaire' },
         { key: 'statusAffaire', label: 'Status' },
-        { key: 'client.nom', label: 'Client' },
+        { key: 'client.nom_client', label: 'Client' },
     ];
 
     const breadcrumbItems = [
@@ -175,24 +244,144 @@ const AfficherAffaire = () => {
         { text: "Liste des affaires", link: "#" }
     ];
 
-    const EditForm = ({ affaire, onChange }) => {
+    const EditForm = ({ affaire, onChange, onDateChange }) => {
+        const [filteredDivisions, setFilteredDivisions] = useState([]);
+
+        useEffect(() => {
+            // Filter divisions based on selected pole
+            const filtered = divisions.filter(division => division.pole.id === affaire.polePrincipale.id);
+            setFilteredDivisions(filtered);
+        }, [affaire.polePrincipale.id, divisions]);
+
         return (
             <form>
                 <div className="mb-3">
                     <label htmlFor="idAffaire" className="form-label">ID Affaire</label>
-                    <input type="text" className="form-control" id="idAffaire" name="idAffaire" value={affaire.idAffaire} onChange={onChange} />
+                    <input type="text" className="form-control" id="idAffaire" name="idAffaire" value={affaire.idAffaire} readOnly />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="marche" className="form-label">Numéro de Marché</label>
+                    <input type="text" className="form-control" id="marche" name="marche" value={affaire.marche} onChange={onChange} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="libelle_affaire" className="form-label">Libellé Affaire</label>
                     <input type="text" className="form-control" id="libelle_affaire" name="libelle_affaire" value={affaire.libelle_affaire} onChange={onChange} />
                 </div>
                 <div className="mb-3">
+                    <label htmlFor="prixGlobal" className="form-label">Prix Global</label>
+                    <input type="number" className="form-control" id="prixGlobal" name="prixGlobal" value={affaire.prixGlobal} onChange={onChange} />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="partCID" className="form-label">Part CID</label>
+                    <input type="number" className="form-control" id="partCID" name="partCID" value={affaire.partCID} onChange={onChange} />
+                </div>
+                <div className="mb-3">
                     <label htmlFor="statusAffaire" className="form-label">Status</label>
-                    <input type="text" className="form-control" id="statusAffaire" name="statusAffaire" value={affaire.statusAffaire} onChange={onChange} />
+                    <select 
+                        className="form-control" 
+                        id="statusAffaire" 
+                        name="statusAffaire" 
+                        value={affaire.statusAffaire} 
+                        onChange={onChange}
+                    >
+                        {statuses.map(status => (
+                            <option key={status} value={status}>{status}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="row mb-3">
+                    <div className="col-md-6">
+                        <label htmlFor="dateDebut" className="form-label">Date de Début</label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            id="dateDebut"
+                            name="dateDebut"
+                            value={affaire.dateDebut ? new Date(affaire.dateDebut).toISOString().split('T')[0] : ''}
+                            onChange={(e) => onDateChange('dateDebut', new Date(e.target.value))}
+                            max={affaire.dateFin ? new Date(affaire.dateFin).toISOString().split('T')[0] : ''}
+                        />
+                    </div>
+                    <div className="col-md-6">
+                        <label htmlFor="dateFin" className="form-label">Date de Fin</label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            id="dateFin"
+                            name="dateFin"
+                            value={affaire.dateFin ? new Date(affaire.dateFin).toISOString().split('T')[0] : ''}
+                            onChange={(e) => onDateChange('dateFin', new Date(e.target.value))}
+                            min={affaire.dateDebut ? new Date(affaire.dateDebut).toISOString().split('T')[0] : ''}
+                        />
+                    </div>
+                </div>
+                <div className="row mb-3">
+                    <div className="col-md-6">
+                        <label htmlFor="dateArret" className="form-label">Date d'Arrêt</label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            id="dateArret"
+                            name="dateArret"
+                            value={affaire.dateArret ? new Date(affaire.dateArret).toISOString().split('T')[0] : ''}
+                            onChange={(e) => onDateChange('dateArret', new Date(e.target.value))}
+                            max={affaire.dateRecommencement ? new Date(affaire.dateRecommencement).toISOString().split('T')[0] : ''}
+                        />
+                    </div>
+                    <div className="col-md-6">
+                        <label htmlFor="dateRecommencement" className="form-label">Date de Recommencement</label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            id="dateRecommencement"
+                            name="dateRecommencement"
+                            value={affaire.dateRecommencement ? new Date(affaire.dateRecommencement).toISOString().split('T')[0] : ''}
+                            onChange={(e) => onDateChange('dateRecommencement', new Date(e.target.value))}
+                            min={affaire.dateArret ? new Date(affaire.dateArret).toISOString().split('T')[0] : ''}
+                        />
+                    </div>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="client" className="form-label">Client</label>
-                    <input type="text" className="form-control" id="client" name="client" value={affaire.client.nom} onChange={onChange} />
+                    <select 
+                        className="form-control" 
+                        id="client" 
+                        name="client.id" 
+                        value={affaire.client.id} 
+                        onChange={onChange}
+                    >
+                        {clients.map(client => (
+                            <option key={client.id} value={client.id}>{client.nom_client}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="polePrincipale" className="form-label">Pôle Principal</label>
+                    <select 
+                        className="form-control" 
+                        id="polePrincipale" 
+                        name="polePrincipale.id" 
+                        value={affaire.polePrincipale.id} 
+                        onChange={onChange}
+                    >
+                        {poles.map(pole => (
+                            <option key={pole.id} value={pole.id}>{pole.libelle_pole}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="divisionPrincipale" className="form-label">Division Principale</label>
+                    <select 
+                        className="form-control" 
+                        id="divisionPrincipale" 
+                        name="divisionPrincipale.id" 
+                        value={affaire.divisionPrincipale.id} 
+                        onChange={onChange}
+                    >
+                        {filteredDivisions.map(division => (
+                            <option key={division.id} value={division.id}>{division.nom_division}</option>
+                        ))}
+                    </select>
                 </div>
             </form>
         );
@@ -247,7 +436,7 @@ const AfficherAffaire = () => {
                 </div>
             </div>
 
-            <Modal show={showModal} onHide={handleCloseModal} centered>
+            <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {modalType === 'delete' && 'Supprimer l\'affaire'}
@@ -263,14 +452,25 @@ const AfficherAffaire = () => {
                         <EditForm 
                             affaire={editedAffaire || selectedAffaire} 
                             onChange={handleEditChange}
+                            onDateChange={handleDateChange}
                         />
                     )}
                     {modalType === 'info' && selectedAffaire && (
                         <div>
                             <p><strong>ID:</strong> {selectedAffaire.idAffaire}</p>
+                            <p><strong>Numéro de Marché:</strong> {selectedAffaire.marche}</p>
                             <p><strong>Libellé:</strong> {selectedAffaire.libelle_affaire}</p>
+                            <p><strong>Prix Global:</strong> {selectedAffaire.prixGlobal}</p>
+                            <p><strong>Part CID:</strong> {selectedAffaire.partCID}</p>
                             <p><strong>Status:</strong> {selectedAffaire.statusAffaire}</p>
-                            <p><strong>Client:</strong> {selectedAffaire.client.nom}</p>
+                            <p><strong>Date de Début:</strong> {new Date(selectedAffaire.dateDebut).toLocaleDateString()}</p>
+                            <p><strong>Date de Fin:</strong> {new Date(selectedAffaire.dateFin).toLocaleDateString()}</p>
+                            <p><strong>Date d'Arrêt:</strong> {selectedAffaire.dateArret ? new Date(selectedAffaire.dateArret).toLocaleDateString() : 'N/A'}</p>
+                            <p><strong>Date de Recommencement:</strong> {selectedAffaire.dateRecommencement ? new Date(selectedAffaire.dateRecommencement).toLocaleDateString() : 'N/A'}</p>
+                            <p><strong>Client:</strong> {selectedAffaire.client.nom_client}</p>
+                            <p><strong>Pôle Principal:</strong> {selectedAffaire.polePrincipale.libelle_pole}</p>
+                            <p><strong>Division Principale:</strong> {selectedAffaire.divisionPrincipale.nom_division}</p>
+                            
                         </div>
                     )}
                 </Modal.Body>
