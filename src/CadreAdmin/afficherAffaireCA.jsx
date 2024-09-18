@@ -246,12 +246,32 @@ const AfficherAffaire = () => {
 
     const EditForm = ({ affaire, onChange, onDateChange }) => {
         const [filteredDivisions, setFilteredDivisions] = useState([]);
+        const [error, setError] = useState('');
 
         useEffect(() => {
             // Filter divisions based on selected pole
             const filtered = divisions.filter(division => division.pole.id === affaire.polePrincipale.id);
             setFilteredDivisions(filtered);
         }, [affaire.polePrincipale.id, divisions]);
+
+        useEffect(() => {
+            // Validate Part CID
+            if (parseFloat(affaire.partCID) > parseFloat(affaire.prixGlobal)) {
+                setError('La Part CID ne peut pas être supérieure au Prix Global');
+            } else {
+                setError('');
+            }
+        }, [affaire.partCID, affaire.prixGlobal]);
+
+        const handleNumberChange = (e) => {
+            const { name, value } = e.target;
+            onChange({
+                target: {
+                    name,
+                    value: value === '' ? '' : parseFloat(value)
+                }
+            });
+        };
 
         return (
             <form>
@@ -269,11 +289,26 @@ const AfficherAffaire = () => {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="prixGlobal" className="form-label">Prix Global</label>
-                    <input type="number" className="form-control" id="prixGlobal" name="prixGlobal" value={affaire.prixGlobal} onChange={onChange} />
+                    <input 
+                        type="number" 
+                        className="form-control" 
+                        id="prixGlobal" 
+                        name="prixGlobal" 
+                        value={affaire.prixGlobal} 
+                        onChange={handleNumberChange} 
+                    />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="partCID" className="form-label">Part CID</label>
-                    <input type="number" className="form-control" id="partCID" name="partCID" value={affaire.partCID} onChange={onChange} />
+                    <input 
+                        type="number" 
+                        className="form-control" 
+                        id="partCID" 
+                        name="partCID" 
+                        value={affaire.partCID} 
+                        onChange={handleNumberChange} 
+                    />
+                    {error && <div className="text-danger">{error}</div>}
                 </div>
                 <div className="mb-3">
                     <label htmlFor="statusAffaire" className="form-label">Status</label>
