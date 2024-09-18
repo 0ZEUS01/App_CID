@@ -2,7 +2,8 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -37,10 +38,10 @@ const TableHeader = ({ columns, sortConfig, requestSort }) => (
 
 const TableRow = ({ item, onShowModal }) => (
     <tr>
-        <td style={{ textAlign: 'left' }}>{item.code}</td>
-        <td style={{ textAlign: 'left' }}>{item.libelle}</td>
-        <td style={{ textAlign: 'left' }}>{item.division}</td>
-        <td style={{ textAlign: 'left' }}>{item.client}</td>
+        <td style={{ textAlign: 'left' }}>{item.idAffaire}</td>
+        <td style={{ textAlign: 'left' }}>{item.libelle_affaire}</td>
+        <td style={{ textAlign: 'left' }}>{item.statusAffaire}</td>
+        <td style={{ textAlign: 'left' }}>{item.client.nom_client}</td>
         <td style={{ textAlign: 'left' }}>
             <div className="form-button-action">
                 <button type="button" onClick={() => onShowModal('info', item)} className="btn btn-link btn-primary">
@@ -82,22 +83,30 @@ const AfficherAffaire = () => {
     const [modalType, setModalType] = useState('');
     const [selectedAffaire, setSelectedAffaire] = useState(null);
     const [editedAffaire, setEditedAffaire] = useState(null);
+    const [affaires, setAffaires] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const data = [
-        { code: '202100890', libelle: "Réalisation des études de circulation 4", division: 'ET', client: 'Direction des amenagements hydrauliques', chef: 'Ammari Yousra' },
-        { code: '202100891', libelle: 'Etude de la rehabilitation du canal de distribution', division: 'G iu', client: 'Direction des infrastructures urbaines', chef: 'Elidrissi Mohamed' },
-        { code: '202100892', libelle: "Etude d'impact environnemental de l'extension de la zone industrielle", division: 'G edd', client: "Direction de l'environnement", chef: 'Rahimi Nour' },
-        { code: '202100893', libelle: "Construction de la station d'epuration des eaux usees", division: 'G edd', client: "Ministere de l'environnement", chef: 'Bouziane Samira' },
-        { code: '202100894', libelle: 'Amenagement des infrastructures routieres', division: 'G iu', client: "Ministere de l'equipement", chef: 'Benjelloun Yassir' },
-        { code: '202100895', libelle: "Rehabilitation du reseau d'assainissement", division: 'G ah', client: "Ministere de l'eau", chef: 'El Hammouchi Noura' },
-        { code: '202100896', libelle: "Etude technique pour l'extension de la zone industrielle", division: 'G edd', client: "Ministere de l'industrie", chef: 'El Ouardighi Anas' },
-        { code: '202100897', libelle: 'Projet de developpement durable des ressources en eau', division: 'G ah', client: "Ministere de l'eau", chef: 'Jabir Salima' },
-        { code: '202100898', libelle: "Construction d'une nouvelle usine de traitement des dechets", division: 'G edd', client: "Ministere de l'environnement", chef: 'Rahmani Fatima' },
-        { code: '202100899', libelle: 'Projet de renovation des infrastructures scolaires', division: 'G iu', client: "Ministere de l'education", chef: 'Habibi Soufiane' },
-    ];
+    useEffect(() => {
+        fetchAffaires();
+    }, []);
+
+    const fetchAffaires = async () => {
+        try {
+            setLoading(true);
+            // Update this URL to match your backend URL and port
+            const response = await axios.get('http://localhost:8080/api/affaires');
+            setAffaires(response.data);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching affaires:', err);
+            setError('Error fetching affaires');
+            setLoading(false);
+        }
+    };
 
     const sortedData = useMemo(() => {
-        let sortableData = [...data];
+        let sortableData = [...affaires];
         if (sortConfig.key !== null) {
             sortableData.sort((a, b) => {
                 if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -110,7 +119,7 @@ const AfficherAffaire = () => {
             });
         }
         return sortableData;
-    }, [data, sortConfig]);
+    }, [affaires, sortConfig]);
 
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -129,31 +138,35 @@ const AfficherAffaire = () => {
 
     const handleCloseModal = () => setShowModal(false);
 
-    const handleDelete = () => {
-        // Perform delete action
-        handleCloseModal();
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`/api/affaires/${selectedAffaire.idAffaire}`);
+            fetchAffaires(); // Refresh the list after deletion
+            handleCloseModal();
+        } catch (err) {
+            setError('Error deleting affaire');
+        }
     };
 
     const handleEditChange = (e) => {
         setEditedAffaire({ ...editedAffaire, [e.target.name]: e.target.value });
     };
 
-    const handleEditSubmit = () => {
-        handleEdit(editedAffaire);
-        handleCloseModal();
-    };
-
-    const handleEdit = (updatedAffaire) => {
-        // Perform edit action with updatedAffaire
-        console.log('Updated affaire:', updatedAffaire);
-        handleCloseModal();
+    const handleEditSubmit = async () => {
+        try {
+            await axios.put(`/api/affaires/${editedAffaire.idAffaire}`, editedAffaire);
+            fetchAffaires(); // Refresh the list after edit
+            handleCloseModal();
+        } catch (err) {
+            setError('Error updating affaire');
+        }
     };
 
     const columns = [
-        { key: 'code', label: 'Code Affaire' },
-        { key: 'libelle', label: 'Libelle Affaire' },
-        { key: 'division', label: 'Division' },
-        { key: 'client', label: 'Client' },
+        { key: 'idAffaire', label: 'ID Affaire' },
+        { key: 'libelle_affaire', label: 'Libellé Affaire' },
+        { key: 'statusAffaire', label: 'Status' },
+        { key: 'client.nom', label: 'Client' },
     ];
 
     const breadcrumbItems = [
@@ -166,20 +179,20 @@ const AfficherAffaire = () => {
         return (
             <form>
                 <div className="mb-3">
-                    <label htmlFor="code" className="form-label">Code Affaire</label>
-                    <input type="text" className="form-control" id="code" name="code" value={affaire.code} onChange={onChange} />
+                    <label htmlFor="idAffaire" className="form-label">ID Affaire</label>
+                    <input type="text" className="form-control" id="idAffaire" name="idAffaire" value={affaire.idAffaire} onChange={onChange} />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="libelle" className="form-label">Libelle Affaire</label>
-                    <input type="text" className="form-control" id="libelle" name="libelle" value={affaire.libelle} onChange={onChange} />
+                    <label htmlFor="libelle_affaire" className="form-label">Libellé Affaire</label>
+                    <input type="text" className="form-control" id="libelle_affaire" name="libelle_affaire" value={affaire.libelle_affaire} onChange={onChange} />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="division" className="form-label">Division</label>
-                    <input type="text" className="form-control" id="division" name="division" value={affaire.division} onChange={onChange} />
+                    <label htmlFor="statusAffaire" className="form-label">Status</label>
+                    <input type="text" className="form-control" id="statusAffaire" name="statusAffaire" value={affaire.statusAffaire} onChange={onChange} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="client" className="form-label">Client</label>
-                    <input type="text" className="form-control" id="client" name="client" value={affaire.client} onChange={onChange} />
+                    <input type="text" className="form-control" id="client" name="client" value={affaire.client.nom} onChange={onChange} />
                 </div>
             </form>
         );
@@ -210,14 +223,20 @@ const AfficherAffaire = () => {
                                     </div>
                                     <div className="card-body">
                                         <div className="table-responsive">
-                                            <table className="table table-striped table-hover mt-3">
-                                                <TableHeader columns={columns} sortConfig={sortConfig} requestSort={requestSort} />
-                                                <tbody>
-                                                    {sortedData.map((item, index) => (
-                                                        <TableRow key={index} item={item} onShowModal={handleShowModal} />
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                            {loading ? (
+                                                <p>Loading...</p>
+                                            ) : error ? (
+                                                <p>{error}</p>
+                                            ) : (
+                                                <table className="table table-striped table-hover mt-3">
+                                                    <TableHeader columns={columns} sortConfig={sortConfig} requestSort={requestSort} />
+                                                    <tbody>
+                                                        {sortedData.map((item) => (
+                                                            <TableRow key={item.idAffaire} item={item} onShowModal={handleShowModal} />
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -238,7 +257,7 @@ const AfficherAffaire = () => {
                 </Modal.Header>
                 <Modal.Body>
                     {modalType === 'delete' && (
-                        <p>Êtes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle}"?</p>
+                        <p>Êtes-vous sûr de vouloir supprimer l'affaire "{selectedAffaire?.libelle_affaire}"?</p>
                     )}
                     {modalType === 'edit' && selectedAffaire && (
                         <EditForm 
@@ -248,10 +267,10 @@ const AfficherAffaire = () => {
                     )}
                     {modalType === 'info' && selectedAffaire && (
                         <div>
-                            <p><strong>Code:</strong> {selectedAffaire.code}</p>
-                            <p><strong>Libellé:</strong> {selectedAffaire.libelle}</p>
-                            <p><strong>Division:</strong> {selectedAffaire.division}</p>
-                            <p><strong>Client:</strong> {selectedAffaire.client}</p>
+                            <p><strong>ID:</strong> {selectedAffaire.idAffaire}</p>
+                            <p><strong>Libellé:</strong> {selectedAffaire.libelle_affaire}</p>
+                            <p><strong>Status:</strong> {selectedAffaire.statusAffaire}</p>
+                            <p><strong>Client:</strong> {selectedAffaire.client.nom}</p>
                         </div>
                     )}
                 </Modal.Body>
