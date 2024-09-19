@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PoleRepository extends JpaRepository<Pole, Long> {
+    // Additional custom methods if needed
 }

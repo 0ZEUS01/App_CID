@@ -226,7 +226,7 @@ const AfficherAffaire = () => {
         { text: "Liste des affaires", link: "#" }
     ];
 
-    const EditForm = React.memo(({ affaire, onChange, onDateChange, poles, divisions }) => {
+    const EditForm = React.memo(({ affaire, onChange, onDateChange, poles, divisions, clients }) => {
         const [localAffaire, setLocalAffaire] = useState(affaire);
         const [filteredDivisions, setFilteredDivisions] = useState([]);
         const [error, setError] = useState('');
@@ -381,12 +381,15 @@ const AfficherAffaire = () => {
                     <select 
                         className="form-control" 
                         id="client" 
-                        name="client.id" 
-                        value={localAffaire.client.id} 
+                        name="client.id_client" 
+                        value={localAffaire.client.id_client} 
                         onChange={handleChange}
                     >
+                        <option value="">Sélectionnez un client</option>
                         {clients.map(client => (
-                            <option key={client.id} value={client.id}>{client.nom_client}</option>
+                            <option key={client.id_client} value={client.id_client}>
+                                {client.nom_client}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -399,7 +402,7 @@ const AfficherAffaire = () => {
                         value={localAffaire.polePrincipale.id_pole} 
                         onChange={handleChange}
                     >
-                        <option key="default-pole" value="">Sélectionnez un pôle</option>
+                        <option value="">Sélectionnez un pôle</option>
                         {poles.map(pole => (
                             <option key={pole.id_pole} value={pole.id_pole}>{pole.libelle_pole}</option>
                         ))}
@@ -414,7 +417,7 @@ const AfficherAffaire = () => {
                         value={localAffaire.divisionPrincipale.id_division} 
                         onChange={handleChange}
                     >
-                        <option key="default-division" value="">Sélectionnez une division</option>
+                        <option value="">Sélectionnez une division</option>
                         {filteredDivisions.map(division => (
                             <option key={division.id_division} value={division.id_division}>{division.nom_division}</option>
                         ))}
@@ -492,6 +495,7 @@ const AfficherAffaire = () => {
                             onDateChange={handleDateChange}
                             poles={poles}
                             divisions={divisions}
+                            clients={clients}
                         />
                     )}
                     {modalType === 'info' && selectedAffaire && (

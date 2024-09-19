@@ -3,12 +3,15 @@ package com.example.backend.controller;
 import com.example.backend.model.Affaire;
 import com.example.backend.model.StatusAffaire;
 import com.example.backend.repository.AffaireRepository;
+import com.example.backend.repository.ClientRepository;
+import com.example.backend.repository.DivisionRepository;
+import com.example.backend.repository.PoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/affaires")
@@ -16,6 +19,15 @@ public class AffaireController {
 
     @Autowired
     private AffaireRepository affaireRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private PoleRepository poleRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
 
     @GetMapping
     public List<Affaire> getAllAffaires() {
@@ -54,9 +66,25 @@ public class AffaireController {
                     existingAffaire.setDateFin(affaire.getDateFin());
                     existingAffaire.setDateArret(affaire.getDateArret());
                     existingAffaire.setDateRecommencement(affaire.getDateRecommencement());
-                    existingAffaire.setClient(affaire.getClient());
-                    existingAffaire.setPolePrincipale(affaire.getPolePrincipale());
-                    existingAffaire.setDivisionPrincipale(affaire.getDivisionPrincipale());
+                    
+                    // Update client
+                    if (affaire.getClient() != null && affaire.getClient().getId_client() != null) {
+                        clientRepository.findById(affaire.getClient().getId_client())
+                                .ifPresent(existingAffaire::setClient);
+                    }
+                    
+                    // Update pole
+                    if (affaire.getPolePrincipale() != null && affaire.getPolePrincipale().getId_pole() != null) {
+                        poleRepository.findById(affaire.getPolePrincipale().getId_pole())
+                                .ifPresent(existingAffaire::setPolePrincipale);
+                    }
+                    
+                    // Update division
+                    if (affaire.getDivisionPrincipale() != null && affaire.getDivisionPrincipale().getId_division() != null) {
+                        divisionRepository.findById(affaire.getDivisionPrincipale().getId_division())
+                                .ifPresent(existingAffaire::setDivisionPrincipale);
+                    }
+                    
                     existingAffaire.setPartCID(affaire.getPartCID());
                     return ResponseEntity.ok(affaireRepository.save(existingAffaire));
                 })
