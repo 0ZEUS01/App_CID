@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
@@ -192,34 +192,16 @@ const AfficherAffaire = () => {
         }
     };
 
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setEditedAffaire(prevState => {
-            const newState = { ...prevState };
-            if (name.includes('.')) {
-                const [objName, objProp] = name.split('.');
-                newState[objName] = { ...newState[objName], [objProp]: value };
-            } else {
-                newState[name] = value;
-            }
-            return newState;
-        });
+    const handleEditChange = useCallback((updatedAffaire) => {
+        setEditedAffaire(updatedAffaire);
+    }, []);
 
-        // Reset division when pole changes
-        if (name === 'polePrincipale.id') {
-            setEditedAffaire(prevState => ({
-                ...prevState,
-                divisionPrincipale: { id: '' }
-            }));
-        }
-    };
-
-    const handleDateChange = (field, date) => {
+    const handleDateChange = useCallback((field, date) => {
         setEditedAffaire(prevState => ({
             ...prevState,
             [field]: date
         }));
-    };
+    }, []);
 
     const handleEditSubmit = async () => {
         try {
@@ -244,48 +226,66 @@ const AfficherAffaire = () => {
         { text: "Liste des affaires", link: "#" }
     ];
 
-    const EditForm = ({ affaire, onChange, onDateChange }) => {
+    const EditForm = React.memo(({ affaire, onChange, onDateChange, poles, divisions }) => {
+        const [localAffaire, setLocalAffaire] = useState(affaire);
         const [filteredDivisions, setFilteredDivisions] = useState([]);
         const [error, setError] = useState('');
 
         useEffect(() => {
-            // Filter divisions based on selected pole
-            const filtered = divisions.filter(division => division.pole.id === affaire.polePrincipale.id);
-            setFilteredDivisions(filtered);
-        }, [affaire.polePrincipale.id, divisions]);
+            setLocalAffaire(affaire);
+        }, [affaire]);
 
         useEffect(() => {
-            // Validate Part CID
-            if (parseFloat(affaire.partCID) > parseFloat(affaire.prixGlobal)) {
+            const filtered = divisions.filter(division => division.pole.id_pole === parseInt(localAffaire.polePrincipale.id_pole));
+            setFilteredDivisions(filtered);
+        }, [localAffaire.polePrincipale.id_pole, divisions]);
+
+        const handleChange = useCallback((e) => {
+            const { name, value } = e.target;
+            setLocalAffaire(prev => {
+                const newState = { ...prev };
+                if (name.includes('.')) {
+                    const [objName, objProp] = name.split('.');
+                    newState[objName] = { ...newState[objName], [objProp]: value };
+                } else {
+                    newState[name] = value;
+                }
+
+                if (name === 'polePrincipale.id_pole') {
+                    newState.divisionPrincipale = { id_division: '' };
+                }
+
+                return newState;
+            });
+        }, []);
+
+        useEffect(() => {
+            if (parseFloat(localAffaire.partCID) > parseFloat(localAffaire.prixGlobal)) {
                 setError('La Part CID ne peut pas être supérieure au Prix Global');
             } else {
                 setError('');
             }
-        }, [affaire.partCID, affaire.prixGlobal]);
 
-        const handleNumberChange = (e) => {
-            const { name, value } = e.target;
-            onChange({
-                target: {
-                    name,
-                    value: value === '' ? '' : parseFloat(value)
-                }
-            });
-        };
+            const timer = setTimeout(() => {
+                onChange(localAffaire);
+            }, 300);
+
+            return () => clearTimeout(timer);
+        }, [localAffaire, onChange]);
 
         return (
             <form>
                 <div className="mb-3">
                     <label htmlFor="idAffaire" className="form-label">ID Affaire</label>
-                    <input type="text" className="form-control" id="idAffaire" name="idAffaire" value={affaire.idAffaire} readOnly />
+                    <input type="text" className="form-control" id="idAffaire" name="idAffaire" value={localAffaire.idAffaire} readOnly />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="marche" className="form-label">Numéro de Marché</label>
-                    <input type="text" className="form-control" id="marche" name="marche" value={affaire.marche} onChange={onChange} />
+                    <input type="text" className="form-control" id="marche" name="marche" value={localAffaire.marche} onChange={handleChange} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="libelle_affaire" className="form-label">Libellé Affaire</label>
-                    <input type="text" className="form-control" id="libelle_affaire" name="libelle_affaire" value={affaire.libelle_affaire} onChange={onChange} />
+                    <input type="text" className="form-control" id="libelle_affaire" name="libelle_affaire" value={localAffaire.libelle_affaire} onChange={handleChange} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="prixGlobal" className="form-label">Prix Global</label>
@@ -294,8 +294,8 @@ const AfficherAffaire = () => {
                         className="form-control" 
                         id="prixGlobal" 
                         name="prixGlobal" 
-                        value={affaire.prixGlobal} 
-                        onChange={handleNumberChange} 
+                        value={localAffaire.prixGlobal} 
+                        onChange={handleChange} 
                     />
                 </div>
                 <div className="mb-3">
@@ -305,8 +305,8 @@ const AfficherAffaire = () => {
                         className="form-control" 
                         id="partCID" 
                         name="partCID" 
-                        value={affaire.partCID} 
-                        onChange={handleNumberChange} 
+                        value={localAffaire.partCID} 
+                        onChange={handleChange} 
                     />
                     {error && <div className="text-danger">{error}</div>}
                 </div>
@@ -316,8 +316,8 @@ const AfficherAffaire = () => {
                         className="form-control" 
                         id="statusAffaire" 
                         name="statusAffaire" 
-                        value={affaire.statusAffaire} 
-                        onChange={onChange}
+                        value={localAffaire.statusAffaire} 
+                        onChange={handleChange}
                     >
                         {statuses.map(status => (
                             <option key={status} value={status}>{status}</option>
@@ -332,9 +332,9 @@ const AfficherAffaire = () => {
                             className="form-control"
                             id="dateDebut"
                             name="dateDebut"
-                            value={affaire.dateDebut ? new Date(affaire.dateDebut).toISOString().split('T')[0] : ''}
+                            value={localAffaire.dateDebut ? new Date(localAffaire.dateDebut).toISOString().split('T')[0] : ''}
                             onChange={(e) => onDateChange('dateDebut', new Date(e.target.value))}
-                            max={affaire.dateFin ? new Date(affaire.dateFin).toISOString().split('T')[0] : ''}
+                            max={localAffaire.dateFin ? new Date(localAffaire.dateFin).toISOString().split('T')[0] : ''}
                         />
                     </div>
                     <div className="col-md-6">
@@ -344,9 +344,9 @@ const AfficherAffaire = () => {
                             className="form-control"
                             id="dateFin"
                             name="dateFin"
-                            value={affaire.dateFin ? new Date(affaire.dateFin).toISOString().split('T')[0] : ''}
+                            value={localAffaire.dateFin ? new Date(localAffaire.dateFin).toISOString().split('T')[0] : ''}
                             onChange={(e) => onDateChange('dateFin', new Date(e.target.value))}
-                            min={affaire.dateDebut ? new Date(affaire.dateDebut).toISOString().split('T')[0] : ''}
+                            min={localAffaire.dateDebut ? new Date(localAffaire.dateDebut).toISOString().split('T')[0] : ''}
                         />
                     </div>
                 </div>
@@ -358,9 +358,9 @@ const AfficherAffaire = () => {
                             className="form-control"
                             id="dateArret"
                             name="dateArret"
-                            value={affaire.dateArret ? new Date(affaire.dateArret).toISOString().split('T')[0] : ''}
+                            value={localAffaire.dateArret ? new Date(localAffaire.dateArret).toISOString().split('T')[0] : ''}
                             onChange={(e) => onDateChange('dateArret', new Date(e.target.value))}
-                            max={affaire.dateRecommencement ? new Date(affaire.dateRecommencement).toISOString().split('T')[0] : ''}
+                            max={localAffaire.dateRecommencement ? new Date(localAffaire.dateRecommencement).toISOString().split('T')[0] : ''}
                         />
                     </div>
                     <div className="col-md-6">
@@ -370,9 +370,9 @@ const AfficherAffaire = () => {
                             className="form-control"
                             id="dateRecommencement"
                             name="dateRecommencement"
-                            value={affaire.dateRecommencement ? new Date(affaire.dateRecommencement).toISOString().split('T')[0] : ''}
+                            value={localAffaire.dateRecommencement ? new Date(localAffaire.dateRecommencement).toISOString().split('T')[0] : ''}
                             onChange={(e) => onDateChange('dateRecommencement', new Date(e.target.value))}
-                            min={affaire.dateArret ? new Date(affaire.dateArret).toISOString().split('T')[0] : ''}
+                            min={localAffaire.dateArret ? new Date(localAffaire.dateArret).toISOString().split('T')[0] : ''}
                         />
                     </div>
                 </div>
@@ -382,8 +382,8 @@ const AfficherAffaire = () => {
                         className="form-control" 
                         id="client" 
                         name="client.id" 
-                        value={affaire.client.id} 
-                        onChange={onChange}
+                        value={localAffaire.client.id} 
+                        onChange={handleChange}
                     >
                         {clients.map(client => (
                             <option key={client.id} value={client.id}>{client.nom_client}</option>
@@ -395,12 +395,13 @@ const AfficherAffaire = () => {
                     <select 
                         className="form-control" 
                         id="polePrincipale" 
-                        name="polePrincipale.id" 
-                        value={affaire.polePrincipale.id} 
-                        onChange={onChange}
+                        name="polePrincipale.id_pole" 
+                        value={localAffaire.polePrincipale.id_pole} 
+                        onChange={handleChange}
                     >
+                        <option key="default-pole" value="">Sélectionnez un pôle</option>
                         {poles.map(pole => (
-                            <option key={pole.id} value={pole.id}>{pole.libelle_pole}</option>
+                            <option key={pole.id_pole} value={pole.id_pole}>{pole.libelle_pole}</option>
                         ))}
                     </select>
                 </div>
@@ -409,18 +410,19 @@ const AfficherAffaire = () => {
                     <select 
                         className="form-control" 
                         id="divisionPrincipale" 
-                        name="divisionPrincipale.id" 
-                        value={affaire.divisionPrincipale.id} 
-                        onChange={onChange}
+                        name="divisionPrincipale.id_division" 
+                        value={localAffaire.divisionPrincipale.id_division} 
+                        onChange={handleChange}
                     >
+                        <option key="default-division" value="">Sélectionnez une division</option>
                         {filteredDivisions.map(division => (
-                            <option key={division.id} value={division.id}>{division.nom_division}</option>
+                            <option key={division.id_division} value={division.id_division}>{division.nom_division}</option>
                         ))}
                     </select>
                 </div>
             </form>
         );
-    };
+    });
 
     return (
         <div className="wrapper">
@@ -488,6 +490,8 @@ const AfficherAffaire = () => {
                             affaire={editedAffaire || selectedAffaire} 
                             onChange={handleEditChange}
                             onDateChange={handleDateChange}
+                            poles={poles}
+                            divisions={divisions}
                         />
                     )}
                     {modalType === 'info' && selectedAffaire && (
