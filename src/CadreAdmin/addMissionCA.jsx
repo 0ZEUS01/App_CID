@@ -3,11 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faEdit, faTrashAlt, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 import { useAffaire } from '../context/AffaireContext';
+
 
 const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options, disabled }) => (
     <div className="mb-3 col-md-6 form-group">
@@ -64,11 +65,15 @@ const AddMission = () => {
     const [unites, setUnites] = useState([]);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [errors, setErrors] = useState({});
+    const [editingMission, setEditingMission] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [missionToDelete, setMissionToDelete] = useState(null);
 
     useEffect(() => {
         // Check if affaireId is passed through location state (from AddAffaire)
         const passedAffaireId = location.state?.affaireId;
-        
+
         if (passedAffaireId) {
             setAffaireId(passedAffaireId);
             setCurrentAffaireId(passedAffaireId);
@@ -88,9 +93,14 @@ const AddMission = () => {
     const fetchMissions = async (id) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/missions/affaire/${id}`);
-            setMissions(response.data);
+            if (response.data) {
+                setMissions(response.data);
+            } else {
+                setMissions([]);
+            }
         } catch (error) {
             console.error('Error fetching missions:', error);
+            setMissions([]);
         }
     };
 
@@ -216,8 +226,8 @@ const AddMission = () => {
                 dateFin: formData.dateFin,
                 affaire: { idAffaire: affaireId },
                 principalDivision: { id_division: parseInt(formData.divisionPrincipale) },
-                secondaryDivisions: [], // Add secondary divisions here if needed
-                compteClient: 0.0, // Add this line with an appropriate value or calculation
+                secondaryDivisions: [],
+                compteClient: 0.0,
             };
 
             // Add quantite and prixMissionUnitaire if not a forfait
@@ -231,7 +241,22 @@ const AddMission = () => {
             const response = await axios.post('http://localhost:8080/api/missions', dataToSend);
             console.log('Response:', response.data);
             setShowSuccessModal(true);
-            // Reset form or navigate as needed
+            // Add the new mission to the list
+            setMissions(prevMissions => [...prevMissions, response.data]);
+
+            // Reset form
+            setFormData({
+                libelle_mission: '',
+                quantite: '',
+                unite: '',
+                prixMissionTotal: '',
+                prixMissionUnitaire: '',
+                partMissionCID: '',
+                dateDebut: '',
+                dateFin: '',
+                pole: '',
+                divisionPrincipale: '',
+            });
         } catch (error) {
             console.error('Error adding mission:', error);
             console.error('Error response:', error.response?.data);
@@ -241,13 +266,71 @@ const AddMission = () => {
     const isForfait = formData.unite === '10';
 
     const handleEdit = (mission) => {
-        // Implement edit functionality
-        console.log('Edit mission:', mission);
+        setEditingMission(mission);
+        setShowEditModal(true);
     };
 
     const handleDelete = (mission) => {
-        // Implement delete functionality
-        console.log('Delete mission:', mission);
+        setMissionToDelete(mission);
+        setShowDeleteModal(true);
+    };
+    
+    const validateEditForm = () => {
+        const newErrors = {};
+    
+        if (parseFloat(editingMission.partMissionCID) > parseFloat(editingMission.prixMissionTotal)) {
+            newErrors.partMissionCID = 'La part CID ne peut pas être supérieure au prix total';
+        }
+    
+        if (new Date(editingMission.dateDebut) > new Date(editingMission.dateFin)) {
+            newErrors.dateFin = 'La date de fin doit être postérieure à la date de début';
+        }
+    
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleUpdateMission = async () => {
+        if (!validateEditForm()) {
+            return;
+        }
+        try {
+            const dataToSend = {
+                id: editingMission.id,
+                libelle_mission: editingMission.libelle_mission,
+                unite: { id_unite: editingMission.unite.id_unite },
+                prixMissionTotal: parseFloat(editingMission.prixMissionTotal),
+                partMissionCID: parseFloat(editingMission.partMissionCID),
+                dateDebut: editingMission.dateDebut,
+                dateFin: editingMission.dateFin,
+                principalDivision: { id_division: editingMission.principalDivision.id_division },
+                affaire: editingMission.affaire
+            };
+    
+            // Add quantite and prixMissionUnitaire if not a forfait
+            if (editingMission.unite.id_unite !== 10) {
+                dataToSend.quantite = parseInt(editingMission.quantite);
+                dataToSend.prixMissionUnitaire = parseFloat(editingMission.prixMissionUnitaire);
+            }
+    
+            const response = await axios.put(`http://localhost:8080/api/missions/${editingMission.id}`, dataToSend);
+            setMissions(prevMissions => prevMissions.map(m => m.id === editingMission.id ? response.data : m));
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating mission:', error);
+            alert('Erreur lors de la mise à jour de la mission: ' + (error.response?.data || error.message));
+        }
+    };
+
+    const handleDeleteMission = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/missions/${missionToDelete.id}`);
+            setMissions(prevMissions => prevMissions.filter(m => m.id !== missionToDelete.id));
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting mission:', error);
+            alert('Erreur lors de la suppression de la mission: ' + (error.response?.data || error.message));
+        }
     };
 
     return (
@@ -304,25 +387,29 @@ const AddMission = () => {
                                                     <div className="d-flex justify-content-between">
                                                         <div>
                                                             <h5><b>{mission.libelle_mission}</b></h5>
-                                                            <p className="text-muted">Unité : {mission.unite.nom_unite}</p>
+                                                            <p>Dates : {new Date(mission.dateDebut).toLocaleDateString()} - {new Date(mission.dateFin).toLocaleDateString()}</p>
                                                         </div>
                                                         <div>
                                                             <h3 className="text-info fw-bold">{mission.prixMissionTotal.toLocaleString()} DH</h3>
                                                             <p>Part CID : {mission.partMissionCID.toLocaleString()} DH</p>
+                                                            <p>Division : {mission.principalDivision.nom_division}</p>
                                                         </div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between mt-2">
                                                         <div>
-                                                            {mission.quantite && mission.prixMissionUnitaire && (
+                                                            {mission.unite.id_unite !== 10 ? (
                                                                 <p className="text-muted">
-                                                                    Quantité : {mission.quantite} {mission.unite.nom_unite} &nbsp;&nbsp;&nbsp; Prix Unitaire : {mission.prixMissionUnitaire.toLocaleString()} DH
+                                                                    Quantité : {mission.quantite} {mission.unite.nom_unite} &nbsp;&nbsp;&nbsp;
+                                                                    Prix Unitaire : {mission.prixMissionUnitaire.toLocaleString()} DH
                                                                 </p>
+                                                            ) : (
+                                                                <p className="text-muted">Forfait</p>
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <button className="btn" onClick={() => handleEdit(mission)}><i className='fas fa-edit text-primary'> Modifier</i></button>
-                                                            <button className="btn" onClick={() => handleDelete(mission)}><i className='fas fa-trash-alt text-danger'> Supprimer</i></button>
+                                                            <button className="btn" onClick={() => handleEdit(mission)}><FontAwesomeIcon icon={faEdit} className="text-primary" /> Modifier</button>
+                                                            <button className="btn" onClick={() => handleDelete(mission)}><FontAwesomeIcon icon={faTrashAlt} className="text-danger" /> Supprimer</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -350,13 +437,153 @@ const AddMission = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <p>
-                        <FontAwesomeIcon icon={faCheckCircle} className="text-success mr-2" />
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-success mr-2" />&nbsp;
                         La mission a été ajoutée avec succès!
                     </p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
                         Fermer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Edit Modal */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Modifier la mission</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editingMission && (
+                        <form>
+                            <div className="row">
+                                <FormField
+                                    label="Libellé de Mission"
+                                    id="libelle_mission"
+                                    value={editingMission.libelle_mission}
+                                    onChange={(e) => setEditingMission({ ...editingMission, libelle_mission: e.target.value })}
+                                />
+                                <FormField
+                                    label="Unité"
+                                    id="unite"
+                                    type="select"
+                                    value={editingMission.unite.id_unite}
+                                    onChange={(e) => setEditingMission({ ...editingMission, unite: { id_unite: parseInt(e.target.value) } })}
+                                    options={unites.map(unite => ({ value: unite.id_unite, label: unite.nom_unite }))}
+                                />
+                                {editingMission.unite.id_unite !== 10 && (
+                                    <>
+                                        <FormField
+                                            label="Quantité"
+                                            id="quantite"
+                                            type="number"
+                                            value={editingMission.quantite}
+                                            onChange={(e) => setEditingMission({ ...editingMission, quantite: e.target.value })}
+                                        />
+                                        <FormField
+                                            label="Prix Unitaire"
+                                            id="prixMissionUnitaire"
+                                            type="number"
+                                            value={editingMission.prixMissionUnitaire}
+                                            onChange={(e) => setEditingMission({ ...editingMission, prixMissionUnitaire: e.target.value })}
+                                        />
+                                    </>
+                                )}
+                                <FormField
+                                    label="Prix Total"
+                                    id="prixMissionTotal"
+                                    type="number"
+                                    value={editingMission.prixMissionTotal}
+                                    onChange={(e) => setEditingMission({ ...editingMission, prixMissionTotal: e.target.value })}
+                                    disabled={editingMission.unite.id_unite !== 10}
+                                />
+                                <FormField
+                                    label="Part Mission CID"
+                                    id="partMissionCID"
+                                    type="number"
+                                    value={editingMission.partMissionCID}
+                                    onChange={(e) => setEditingMission({ ...editingMission, partMissionCID: e.target.value })}
+                                />
+                                <FormField
+                                    label="Date de début"
+                                    id="dateDebut"
+                                    type="date"
+                                    value={editingMission.dateDebut}
+                                    onChange={(e) => setEditingMission({ ...editingMission, dateDebut: e.target.value })}
+                                />
+                                <FormField
+                                    label="Date de fin"
+                                    id="dateFin"
+                                    type="date"
+                                    value={editingMission.dateFin}
+                                    onChange={(e) => setEditingMission({ ...editingMission, dateFin: e.target.value })}
+                                />
+                                <FormField
+                                    label="Pôle"
+                                    id="pole"
+                                    type="select"
+                                    value={editingMission.principalDivision.pole.id_pole}
+                                    onChange={(e) => {
+                                        const newPoleId = parseInt(e.target.value);
+                                        setEditingMission({
+                                            ...editingMission,
+                                            principalDivision: {
+                                                ...editingMission.principalDivision,
+                                                pole: { id_pole: newPoleId }
+                                            }
+                                        });
+                                        // Reset division when pole changes
+                                        setFilteredDivisions(allDivisions.filter(div => div.pole.id_pole === newPoleId));
+                                    }}
+                                    options={poles.map(pole => ({ value: pole.id_pole, label: pole.libelle_pole }))}
+                                />
+                                <FormField
+                                    label="Division Principale"
+                                    id="divisionPrincipale"
+                                    type="select"
+                                    value={editingMission.principalDivision.id_division}
+                                    onChange={(e) => setEditingMission({
+                                        ...editingMission,
+                                        principalDivision: {
+                                            ...editingMission.principalDivision,
+                                            id_division: parseInt(e.target.value)
+                                        }
+                                    })}
+                                    options={filteredDivisions.map(div => ({ value: div.id_division, label: div.nom_division }))}
+                                    disabled={!editingMission.principalDivision.pole.id_pole}
+                                />
+                            </div>
+                        </form>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                        Annuler
+                    </Button>
+                    <Button variant="primary" onClick={handleUpdateMission}>
+                        Enregistrer les modifications
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Delete Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Supprimer la mission</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        <FontAwesomeIcon icon={faInfoCircle} className="text-warning mr-2" />&nbsp;
+                        Êtes-vous sûr de vouloir supprimer cette mission ?
+                    </p>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Annuler
+                    </Button>
+                    <Button variant="danger" onClick={handleDeleteMission}>
+                        Supprimer
                     </Button>
                 </Modal.Footer>
             </Modal>

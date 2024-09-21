@@ -226,4 +226,13 @@ public class MissionController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/affaire/{affaireId}")
+    public ResponseEntity<List<Mission>> getMissionsByAffaireId(@PathVariable Long affaireId) {
+        List<Mission> missions = missionRepository.findByAffaireIdAffaire(affaireId);
+        if (missions.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(missions);
+    }
 }
