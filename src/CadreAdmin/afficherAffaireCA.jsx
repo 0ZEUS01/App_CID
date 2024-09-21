@@ -85,6 +85,7 @@ const AfficherAffaire = () => {
     const [clients, setClients] = useState([]);
     const [poles, setPoles] = useState([]);
     const [divisions, setDivisions] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchAffaires();
@@ -144,8 +145,20 @@ const AfficherAffaire = () => {
         }
     };
 
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
+
+    const filteredAffaires = useMemo(() => {
+        return affaires.filter(affaire => 
+            affaire.idAffaire.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+            affaire.libelle_affaire.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            affaire.client.nom_client.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [affaires, searchTerm]);
+
     const sortedData = useMemo(() => {
-        let sortableData = [...affaires];
+        let sortableData = [...filteredAffaires];
         if (sortConfig.key !== null) {
             sortableData.sort((a, b) => {
                 if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -158,7 +171,7 @@ const AfficherAffaire = () => {
             });
         }
         return sortableData;
-    }, [affaires, sortConfig]);
+    }, [filteredAffaires, sortConfig]);
 
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -433,7 +446,7 @@ const AfficherAffaire = () => {
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
