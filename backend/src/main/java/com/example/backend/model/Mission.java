@@ -39,7 +39,7 @@ public class Mission {
     private Double partMissionCID;
 
     @Column(name = "compte_client", nullable = false)
-    private Double compteClient;
+    private Double compteClient = 0.0; // Set a default value
 
     @Column(name = "date_debut", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -61,8 +61,20 @@ public class Mission {
     @JoinColumn(name = "affaire_id", nullable = false)
     private Affaire affaire;
 
+    @ManyToOne
+    @JoinColumn(name = "principal_division_id", nullable = false)
+    private Division principalDivision;
+
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<MissionDivision> missionDivisions = new HashSet<>();
+    private Set<MissionDivision> secondaryDivisions = new HashSet<>();
+
+    public Set<MissionDivision> getSecondaryDivisions() {
+        return secondaryDivisions;
+    }
+
+    public void setSecondaryDivisions(Set<MissionDivision> secondaryDivisions) {
+        this.secondaryDivisions = secondaryDivisions;
+    }
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionST> sousTraitants = new HashSet<>();
@@ -70,13 +82,13 @@ public class Mission {
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionPartenaire> partenaires = new HashSet<>();
 
-    public void addMissionDivision(MissionDivision missionDivision) {
-        missionDivisions.add(missionDivision);
+    public void addSecondaryDivision(MissionDivision missionDivision) {
+        secondaryDivisions.add(missionDivision);
         missionDivision.setMission(this);
     }
 
-    public void removeMissionDivision(MissionDivision missionDivision) {
-        missionDivisions.remove(missionDivision);
+    public void removeSecondaryDivision(MissionDivision missionDivision) {
+        secondaryDivisions.remove(missionDivision);
         missionDivision.setMission(null);
     }
 }

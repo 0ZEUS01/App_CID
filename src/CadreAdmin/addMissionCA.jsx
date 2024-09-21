@@ -182,20 +182,24 @@ const AddMission = () => {
                 partMissionCID: parseFloat(formData.partMissionCID),
                 dateDebut: formData.dateDebut,
                 dateFin: formData.dateFin,
-                affaire: { idAffaire: parseInt(formData.affaireId) }, // Make sure this is coming from your form
-                missionDivisions: [
-                    {
-                        division: { id_division: parseInt(formData.divisionPrincipale) },
-                        isPrincipal: true, // This should be set based on user input
-                        partMission: 100
-                    }
-                ]
+                affaire: { idAffaire: 202400001 }, // Fixed affaire ID for testing
+                principalDivision: { id_division: parseInt(formData.divisionPrincipale) },
+                secondaryDivisions: [], // Add secondary divisions here if needed
+                compteClient: 0.0, // Add this line with an appropriate value or calculation
             };
-    
+
+            // Add quantite and prixMissionUnitaire if not a forfait
+            if (formData.unite !== '10') {
+                dataToSend.quantite = parseInt(formData.quantite);
+                dataToSend.prixMissionUnitaire = parseFloat(formData.prixMissionUnitaire);
+            }
+
             console.log('Data being sent:', dataToSend);
-    
+
             const response = await axios.post('http://localhost:8080/api/missions', dataToSend);
-            // ... rest of your code
+            console.log('Response:', response.data);
+            setShowSuccessModal(true);
+            // Reset form or navigate as needed
         } catch (error) {
             console.error('Error adding mission:', error);
             console.error('Error response:', error.response?.data);

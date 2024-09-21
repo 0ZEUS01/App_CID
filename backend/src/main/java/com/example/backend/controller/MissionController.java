@@ -15,6 +15,9 @@ import java.util.Set;
 public class MissionController {
 
     @Autowired
+    private DivisionRepository divisionRepository;
+
+    @Autowired
     private MissionRepository missionRepository;
 
     @Autowired
@@ -45,84 +48,143 @@ public class MissionController {
     }
 
     @PostMapping
-    public ResponseEntity<Mission> createMission(@RequestBody Mission mission) {
-        if (mission.getUnite() == null || mission.getUnite().getId_unite() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        Unite unite = uniteRepository.findById(mission.getUnite().getId_unite())
-                .orElseThrow(() -> new RuntimeException("Unite not found"));
-        mission.setUnite(unite);
-
-        // Handle Affaire relationship
-        if (mission.getAffaire() == null || mission.getAffaire().getIdAffaire() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        Affaire affaire = affaireRepository.findById(mission.getAffaire().getIdAffaire())
-                .orElseThrow(() -> new RuntimeException("Affaire not found"));
-        mission.setAffaire(affaire);
-
-        // Handle MissionDivision relationships
-        if (mission.getMissionDivisions() != null) {
-            Set<MissionDivision> newMissionDivisions = new HashSet<>();
-            for (MissionDivision md : mission.getMissionDivisions()) {
-                MissionDivision newMd = new MissionDivision();
-                newMd.setDivision(md.getDivision());
-                newMd.setPrincipal(md.isPrincipal());
-                newMd.setPartMission(md.getPartMission());
-                mission.addMissionDivision(newMd);
-                newMissionDivisions.add(newMd);
+    public ResponseEntity<?> createMission(@RequestBody Mission mission) {
+        try {
+            // Validate Unite
+            if (mission.getUnite() == null || mission.getUnite().getId_unite() == null) {
+                return ResponseEntity.badRequest().body("Unite is required");
             }
-            mission.setMissionDivisions(newMissionDivisions);
-        }
+            Unite unite = uniteRepository.findById(mission.getUnite().getId_unite())
+                    .orElseThrow(() -> new RuntimeException("Unite not found"));
+            mission.setUnite(unite);
 
-        Mission savedMission = missionRepository.save(mission);
-        return ResponseEntity.ok(savedMission);
+            // Validate Affaire
+            if (mission.getAffaire() == null || mission.getAffaire().getIdAffaire() == null) {
+                return ResponseEntity.badRequest().body("Affaire is required");
+            }
+            Affaire affaire = affaireRepository.findById(mission.getAffaire().getIdAffaire())
+                    .orElseThrow(() -> new RuntimeException("Affaire not found"));
+            mission.setAffaire(affaire);
+
+            // Validate Principal Division
+            if (mission.getPrincipalDivision() == null || mission.getPrincipalDivision().getId_division() == null) {
+                return ResponseEntity.badRequest().body("Principal Division is required");
+            }
+            Division principalDivision = divisionRepository.findById(mission.getPrincipalDivision().getId_division())
+                    .orElseThrow(() -> new RuntimeException("Principal Division not found"));
+            mission.setPrincipalDivision(principalDivision);
+
+            // Handle Secondary Divisions
+            if (mission.getSecondaryDivisions() != null && !mission.getSecondaryDivisions().isEmpty()) {
+                Set<MissionDivision> newSecondaryDivisions = new HashSet<>();
+                for (MissionDivision md : mission.getSecondaryDivisions()) {
+                    if (md.getDivision() == null || md.getDivision().getId_division() == null) {
+                        return ResponseEntity.badRequest().body("Invalid Secondary Division");
+                    }
+                    Division division = divisionRepository.findById(md.getDivision().getId_division())
+                            .orElseThrow(() -> new RuntimeException("Secondary Division not found"));
+                    
+                    MissionDivision newMd = new MissionDivision();
+                    newMd.setDivision(division);
+                    newMd.setPartMission(md.getPartMission());
+                    newMd.setMission(mission);
+                    newSecondaryDivisions.add(newMd);
+                }
+                mission.setSecondaryDivisions(newSecondaryDivisions);
+            }
+
+            Mission savedMission = missionRepository.save(mission);
+            return ResponseEntity.ok(savedMission);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error creating mission: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Mission> updateMission(@PathVariable Long id, @RequestBody Mission mission) {
-        return (ResponseEntity<Mission>) missionRepository.findById(id)
+        try {
+            return missionRepository.findById(id)
                 .map(existingMission -> {
+                    // Update basic fields
                     existingMission.setLibelle_mission(mission.getLibelle_mission());
                     existingMission.setQuantite(mission.getQuantite());
+                    existingMission.setPrixMissionTotal(mission.getPrixMissionTotal());
+                    existingMission.setPartMissionCID(mission.getPartMissionCID());
+                    existingMission.setDateDebut(mission.getDateDebut());
+                    existingMission.setDateFin(mission.getDateFin());
                     
                     // Handle Unite relationship
-                    if (mission.getUnite() == null || mission.getUnite().getId_unite() == null) {
-                        return ResponseEntity.badRequest().body(null);
+                    if (mission.getUnite() != null && mission.getUnite().getId_unite() != null) {
+                        Unite unite = uniteRepository.findById(mission.getUnite().getId_unite())
+                                .orElseThrow(() -> new RuntimeException("Unite not found"));
+                        existingMission.setUnite(unite);
                     }
 
-                    Unite unite = uniteRepository.findById(mission.getUnite().getId_unite())
-                            .orElseThrow(() -> new RuntimeException("Unite not found"));
-                    existingMission.setUnite(unite);
+                    // Handle Principal Division
+                    if (mission.getPrincipalDivision() != null && mission.getPrincipalDivision().getId_division() != null) {
+                        Division principalDivision = divisionRepository.findById(mission.getPrincipalDivision().getId_division())
+                                .orElseThrow(() -> new RuntimeException("Principal Division not found"));
+                        existingMission.setPrincipalDivision(principalDivision);
+                    }
 
-                    // Update MissionDivisions
-                    updateMissionDivisions(existingMission, mission.getMissionDivisions());
+                    // Update Secondary Divisions
+                    if (mission.getSecondaryDivisions() != null) {
+                        updateSecondaryDivisions(existingMission, mission.getSecondaryDivisions());
+                    }
                     
                     // Update MissionSTs (Sous-Traitants)
-                    updateMissionSTs(existingMission, mission.getSousTraitants());
+                    if (mission.getSousTraitants() != null) {
+                        updateMissionSTs(existingMission, mission.getSousTraitants());
+                    }
                     
                     // Update MissionPartenaires
-                    updateMissionPartenaires(existingMission, mission.getPartenaires());
+                    if (mission.getPartenaires() != null) {
+                        updateMissionPartenaires(existingMission, mission.getPartenaires());
+                    }
                     
-                    return ResponseEntity.ok().body(missionRepository.save(existingMission));
+                    Mission updatedMission = missionRepository.save(existingMission);
+                    return ResponseEntity.ok().body(updatedMission);
                 })
                 .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-    private void updateMissionDivisions(Mission existingMission, Set<MissionDivision> newDivisions) {
-        // Remove divisions no longer associated with the mission
-        existingMission.getMissionDivisions().stream()
-                .filter(md -> !newDivisions.contains(md))
-                .forEach(missionDivisionRepository::delete);
+    private void updateSecondaryDivisions(Mission existingMission, Set<MissionDivision> newSecondaryDivisions) {
+        // Remove secondary divisions no longer associated with the mission
+        existingMission.getSecondaryDivisions().removeIf(md -> 
+            newSecondaryDivisions.stream().noneMatch(newMd -> 
+                newMd.getDivision() != null && 
+                md.getDivision() != null && 
+                newMd.getDivision().getId_division().equals(md.getDivision().getId_division())
+            )
+        );
 
-        // Update existing divisions and add new ones
-        newDivisions.forEach(md -> {
-            md.setMission(existingMission);
-            missionDivisionRepository.save(md);
+        // Update existing secondary divisions and add new ones
+        newSecondaryDivisions.forEach(newMd -> {
+            if (newMd.getDivision() != null && newMd.getDivision().getId_division() != null) {
+                MissionDivision existingMd = existingMission.getSecondaryDivisions().stream()
+                    .filter(md -> md.getDivision() != null && 
+                                  md.getDivision().getId_division().equals(newMd.getDivision().getId_division()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (existingMd == null) {
+                    // This is a new secondary division
+                    MissionDivision md = new MissionDivision();
+                    md.setMission(existingMission);
+                    md.setDivision(newMd.getDivision());
+                    md.setPartMission(newMd.getPartMission());
+                    existingMission.getSecondaryDivisions().add(md);
+                } else {
+                    // Update existing secondary division
+                    existingMd.setPartMission(newMd.getPartMission());
+                }
+            }
         });
-
-        existingMission.setMissionDivisions(newDivisions);
     }
 
     private void updateMissionSTs(Mission existingMission, Set<MissionST> newSousTraitants) {
