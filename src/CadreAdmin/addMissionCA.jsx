@@ -265,74 +265,84 @@ const AddMission = () => {
     };
     const isForfait = formData.unite === '10';
 
-    const handleEdit = (mission) => {
-        setEditingMission(mission);
-        setShowEditModal(true);
-    };
-
     const handleDelete = (mission) => {
         setMissionToDelete(mission);
         setShowDeleteModal(true);
     };
-    
-    const validateEditForm = () => {
-        const newErrors = {};
-    
-        if (parseFloat(editingMission.partMissionCID) > parseFloat(editingMission.prixMissionTotal)) {
-            newErrors.partMissionCID = 'La part CID ne peut pas être supérieure au prix total';
-        }
-    
-        if (new Date(editingMission.dateDebut) > new Date(editingMission.dateFin)) {
-            newErrors.dateFin = 'La date de fin doit être postérieure à la date de début';
-        }
-    
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
-    const handleUpdateMission = async () => {
-        if (!validateEditForm()) {
+    const handleDeleteMission = async () => {
+        if (!missionToDelete || !missionToDelete.id_mission) {
+            console.error('No mission selected for deletion');
             return;
         }
         try {
-            const dataToSend = {
-                id: editingMission.id,
-                libelle_mission: editingMission.libelle_mission,
-                unite: { id_unite: editingMission.unite.id_unite },
-                prixMissionTotal: parseFloat(editingMission.prixMissionTotal),
-                partMissionCID: parseFloat(editingMission.partMissionCID),
-                dateDebut: editingMission.dateDebut,
-                dateFin: editingMission.dateFin,
-                principalDivision: { id_division: editingMission.principalDivision.id_division },
-                affaire: editingMission.affaire
-            };
-    
-            // Add quantite and prixMissionUnitaire if not a forfait
-            if (editingMission.unite.id_unite !== 10) {
-                dataToSend.quantite = parseInt(editingMission.quantite);
-                dataToSend.prixMissionUnitaire = parseFloat(editingMission.prixMissionUnitaire);
-            }
-    
-            const response = await axios.put(`http://localhost:8080/api/missions/${editingMission.id}`, dataToSend);
-            setMissions(prevMissions => prevMissions.map(m => m.id === editingMission.id ? response.data : m));
-            setShowEditModal(false);
-        } catch (error) {
-            console.error('Error updating mission:', error);
-            alert('Erreur lors de la mise à jour de la mission: ' + (error.response?.data || error.message));
-        }
-    };
-
-    const handleDeleteMission = async () => {
-        try {
-            await axios.delete(`http://localhost:8080/api/missions/${missionToDelete.id}`);
-            setMissions(prevMissions => prevMissions.filter(m => m.id !== missionToDelete.id));
+            await axios.delete(`http://localhost:8080/api/missions/${missionToDelete.id_mission}`);
+            setMissions(prevMissions => prevMissions.filter(m => m.id_mission !== missionToDelete.id_mission));
             setShowDeleteModal(false);
         } catch (error) {
             console.error('Error deleting mission:', error);
             alert('Erreur lors de la suppression de la mission: ' + (error.response?.data || error.message));
         }
     };
+    const handleEdit = (mission) => {
+        setEditingMission({ ...mission });
+        setShowEditModal(true);
+    };
 
+    const handleUpdateMission = async () => {
+        if (!editingMission || !editingMission.id_mission) {
+            console.error('No mission selected for editing');
+            return;
+        }
+        if (!validateEditForm()) {
+            return;
+        }
+        try {
+            const dataToSend = {
+                id_mission: editingMission.id_mission,
+                libelle_mission: editingMission.libelle_mission,
+                unite: { id_unite: parseInt(editingMission.unite.id_unite) },
+                prixMissionTotal: parseFloat(editingMission.prixMissionTotal),
+                partMissionCID: parseFloat(editingMission.partMissionCID),
+                dateDebut: editingMission.dateDebut,
+                dateFin: editingMission.dateFin,
+                principalDivision: { id_division: parseInt(editingMission.principalDivision.id_division) },
+                affaire: editingMission.affaire
+            };
+
+            if (editingMission.unite.id_unite !== 10) {
+                dataToSend.quantite = parseInt(editingMission.quantite);
+                dataToSend.prixMissionUnitaire = parseFloat(editingMission.prixMissionUnitaire);
+            }
+
+            console.log('Data being sent:', dataToSend);
+
+            const response = await axios.put(`http://localhost:8080/api/missions/${editingMission.id_mission}`, dataToSend);
+            console.log('Response:', response.data);
+            setMissions(prevMissions => prevMissions.map(m => m.id_mission === editingMission.id_mission ? response.data : m));
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Error updating mission:', error);
+            console.error('Error response:', error.response?.data);
+            alert('Erreur lors de la mise à jour de la mission: ' + (error.response?.data || error.message));
+        }
+    };
+    const validateEditForm = () => {
+        const newErrors = {};
+
+        if (parseFloat(editingMission.partMissionCID) > parseFloat(editingMission.prixMissionTotal)) {
+            newErrors.partMissionCID = 'La part CID ne peut pas être supérieure au prix total';
+        }
+
+        if (new Date(editingMission.dateDebut) > new Date(editingMission.dateFin)) {
+            newErrors.dateFin = 'La date de fin doit être postérieure à la date de début';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+ 
     return (
         <div className="wrapper">
             <Sidebar />
@@ -381,7 +391,7 @@ const AddMission = () => {
                                 <h4>Missions existantes</h4>
                                 <div className="row">
                                     {missions.map((mission) => (
-                                        <div key={mission.id} className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                        <div key={mission.id_mission} className="col-12 col-sm-6 col-md-6 col-xl-12">
                                             <div className="card">
                                                 <div className="card-body">
                                                     <div className="d-flex justify-content-between">

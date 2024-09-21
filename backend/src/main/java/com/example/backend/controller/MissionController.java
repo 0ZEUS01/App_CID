@@ -102,13 +102,12 @@ public class MissionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Mission> updateMission(@PathVariable Long id, @RequestBody Mission mission) {
+    public ResponseEntity<?> updateMission(@PathVariable Long id, @RequestBody Mission mission) {
         try {
             return missionRepository.findById(id)
                 .map(existingMission -> {
                     // Update basic fields
                     existingMission.setLibelle_mission(mission.getLibelle_mission());
-                    existingMission.setQuantite(mission.getQuantite());
                     existingMission.setPrixMissionTotal(mission.getPrixMissionTotal());
                     existingMission.setPartMissionCID(mission.getPartMissionCID());
                     existingMission.setDateDebut(mission.getDateDebut());
@@ -119,6 +118,15 @@ public class MissionController {
                         Unite unite = uniteRepository.findById(mission.getUnite().getId_unite())
                                 .orElseThrow(() -> new RuntimeException("Unite not found"));
                         existingMission.setUnite(unite);
+                    }
+
+                    // Handle quantite and prixMissionUnitaire
+                    if (mission.getUnite().getId_unite() != 10) { // Assuming 10 is the ID for "forfait"
+                        existingMission.setQuantite(mission.getQuantite());
+                        existingMission.setPrixMissionUnitaire(mission.getPrixMissionUnitaire());
+                    } else {
+                        existingMission.setQuantite(0);
+                        existingMission.setPrixMissionUnitaire(null);
                     }
 
                     // Handle Principal Division
@@ -149,7 +157,7 @@ public class MissionController {
                 .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Error updating mission: " + e.getMessage());
         }
     }
 
