@@ -136,21 +136,13 @@ public class MissionController {
                         existingMission.setPrincipalDivision(principalDivision);
                     }
 
-                    // Update Secondary Divisions
-                    if (mission.getSecondaryDivisions() != null) {
-                        updateSecondaryDivisions(existingMission, mission.getSecondaryDivisions());
+                    // Handle Affaire
+                    if (mission.getAffaire() != null && mission.getAffaire().getIdAffaire() != null) {
+                        Affaire affaire = affaireRepository.findById(mission.getAffaire().getIdAffaire())
+                                .orElseThrow(() -> new RuntimeException("Affaire not found"));
+                        existingMission.setAffaire(affaire);
                     }
-                    
-                    // Update MissionSTs (Sous-Traitants)
-                    if (mission.getSousTraitants() != null) {
-                        updateMissionSTs(existingMission, mission.getSousTraitants());
-                    }
-                    
-                    // Update MissionPartenaires
-                    if (mission.getPartenaires() != null) {
-                        updateMissionPartenaires(existingMission, mission.getPartenaires());
-                    }
-                    
+
                     Mission updatedMission = missionRepository.save(existingMission);
                     return ResponseEntity.ok().body(updatedMission);
                 })

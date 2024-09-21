@@ -307,23 +307,31 @@ const AddMission = () => {
                 dateDebut: editingMission.dateDebut,
                 dateFin: editingMission.dateFin,
                 principalDivision: { id_division: parseInt(editingMission.principalDivision.id_division) },
-                affaire: editingMission.affaire
+                affaire: { idAffaire: editingMission.affaire.idAffaire }
             };
-
+    
             if (editingMission.unite.id_unite !== 10) {
                 dataToSend.quantite = parseInt(editingMission.quantite);
                 dataToSend.prixMissionUnitaire = parseFloat(editingMission.prixMissionUnitaire);
             }
-
-            console.log('Data being sent:', dataToSend);
-
+    
+            console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
+    
             const response = await axios.put(`http://localhost:8080/api/missions/${editingMission.id_mission}`, dataToSend);
             console.log('Response:', response.data);
             setMissions(prevMissions => prevMissions.map(m => m.id_mission === editingMission.id_mission ? response.data : m));
             setShowEditModal(false);
         } catch (error) {
             console.error('Error updating mission:', error);
-            console.error('Error response:', error.response?.data);
+            if (error.response) {
+                console.error('Error response data:', error.response.data);
+                console.error('Error response status:', error.response.status);
+                console.error('Error response headers:', error.response.headers);
+            } else if (error.request) {
+                console.error('Error request:', error.request);
+            } else {
+                console.error('Error message:', error.message);
+            }
             alert('Erreur lors de la mise à jour de la mission: ' + (error.response?.data || error.message));
         }
     };
