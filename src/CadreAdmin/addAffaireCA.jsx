@@ -196,8 +196,11 @@ const AddAffaire = () => {
                     partCID: parseFloat(formData.partCID)
                 };
                 const response = await axios.post('http://localhost:8080/api/affaires', dataToSend);
-                setCurrentAffaireId(response.data.idAffaire);
+                const newAffaireId = response.data.idAffaire;
+                setCurrentAffaireId(newAffaireId);
                 setShowSuccessModal(true);
+                // Navigate to AddMission with the new affaire ID
+                navigate('/addMissionCA', { state: { affaireId: newAffaireId } });
             } catch (error) {
                 console.error('Error adding affaire:', error);
                 alert('Erreur lors de l\'ajout de l\'affaire: ' + error.response?.data || error.message);
@@ -207,7 +210,7 @@ const AddAffaire = () => {
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        navigate('/addMissionCA');
+        navigate('/afficherAffaireCA');
     };
 
     const breadcrumbItems = [

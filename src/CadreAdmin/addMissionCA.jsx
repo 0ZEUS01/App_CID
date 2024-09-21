@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -40,8 +40,11 @@ const FormField = ({ label, id, type = 'text', placeholder, value, onChange, opt
 );
 
 const AddMission = () => {
-    const { currentAffaireId } = useAffaire();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { currentAffaireId, setCurrentAffaireId } = useAffaire();
+    const [affaireId, setAffaireId] = useState(null);
+    const [missions, setMissions] = useState([]);
     const [formData, setFormData] = useState({
         libelle_mission: '',
         quantite: '',
@@ -55,7 +58,6 @@ const AddMission = () => {
         divisionPrincipale: '',
     });
 
-    const [missions, setMissions] = useState([]);
     const [poles, setPoles] = useState([]);
     const [allDivisions, setAllDivisions] = useState([]);
     const [filteredDivisions, setFilteredDivisions] = useState([]);
@@ -64,10 +66,33 @@ const AddMission = () => {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        if (!currentAffaireId) {
-            navigate('/addAffaireCA'); // Redirect if no affaire ID is set
+        // Check if affaireId is passed through location state (from AddAffaire)
+        const passedAffaireId = location.state?.affaireId;
+        
+        if (passedAffaireId) {
+            setAffaireId(passedAffaireId);
+            setCurrentAffaireId(passedAffaireId);
+        } else if (currentAffaireId) {
+            setAffaireId(currentAffaireId);
+        } else {
+            navigate('/afficherAffaireCA'); // Redirect if no affaire ID is available
         }
-    }, [currentAffaireId, navigate]);
+    }, [location, currentAffaireId, setCurrentAffaireId, navigate]);
+
+    useEffect(() => {
+        if (affaireId) {
+            fetchMissions(affaireId);
+        }
+    }, [affaireId]);
+
+    const fetchMissions = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/missions/affaire/${id}`);
+            setMissions(response.data);
+        } catch (error) {
+            console.error('Error fetching missions:', error);
+        }
+    };
 
     useEffect(() => {
         // Fetch poles
@@ -189,7 +214,7 @@ const AddMission = () => {
                 partMissionCID: parseFloat(formData.partMissionCID),
                 dateDebut: formData.dateDebut,
                 dateFin: formData.dateFin,
-                affaire: { idAffaire: currentAffaireId },
+                affaire: { idAffaire: affaireId },
                 principalDivision: { id_division: parseInt(formData.divisionPrincipale) },
                 secondaryDivisions: [], // Add secondary divisions here if needed
                 compteClient: 0.0, // Add this line with an appropriate value or calculation
@@ -215,6 +240,16 @@ const AddMission = () => {
     };
     const isForfait = formData.unite === '10';
 
+    const handleEdit = (mission) => {
+        // Implement edit functionality
+        console.log('Edit mission:', mission);
+    };
+
+    const handleDelete = (mission) => {
+        // Implement delete functionality
+        console.log('Delete mission:', mission);
+    };
+
     return (
         <div className="wrapper">
             <Sidebar />
@@ -222,7 +257,7 @@ const AddMission = () => {
                 <MainHeader />
                 <div className="container">
                     <div className="page-inner">
-                        <h3 className="fw-bold mb-3">Ajouter des Missions pour l'Affaire #{currentAffaireId}</h3>
+                        <h3 className="fw-bold mb-3">Ajouter des Missions pour l'Affaire #{affaireId}</h3>
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">
@@ -254,6 +289,46 @@ const AddMission = () => {
                                             <button type="submit" className="btn btn-primary">Ajouter Mission</button>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="row mt-4">
+                            <div className="col-md-12">
+                                <h4>Missions existantes</h4>
+                                <div className="row">
+                                    {missions.map((mission) => (
+                                        <div key={mission.id} className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                            <div className="card">
+                                                <div className="card-body">
+                                                    <div className="d-flex justify-content-between">
+                                                        <div>
+                                                            <h5><b>{mission.libelle_mission}</b></h5>
+                                                            <p className="text-muted">Unité : {mission.unite.nom_unite}</p>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-info fw-bold">{mission.prixMissionTotal.toLocaleString()} DH</h3>
+                                                            <p>Part CID : {mission.partMissionCID.toLocaleString()} DH</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between mt-2">
+                                                        <div>
+                                                            {mission.quantite && mission.prixMissionUnitaire && (
+                                                                <p className="text-muted">
+                                                                    Quantité : {mission.quantite} {mission.unite.nom_unite} &nbsp;&nbsp;&nbsp; Prix Unitaire : {mission.prixMissionUnitaire.toLocaleString()} DH
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <button className="btn" onClick={() => handleEdit(mission)}><i className='fas fa-edit text-primary'> Modifier</i></button>
+                                                            <button className="btn" onClick={() => handleDelete(mission)}><i className='fas fa-trash-alt text-danger'> Supprimer</i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

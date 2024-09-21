@@ -2,23 +2,16 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faHome, 
-    faArrowRight, 
-    faInfo, 
-    faEdit, 
-    faTimes, 
-    faPlus
-    // Remove faHeart from this import
-} from '@fortawesome/free-solid-svg-icons';
+import { faInfo, faEdit, faTimes, faHome, faArrowRight,faPlus } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
+import { useAffaire } from '../context/AffaireContext';
 
 const TableHeader = ({ columns, sortConfig, requestSort }) => (
     <thead>
@@ -78,6 +71,8 @@ const Breadcrumb = ({ items }) => (
 );
 
 const AfficherAffaire = () => {
+    const navigate = useNavigate();
+    const { setCurrentAffaireId } = useAffaire();
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
@@ -181,6 +176,13 @@ const AfficherAffaire = () => {
     };
 
     const handleCloseModal = () => setShowModal(false);
+
+    const handleViewMissions = () => {
+        if (selectedAffaire) {
+            setCurrentAffaireId(selectedAffaire.idAffaire);
+            navigate('/addMissionCA');
+        }
+    };
 
     const handleDelete = async () => {
         try {
@@ -540,7 +542,7 @@ const AfficherAffaire = () => {
                     )}
                     {modalType === 'info' && (
                         <>
-                            <Button variant="primary" onClick={() => window.location.href = '/AfficherMissionCA'}>
+                            <Button variant="primary" onClick={handleViewMissions}>
                                 Voir les missions
                             </Button>
                             <Button variant="secondary" onClick={handleCloseModal}>
