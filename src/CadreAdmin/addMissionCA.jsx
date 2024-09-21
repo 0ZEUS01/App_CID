@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,6 +7,7 @@ import { faCheckCircle, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-i
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
+import { useAffaire } from '../context/AffaireContext';
 
 const FormField = ({ label, id, type = 'text', placeholder, value, onChange, options, disabled }) => (
     <div className="mb-3 col-md-6 form-group">
@@ -39,7 +40,7 @@ const FormField = ({ label, id, type = 'text', placeholder, value, onChange, opt
 );
 
 const AddMission = () => {
-    const { affaireId } = useParams();
+    const { currentAffaireId } = useAffaire();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         libelle_mission: '',
@@ -61,6 +62,12 @@ const AddMission = () => {
     const [unites, setUnites] = useState([]);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        if (!currentAffaireId) {
+            navigate('/addAffaireCA'); // Redirect if no affaire ID is set
+        }
+    }, [currentAffaireId, navigate]);
 
     useEffect(() => {
         // Fetch poles
@@ -182,7 +189,7 @@ const AddMission = () => {
                 partMissionCID: parseFloat(formData.partMissionCID),
                 dateDebut: formData.dateDebut,
                 dateFin: formData.dateFin,
-                affaire: { idAffaire: 202400001 }, // Fixed affaire ID for testing
+                affaire: { idAffaire: currentAffaireId },
                 principalDivision: { id_division: parseInt(formData.divisionPrincipale) },
                 secondaryDivisions: [], // Add secondary divisions here if needed
                 compteClient: 0.0, // Add this line with an appropriate value or calculation
@@ -215,7 +222,7 @@ const AddMission = () => {
                 <MainHeader />
                 <div className="container">
                     <div className="page-inner">
-                        <h3 className="fw-bold mb-3">Ajouter des Missions pour l'Affaire #{affaireId}</h3>
+                        <h3 className="fw-bold mb-3">Ajouter des Missions pour l'Affaire #{currentAffaireId}</h3>
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="card">

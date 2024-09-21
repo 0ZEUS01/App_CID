@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AffaireProvider } from './context/AffaireContext';
 import PageMeta from './PageMeta';
 
 // Import views
@@ -67,22 +68,24 @@ const routes = [
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {routes.map(({ path, element: Element, title }) => (
-          <Route 
-            key={path} 
-            path={path} 
-            element={
-              <>
-                <PageMeta title={title} />
-                <Element />
-              </>
-            } 
-          />
-        ))}
-      </Routes>
-    </Router>
+    <AffaireProvider>
+      <Router>
+        <Routes>
+          {routes.map(({ path, element: Element, title }) => (
+            <Route 
+              key={path} 
+              path={path} 
+              element={
+                <>
+                  <PageMeta title={title} />
+                  <Element />
+                </>
+              } 
+            />
+          ))}
+        </Routes>
+      </Router>
+    </AffaireProvider>
   );
 }
 
