@@ -1,52 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faBriefcase, 
-  faCalendarAlt,
-  faBell,
-  faHome,
-  faArrowRight,
-  faHeart,
-  faListAlt,
-  faChartBar
+    faBriefcase, 
+    faCalendarAlt,
+    faHome,
+    faArrowRight,
+    faHeart,
+    faListAlt,
+    faChartBar
 } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Chart from 'react-apexcharts';
 
 const HomeCA = () => {
-    const [affaireStats] = useState({
-        total: 15,
-        enCours: 8,
-        terminees: 7,
+    const [affaireStats, setAffaireStats] = useState({
+        total: 0,
+        enCours: 0,
+        terminees: 0,
     });
 
-    const [recentNotifications] = useState([
-        { id: 1, message: "Nouvelle affaire ajoutée: Étude de faisabilité pour le projet X" },
-        { id: 2, message: "Rapport mensuel en attente de validation" },
-        { id: 3, message: "Réunion d'équipe prévue demain à 10h" },
-    ]);
-
-    const chartOptions = {
-        chart: {
-            id: "basic-bar",
-            toolbar: {
-                show: true
+    const [chartData, setChartData] = useState({
+        options: {
+            chart: {
+                id: "basic-bar",
+                toolbar: {
+                    show: true
+                }
+            },
+            xaxis: {
+                categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
+            },
+            colors: ['#36A2EB']
+        },
+        series: [
+            {
+                name: "Affaires terminées",
+                data: []
             }
-        },
-        xaxis: {
-            categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
-        },
-        colors: ['#36A2EB']
+        ]
+    });
+
+    useEffect(() => {
+        fetchAffaireStats();
+        fetchChartData();
+    }, []);
+
+    const fetchAffaireStats = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/affaires/stats');
+            setAffaireStats(response.data);
+        } catch (error) {
+            console.error('Error fetching affaire stats:', error);
+        }
     };
 
-    const chartSeries = [
-        {
-            name: "Affaires terminées",
-            data: [30, 40, 45, 50, 49, 60, 70, 91, 85, 95, 100, 110]
+    const fetchChartData = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/affaires/monthly-stats');
+            setChartData(prevState => ({
+                ...prevState,
+                series: [{
+                    name: "Affaires terminées",
+                    data: response.data
+                }]
+            }));
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
         }
-    ];
+    };
 
     return (
         <div className="wrapper">
@@ -93,7 +117,7 @@ const HomeCA = () => {
                                     <Card.Footer>
                                         <hr />
                                         <div className="stats">
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Dernière mise à jour il y a 1 jour
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Mis à jour à l'instant
                                         </div>
                                     </Card.Footer>
                                 </Card>
@@ -118,7 +142,7 @@ const HomeCA = () => {
                                     <Card.Footer>
                                         <hr />
                                         <div className="stats">
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Dernière mise à jour il y a 1 jour
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Mis à jour à l'instant
                                         </div>
                                     </Card.Footer>
                                 </Card>
@@ -143,47 +167,27 @@ const HomeCA = () => {
                                     <Card.Footer>
                                         <hr />
                                         <div className="stats">
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Dernière mise à jour il y a 1 jour
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Mis à jour à l'instant
                                         </div>
                                     </Card.Footer>
                                 </Card>
                             </Col>
                         </Row>
                         <Row>
-                            <Col lg={8}>
+                            <Col lg={12}>
                                 <Card>
                                     <Card.Header>
                                         <Card.Title as="h4">Performance des Affaires</Card.Title>
                                         <p className="card-category">Affaires terminées par mois</p>
                                     </Card.Header>
                                     <Card.Body>
-                                        <Chart options={chartOptions} series={chartSeries} type="bar" height={350} />
+                                        <Chart options={chartData.options} series={chartData.series} type="bar" height={350} />
                                     </Card.Body>
                                     <Card.Footer>
                                         <hr />
                                         <div className="stats">
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Mis à jour il y a 3 minutes
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Mis à jour à l'instant
                                         </div>
-                                    </Card.Footer>
-                                </Card>
-                            </Col>
-                            <Col lg={4}>
-                                <Card>
-                                    <Card.Header>
-                                        <Card.Title as="h4">Notifications Récentes</Card.Title>
-                                        <p className="card-category">Dernières mises à jour</p>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        {recentNotifications.map(notification => (
-                                            <div key={notification.id} className="notification-item">
-                                                <FontAwesomeIcon icon={faBell} className="me-2 text-warning" />
-                                                {notification.message}
-                                                <hr />
-                                            </div>
-                                        ))}
-                                    </Card.Body>
-                                    <Card.Footer>
-                                        <Button variant="primary" size="sm">Voir toutes les notifications</Button>
                                     </Card.Footer>
                                 </Card>
                             </Col>

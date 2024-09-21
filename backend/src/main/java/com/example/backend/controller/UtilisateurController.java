@@ -6,10 +6,13 @@ import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.UtilisateurRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -125,6 +128,25 @@ public class UtilisateurController {
         String redirectionLink = roles.iterator().next().getRedirectionLink();
 
         return ResponseEntity.ok().body(new LoginResponse("Login successful", redirectionLink));
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<?> getUserDetails(@RequestParam String identifier) {
+        try {
+            Utilisateur user = utilisateurRepository.findByEmailIgnoreCaseOrUsernameIgnoreCase(identifier, identifier)
+                    .orElse(null);
+            if (user != null) {
+                Map<String, String> userDetails = new HashMap<>();
+                userDetails.put("firstName", user.getPrenom());
+                userDetails.put("lastName", user.getNom());
+                userDetails.put("email", user.getEmail());
+                return ResponseEntity.ok(userDetails);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user details");
+        }
     }
 }
 

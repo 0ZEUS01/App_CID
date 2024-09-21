@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/affaires")
@@ -120,5 +119,35 @@ public class AffaireController {
                     return ResponseEntity.ok(String.valueOf(nextId));
                 })
                 .orElse(ResponseEntity.ok(String.valueOf(java.time.Year.now().getValue() * 100000 + 1)));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getAffaireStats() {
+        long total = affaireRepository.count();
+        long enCours = affaireRepository.countByStatusAffaire(StatusAffaire.EN_PRODUCTION);
+        long terminees = affaireRepository.countByStatusAffaire(StatusAffaire.TERMINE);
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("total", total);
+        stats.put("enCours", enCours);
+        stats.put("terminees", terminees);
+
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/monthly-stats")
+    public ResponseEntity<List<Long>> getMonthlyStats() {
+        List<Long> monthlyStats = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        for (int i = 0; i < 12; i++) {
+            cal.set(Calendar.MONTH, i);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            Date startOfMonth = cal.getTime();
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date endOfMonth = cal.getTime();
+            long count = affaireRepository.countByStatusAffaireAndDateFinBetween(StatusAffaire.TERMINE, startOfMonth, endOfMonth);
+            monthlyStats.add(count);
+        }
+        return ResponseEntity.ok(monthlyStats);
     }
 }

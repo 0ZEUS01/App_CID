@@ -4,12 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const Login = () => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { setUser } = useUser();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,6 +23,11 @@ const Login = () => {
                 password
             });
             if (response.data.redirectionLink) {
+                // Save user information
+                setUser({
+                    username: response.data.username || trimmedLowercaseIdentifier,
+                    email: response.data.email || trimmedLowercaseIdentifier
+                });
                 navigate(response.data.redirectionLink);
             } else {
                 setError('Connexion réussie mais aucun lien de redirection fourni.');

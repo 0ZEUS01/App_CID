@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AffaireProvider } from './context/AffaireContext';
 import PageMeta from './PageMeta';
+import { UserProvider } from './context/UserContext';
 
 // Import views
 import Login from './views/login';
@@ -68,24 +69,26 @@ const routes = [
 
 function App() {
   return (
-    <AffaireProvider>
-      <Router>
-        <Routes>
-          {routes.map(({ path, element: Element, title }) => (
-            <Route 
-              key={path} 
-              path={path} 
-              element={
-                <>
-                  <PageMeta title={title} />
-                  <Element />
-                </>
-              } 
-            />
-          ))}
-        </Routes>
-      </Router>
-    </AffaireProvider>
+    <UserProvider>
+      <AffaireProvider>
+        <Router>
+          <Routes>
+            {routes.map(({ path, element: Element, title }) => (
+              <Route 
+                key={path} 
+                path={path} 
+                element={
+                  <>
+                    <PageMeta title={title} />
+                    <Element />
+                  </>
+                } 
+              />
+            ))}
+          </Routes>
+        </Router>
+      </AffaireProvider>
+    </UserProvider>
   );
 }
 
