@@ -309,14 +309,14 @@ const AddMission = () => {
                 principalDivision: { id_division: parseInt(editingMission.principalDivision.id_division) },
                 affaire: { idAffaire: editingMission.affaire.idAffaire }
             };
-    
+
             if (editingMission.unite.id_unite !== 10) {
                 dataToSend.quantite = parseInt(editingMission.quantite);
                 dataToSend.prixMissionUnitaire = parseFloat(editingMission.prixMissionUnitaire);
             }
-    
+
             console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
-    
+
             const response = await axios.put(`http://localhost:8080/api/missions/${editingMission.id_mission}`, dataToSend);
             console.log('Response:', response.data);
             setMissions(prevMissions => prevMissions.map(m => m.id_mission === editingMission.id_mission ? response.data : m));
@@ -350,7 +350,7 @@ const AddMission = () => {
         return Object.keys(newErrors).length === 0;
     };
 
- 
+
     return (
         <div className="wrapper">
             <Sidebar />
@@ -396,45 +396,51 @@ const AddMission = () => {
 
                         <div className="row mt-4">
                             <div className="col-md-12">
-                                <h4>Missions existantes</h4>
-                                <div className="row">
-                                    {missions.map((mission) => (
-                                        <div key={mission.id_mission} className="col-12 col-sm-6 col-md-6 col-xl-12">
-                                            <div className="card">
-                                                <div className="card-body">
-                                                    <div className="d-flex justify-content-between">
-                                                        <div>
-                                                            <h5><b>{mission.libelle_mission}</b></h5>
-                                                            <p>Dates : {new Date(mission.dateDebut).toLocaleDateString()} - {new Date(mission.dateFin).toLocaleDateString()}</p>
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="text-info fw-bold">{mission.prixMissionTotal.toLocaleString()} DH</h3>
-                                                            <p>Part CID : {mission.partMissionCID.toLocaleString()} DH</p>
-                                                            <p>Division : {mission.principalDivision.nom_division}</p>
-                                                        </div>
-                                                    </div>
+                                {missions.length > 0 ? (
+                                    <>
+                                        <h4>Missions existantes</h4>
+                                        <div className="row">
+                                            {missions.map((mission) => (
+                                                <div key={mission.id_mission} className="col-12 col-sm-6 col-md-6 col-xl-12">
+                                                    <div className="card">
+                                                        <div className="card-body">
+                                                            <div className="d-flex justify-content-between">
+                                                                <div>
+                                                                    <h5><b>{mission.libelle_mission}</b></h5>
+                                                                    <p>Dates : {new Date(mission.dateDebut).toLocaleDateString()} - {new Date(mission.dateFin).toLocaleDateString()}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 className="text-info fw-bold">{mission.prixMissionTotal.toLocaleString()} DH</h3>
+                                                                    <p>Part CID : {mission.partMissionCID.toLocaleString()} DH</p>
+                                                                    <p>Division : {mission.principalDivision.nom_division}</p>
+                                                                </div>
+                                                            </div>
 
-                                                    <div className="d-flex justify-content-between mt-2">
-                                                        <div>
-                                                            {mission.unite.id_unite !== 10 ? (
-                                                                <p className="text-muted">
-                                                                    Quantité : {mission.quantite} {mission.unite.nom_unite} &nbsp;&nbsp;&nbsp;
-                                                                    Prix Unitaire : {mission.prixMissionUnitaire.toLocaleString()} DH
-                                                                </p>
-                                                            ) : (
-                                                                <p className="text-muted">Forfait</p>
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            <button className="btn" onClick={() => handleEdit(mission)}><FontAwesomeIcon icon={faEdit} className="text-primary" /> Modifier</button>
-                                                            <button className="btn" onClick={() => handleDelete(mission)}><FontAwesomeIcon icon={faTrashAlt} className="text-danger" /> Supprimer</button>
+                                                            <div className="d-flex justify-content-between mt-2">
+                                                                <div>
+                                                                    {mission.unite.id_unite !== 10 ? (
+                                                                        <p className="text-muted">
+                                                                            Quantité : {mission.quantite} {mission.unite.nom_unite} &nbsp;&nbsp;&nbsp;
+                                                                            Prix Unitaire : {mission.prixMissionUnitaire.toLocaleString()} DH
+                                                                        </p>
+                                                                    ) : (
+                                                                        <p className="text-muted">Forfait</p>
+                                                                    )}
+                                                                </div>
+                                                                <div>
+                                                                    <button className="btn" onClick={() => handleEdit(mission)}><FontAwesomeIcon icon={faEdit} className="text-primary" /> Modifier</button>
+                                                                    <button className="btn" onClick={() => handleDelete(mission)}><FontAwesomeIcon icon={faTrashAlt} className="text-danger" /> Supprimer</button>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
+                                    </>
+                                ) : (
+                                    <p></p>
+                                )}
                             </div>
                         </div>
 
