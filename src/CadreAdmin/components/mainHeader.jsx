@@ -3,16 +3,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const SearchBar = ({ className }) => (
-    <div className={`input-group ${className}`}>
-        <div className="input-group-prepend">
-            <button type="submit" className="btn btn-search pe-1">
-                <i className="fa fa-search search-icon" />
-            </button>
+const SearchBar = ({ className, onSearch }) => {
+    const handleSearch = (e) => {
+        onSearch(e.target.value);
+    };
+
+    return (
+        <div className={`input-group ${className}`}>
+            <div className="input-group-prepend">
+                <span className="input-group-text">
+                    <i className="fa fa-search search-icon" />
+                </span>
+            </div>
+            <input 
+                type="text" 
+                placeholder="Rechercher une mission..." 
+                className="form-control" 
+                onChange={handleSearch}
+            />
         </div>
-        <input type="text" placeholder="Search ..." className="form-control" />
-    </div>
-);
+    );
+};
 
 const QuickAction = ({ icon, text, bgColor }) => (
     <a className="col-6 col-md-4 p-0" href="#">
@@ -65,7 +76,7 @@ const UserDropdown = ({ username, email, avatarSrc }) => (
     </li>
 );
 
-const MainHeader = () => (
+const MainHeader = ({ onSearch }) => (
     <div className="main-header">
         <div className="main-header-logo">
             <div className="logo-header" data-background-color="dark">
@@ -88,7 +99,7 @@ const MainHeader = () => (
         <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
             <div className="container-fluid">
                 <nav className="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-                    <SearchBar />
+                    <SearchBar onSearch={onSearch} />
                 </nav>
                 <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
                     <li className="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">

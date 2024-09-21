@@ -59,6 +59,7 @@ const AddMission = () => {
         divisionPrincipale: '',
     });
 
+    const [searchTerm, setSearchTerm] = useState('');
     const [poles, setPoles] = useState([]);
     const [allDivisions, setAllDivisions] = useState([]);
     const [filteredDivisions, setFilteredDivisions] = useState([]);
@@ -89,6 +90,14 @@ const AddMission = () => {
             fetchMissions(affaireId);
         }
     }, [affaireId]);
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+    };
+
+    const filteredMissions = missions.filter(mission => 
+        mission.libelle_mission.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const fetchMissions = async (id) => {
         try {
@@ -355,7 +364,7 @@ const AddMission = () => {
         <div className="wrapper">
             <Sidebar />
             <div className="main-panel">
-                <MainHeader />
+                <MainHeader onSearch={handleSearch} />
                 <div className="container">
                     <div className="page-inner">
                         <h3 className="fw-bold mb-3">Ajouter des Missions pour l'Affaire #{affaireId}</h3>
@@ -396,11 +405,11 @@ const AddMission = () => {
 
                         <div className="row mt-4">
                             <div className="col-md-12">
-                                {missions.length > 0 ? (
+                                {filteredMissions.length > 0 ? (
                                     <>
                                         <h4>Missions existantes</h4>
                                         <div className="row">
-                                            {missions.map((mission) => (
+                                            {filteredMissions.map((mission) => (
                                                 <div key={mission.id_mission} className="col-12 col-sm-6 col-md-6 col-xl-12">
                                                     <div className="card">
                                                         <div className="card-body">
@@ -439,7 +448,7 @@ const AddMission = () => {
                                         </div>
                                     </>
                                 ) : (
-                                    <p></p>
+                                    <p>{searchTerm ? "Aucune mission trouvée" : "Aucune mission existante pour cette affaire."}</p>
                                 )}
                             </div>
                         </div>
