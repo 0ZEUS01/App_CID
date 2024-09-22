@@ -2,8 +2,7 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+
 
 const SearchBar = ({ className, onSearch }) => (
     <div className={`input-group ${className}`}>

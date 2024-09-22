@@ -19,7 +19,7 @@ const SearchBar = ({ className, onSearch }) => {
             </div>
             <input 
                 type="text" 
-                placeholder="Rechercher une mission..." 
+                placeholder="Rechercher..." 
                 className="form-control" 
                 onChange={handleSearch}
             />
@@ -56,7 +56,7 @@ const UserDropdown = ({ firstName, lastName, email }) => (
 );
 
 const MainHeader = ({ onSearch }) => {
-    const { user, setUser } = useUser();
+    const {setUser } = useUser();
     const [userDetails, setUserDetails] = useState(null);
 
     useEffect(() => {

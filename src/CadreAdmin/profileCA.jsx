@@ -1,61 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faUser, 
-    faEnvelope,
-    faPhone,
-    faHome,
-    faArrowRight,
-    faCalendarAlt
-} from '@fortawesome/free-solid-svg-icons';
+import { Form, Button, Modal, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
-import ProfileForm from '../views/profileForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 
 const ProfilePage = () => {
-    const [userDetails, setUserDetails] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({});
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUserDetails(JSON.parse(storedUser));
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
-        }
+        fetchUserData();
     }, []);
 
-    const handleUpdate = async (updatedUser) => {
-        try {
-            const response = await axios.put(`http://localhost:8080/api/utilisateurs/${userDetails.id_utilisateur}`, updatedUser);
-            if (response.data) {
-                setUserDetails(response.data);
-                localStorage.setItem('user', JSON.stringify(response.data));
-            }
-        } catch (error) {
-            console.error('Error updating user details:', error);
-        }
-    };
-
-    const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete your account?')) {
+    const fetchUserData = async () => {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
             try {
-                await axios.delete(`http://localhost:8080/api/utilisateurs/${userDetails.id_utilisateur}`);
-                localStorage.removeItem('user');
-                // Redirect to logout or home page
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/${userId}`);
+                setUser(response.data);
+                setFormData(response.data);
             } catch (error) {
-                console.error('Error deleting user account:', error);
+                console.error('Error fetching user data:', error);
+                setError('Failed to load user data. Please try again later.');
             }
         }
     };
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`, formData);
+            setUser(formData);
+            setIsEditing(false);
+            setError('');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            setError('Failed to update profile. Please try again.');
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`);
+            localStorage.removeItem('userId');
+            navigate('/login');
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            setError('Failed to delete account. Please try again.');
+        }
+    };
+
+    if (!user) return <div className="wrapper"><div className="main-panel"><div className="content">Loading...</div></div></div>;
 
     return (
         <div className="wrapper">
@@ -65,127 +73,159 @@ const ProfilePage = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h4 className="page-title">Profile</h4>
-                            <ul className="breadcrumbs">
+                            <h3 className="fw-bold mb-3">Profile</h3>
+                            <ul className="breadcrumbs mb-3">
                                 <li className="nav-home">
-                                    <Button variant="link" className="nav-link">
-                                        <FontAwesomeIcon icon={faHome} />
-                                    </Button>
+                                    <FontAwesomeIcon icon={faHome} />
                                 </li>
                                 <li className="separator">
                                     <FontAwesomeIcon icon={faArrowRight} />
                                 </li>
                                 <li className="nav-item">
-                                    <Button variant="link" className="nav-link">Profile</Button>
+                                    <span>Profile</span>
                                 </li>
                             </ul>
                         </div>
-                        <h4>User Information</h4>
-                        {userDetails ? (
-                            <>
-                                <Row className="mb-4">
-                                    <Col md={4}>
-                                        <Card className="card-stats card-round">
-                                            <Card.Body>
-                                                <Row>
-                                                    <Col xs={4}>
-                                                        <div className="icon-big text-center">
-                                                            <FontAwesomeIcon icon={faUser} className="text-warning" />
-                                                        </div>
-                                                    </Col>
-                                                    <Col xs={8} className="col-stats">
-                                                        <div className="numbers">
-                                                            <p className="card-category">Name</p>
-                                                            <Card.Title as="h4">{`${userDetails.prenom} ${userDetails.nom}`}</Card.Title>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </Card.Body>
-                                            <Card.Footer>
-                                                <hr />
-                                                <div className="stats">
-                                                    <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Last updated
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="card">
+                                    <div className="card-header d-flex justify-content-between align-items-center">
+                                        <h4 className="card-title">User Information</h4>
+                                        <Button variant="primary" onClick={() => setIsEditing(!isEditing)}>
+                                            <FontAwesomeIcon icon={isEditing ? faSave : faEdit} /> {isEditing ? 'Save' : 'Edit'}
+                                        </Button>
+                                    </div>
+                                    <div className="card-body">
+                                        {error && <Alert variant="danger">{error}</Alert>}
+                                        <Form onSubmit={handleSubmit}>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>First Name</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="prenom"
+                                                            value={formData.prenom || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
                                                 </div>
-                                            </Card.Footer>
-                                        </Card>
-                                    </Col>
-                                    <Col md={4}>
-                                        <Card className="card-stats card-round">
-                                            <Card.Body>
-                                                <Row>
-                                                    <Col xs={4}>
-                                                        <div className="icon-big text-center">
-                                                            <FontAwesomeIcon icon={faEnvelope} className="text-success" />
-                                                        </div>
-                                                    </Col>
-                                                    <Col xs={8} className="col-stats">
-                                                        <div className="numbers">
-                                                            <p className="card-category">Email</p>
-                                                            <Card.Title as="h4">{userDetails.email}</Card.Title>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </Card.Body>
-                                            <Card.Footer>
-                                                <hr />
-                                                <div className="stats">
-                                                    <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Last updated
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Last Name</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="nom"
+                                                            value={formData.nom || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
                                                 </div>
-                                            </Card.Footer>
-                                        </Card>
-                                    </Col>
-                                    <Col md={4}>
-                                        <Card className="card-stats card-round">
-                                            <Card.Body>
-                                                <Row>
-                                                    <Col xs={4}>
-                                                        <div className="icon-big text-center">
-                                                            <FontAwesomeIcon icon={faPhone} className="text-danger" />
-                                                        </div>
-                                                    </Col>
-                                                    <Col xs={8} className="col-stats">
-                                                        <div className="numbers">
-                                                            <p className="card-category">Phone</p>
-                                                            <Card.Title as="h4">{userDetails.num_telephone}</Card.Title>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </Card.Body>
-                                            <Card.Footer>
-                                                <hr />
-                                                <div className="stats">
-                                                    <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Last updated
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Email</Form.Label>
+                                                        <Form.Control
+                                                            type="email"
+                                                            name="email"
+                                                            value={formData.email || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
                                                 </div>
-                                            </Card.Footer>
-                                        </Card>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col lg={12}>
-                                        <Card>
-                                            <Card.Header>
-                                                <Card.Title as="h4">Edit Profile</Card.Title>
-                                            </Card.Header>
-                                            <Card.Body>
-                                                <ProfileForm user={userDetails} onUpdate={handleUpdate} onDelete={handleDelete} />
-                                            </Card.Body>
-                                            <Card.Footer>
-                                                <hr />
-                                                <div className="stats">
-                                                    <FontAwesomeIcon icon={faCalendarAlt} className="me-1" /> Last updated
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Username</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="username"
+                                                            value={formData.username || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
                                                 </div>
-                                            </Card.Footer>
-                                        </Card>
-                                    </Col>
-                                </Row>
-                            </>
-                        ) : (
-                            <div>No user data available</div>
-                        )}
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Phone Number</Form.Label>
+                                                        <Form.Control
+                                                            type="tel"
+                                                            name="num_telephone"
+                                                            value={formData.num_telephone || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Date of Birth</Form.Label>
+                                                        <Form.Control
+                                                            type="date"
+                                                            name="date_naissance"
+                                                            value={formData.date_naissance || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Address</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="adresse"
+                                                            value={formData.adresse || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        />
+                                                    </Form.Group>
+                                                </div>
+                                            </div>
+                                            {isEditing && (
+                                                <Button variant="primary" type="submit" className="btn-fill mt-3">
+                                                    Update Profile
+                                                </Button>
+                                            )}
+                                        </Form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row mt-3">
+                            <div className="col-md-12">
+                                <Button variant="danger" className="btn-fill" onClick={() => setShowDeleteModal(true)}>
+                                    Delete Account
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                     <Footer />
                 </div>
             </div>
+
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Account Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to delete your account? This action cannot be undone.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleDeleteAccount}>
+                        Delete Account
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
