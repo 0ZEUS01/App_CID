@@ -9,7 +9,6 @@ import {
     faCalendarAlt,
     faHome,
     faArrowRight,
-    faHeart,
     faListAlt,
     faChartBar,
     faClock,

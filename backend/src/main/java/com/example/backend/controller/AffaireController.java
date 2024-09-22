@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Year;
 import java.util.*;
 
 @RestController
@@ -171,6 +172,43 @@ public class AffaireController {
                 stats.put("annule", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.ANNULE));
 
                 return ResponseEntity.ok(stats);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/chart-data/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getChartDataByPole(@PathVariable Long userId) {
+        return (ResponseEntity<List<Map<String, Object>>>) utilisateurRepository.findById(userId)
+            .map(user -> {
+                Pole pole = user.getPole();
+                if (pole == null) {
+                    return ResponseEntity.badRequest().body(null);
+                }
+
+                int currentYear = Year.now().getValue();
+                List<Object[]> rawData = affaireRepository.countByPolePrincipaleAndStatusAffaireGroupByMonth(pole, currentYear);
+
+                Map<StatusAffaire, long[]> statusData = new EnumMap<>(StatusAffaire.class);
+                for (StatusAffaire status : StatusAffaire.values()) {
+                    statusData.put(status, new long[12]);
+                }
+
+                for (Object[] row : rawData) {
+                    int month = ((Number) row[0]).intValue() - 1; // Adjust for 0-based array
+                    StatusAffaire status = (StatusAffaire) row[1];
+                    long count = ((Number) row[2]).longValue();
+                    statusData.get(status)[month] = count;
+                }
+
+                List<Map<String, Object>> seriesData = new ArrayList<>();
+                for (Map.Entry<StatusAffaire, long[]> entry : statusData.entrySet()) {
+                    Map<String, Object> series = new HashMap<>();
+                    series.put("name", entry.getKey().name());
+                    series.put("data", entry.getValue());
+                    seriesData.add(series);
+                }
+
+                return ResponseEntity.ok(seriesData);
             })
             .orElse(ResponseEntity.notFound().build());
     }
