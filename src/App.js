@@ -1,8 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AffaireProvider } from './context/AffaireContext';
 import PageMeta from './PageMeta';
-import { UserProvider } from './context/UserContext';
+import { UserProvider, useUser } from './context/UserContext';
 
 // Import views
 import Login from './views/login';
@@ -34,9 +34,25 @@ import AfficherPays from './Admin/Pays/afficherPays'
 import AfficherSousTraitant from './Admin/SousTraitant/afficherST'
 import AfficherPartenaire from './Admin/Partenaire/afficherPartenaire'
 import HomeAdmin from './Admin/HomeAdmin';
+import ProfilePageCA from './CadreAdmin/profileCA';
+
+function LogoutComponent() {
+  const { setUser } = useUser();
+
+  React.useEffect(() => {
+    // Clear user data from context
+    setUser(null);
+    // Clear user ID from local storage
+    localStorage.removeItem('userId');
+  }, [setUser]);
+
+  // Redirect to login page
+  return <Navigate to="/login" />;
+}
+
 // Update the routes array with French titles
 const routes = [
-  { path: '/', element: Login, title: 'Login' },
+  { path: '/login', element: Login, title: 'Login' },
   { path: '/HomeCA', element: HomeCA, title: 'Accueil - CID' },
   { path: '/addAffaireCA', element: AddAffaireCA, title: 'Ajouter Affaire - CID' },
   { path: '/afficherAffaireCA', element: AfficherAffaireCA, title: 'Afficher Affaire - CID' },
@@ -65,6 +81,9 @@ const routes = [
   { path: '/afficherSousTraitant', element: AfficherSousTraitant, title: 'Gestion des Sous-traitants - CID' },
   { path: '/afficherPartenaire', element: AfficherPartenaire, title: 'Gestion des Partenaires - CID' },
   { path: '/HomeAdmin', element: HomeAdmin, title: 'Accueil - CID' },
+  { path: '/profileCA', element: ProfilePageCA, title: 'Profile - CID' },
+  { path: '/logout', element: LogoutComponent, title: 'Logout - CID' },
+  { path: '/', element: <Navigate to="/login" replace /> },
 ];
 
 function App() {
@@ -85,6 +104,7 @@ function App() {
                 } 
               />
             ))}
+            <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
       </AffaireProvider>

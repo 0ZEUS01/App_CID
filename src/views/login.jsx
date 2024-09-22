@@ -25,9 +25,12 @@ const Login = () => {
             if (response.data.redirectionLink) {
                 // Save user information
                 setUser({
+                    id: response.data.id,
                     username: response.data.username || trimmedLowercaseIdentifier,
                     email: response.data.email || trimmedLowercaseIdentifier
                 });
+                // Save user ID in local storage
+                localStorage.setItem('userId', response.data.id);
                 navigate(response.data.redirectionLink);
             } else {
                 setError('Connexion réussie mais aucun lien de redirection fourni.');
