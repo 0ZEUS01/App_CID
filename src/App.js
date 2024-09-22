@@ -36,6 +36,7 @@ import AfficherPartenaire from './Admin/Partenaire/afficherPartenaire'
 import HomeAdmin from './Admin/HomeAdmin';
 import ProfilePageCA from './CadreAdmin/profileCA';
 import ProfilePageAdmin from './Admin/profileAdmin';
+import ProfilePageCP from './ChefPole/profileCP';
 
 function LogoutComponent() {
   const { setUser } = useUser();
@@ -87,6 +88,7 @@ const routes = [
   { path: '/profileCA', element: ProfilePageCA, title: 'Profile - CID' },
   { path: '/logout', element: LogoutComponent, title: 'Logout - CID' },
   { path: '/profileAdmin', element: ProfilePageAdmin, title: 'Profile - CID' },
+  { path: '/profileCP', element: ProfilePageCP, title: 'Profile - CID' },
 ];
 
 function App() {

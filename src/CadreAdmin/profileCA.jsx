@@ -47,12 +47,32 @@ const ProfilePage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        if (name === "pays") {
+            // For country, we need to set the whole country object
+            const selectedCountry = countries.find(country => country.id_pays.toString() === value);
+            setFormData(prevData => ({
+                ...prevData,
+                pays: selectedCountry
+            }));
+        } else {
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
     };
 
     const handleSaveEdit = async () => {
         try {
-            const response = await axios.put(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`, formData);
+            // Create a copy of formData to modify
+            const updatedFormData = { ...formData };
+            
+            // If pays is an object, ensure we're just sending the id
+            if (updatedFormData.pays && typeof updatedFormData.pays === 'object') {
+                updatedFormData.pays = { id_pays: updatedFormData.pays.id_pays };
+            }
+
+            const response = await axios.put(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`, updatedFormData);
             setUser(response.data);
             setIsEditing(false);
             setError('');

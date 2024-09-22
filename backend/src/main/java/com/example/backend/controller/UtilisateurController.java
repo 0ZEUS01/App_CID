@@ -2,8 +2,10 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Role;
 import com.example.backend.model.Utilisateur;
+import com.example.backend.model.Pays;
 import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.UtilisateurRepository;
+import com.example.backend.repository.PaysRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,9 @@ public class UtilisateurController {
     
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PaysRepository paysRepository;
 
     @GetMapping
     public List<Utilisateur> getAllUtilisateurs() {
@@ -63,10 +68,23 @@ public class UtilisateurController {
                     existingUtilisateur.setSexe(utilisateur.getSexe());
                     existingUtilisateur.setAdresse(utilisateur.getAdresse());
 
-                    // Handle Pole, Division, and Pays
+                    // Handle Pole and Division
                     existingUtilisateur.setPole(utilisateur.getPole());
                     existingUtilisateur.setDivision(utilisateur.getDivision());
-                    existingUtilisateur.setPays(utilisateur.getPays());
+                    
+                    // Handle Pays
+                    if (utilisateur.getPays() != null) {
+                        Long paysId = utilisateur.getPays().getId_pays();
+                        if (paysId != null) {
+                            Pays pays = paysRepository.findById(paysId)
+                                    .orElseThrow(() -> new RuntimeException("Country not found with id: " + paysId));
+                            existingUtilisateur.setPays(pays);
+                        } else {
+                            existingUtilisateur.setPays(null);
+                        }
+                    } else {
+                        existingUtilisateur.setPays(null);
+                    }
 
                     // Handle Roles
                     if (utilisateur.getRoles() != null) {
