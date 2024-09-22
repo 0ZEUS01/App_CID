@@ -6,7 +6,7 @@ import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUser, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
@@ -14,10 +14,12 @@ const ProfilePage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
     const [error, setError] = useState('');
+    const [countries, setCountries] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserData();
+        fetchCountries();
     }, []);
 
     const fetchUserData = async () => {
@@ -34,16 +36,24 @@ const ProfilePage = () => {
         }
     };
 
+    const fetchCountries = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/pays');
+            setCountries(response.data);
+        } catch (error) {
+            console.error('Error fetching countries:', error);
+        }
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSaveEdit = async () => {
         try {
-            await axios.put(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`, formData);
-            setUser(formData);
+            const response = await axios.put(`http://localhost:8080/api/utilisateurs/${user.id_utilisateur}`, formData);
+            setUser(response.data);
             setIsEditing(false);
             setError('');
         } catch (error) {
@@ -91,13 +101,23 @@ const ProfilePage = () => {
                                 <div className="card">
                                     <div className="card-header d-flex justify-content-between align-items-center">
                                         <h4 className="card-title">User Information</h4>
-                                        <Button variant="primary" onClick={() => setIsEditing(!isEditing)}>
-                                            <FontAwesomeIcon icon={isEditing ? faSave : faEdit} /> {isEditing ? 'Save' : 'Edit'}
+                                        <Button 
+                                            variant="primary" 
+                                            onClick={() => {
+                                                if (isEditing) {
+                                                    handleSaveEdit();
+                                                } else {
+                                                    setIsEditing(true);
+                                                }
+                                            }}
+                                        >
+                                            <FontAwesomeIcon icon={isEditing ? faSave : faEdit} /> &nbsp;
+                                            {isEditing ? 'Save' : 'Edit'}
                                         </Button>
                                     </div>
                                     <div className="card-body">
                                         {error && <Alert variant="danger">{error}</Alert>}
-                                        <Form onSubmit={handleSubmit}>
+                                        <Form>
                                             <div className="row">
                                                 <div className="col-md-6">
                                                     <Form.Group className="mb-3">
@@ -177,6 +197,43 @@ const ProfilePage = () => {
                                                 </div>
                                             </div>
                                             <div className="row">
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Gender</Form.Label>
+                                                        <Form.Control
+                                                            as="select"
+                                                            name="sexe"
+                                                            value={formData.sexe || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        >
+                                                            <option value="">Select Gender</option>
+                                                            <option value="M">Male</option>
+                                                            <option value="F">Female</option>
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Country</Form.Label>
+                                                        <Form.Control
+                                                            as="select"
+                                                            name="pays"
+                                                            value={formData.pays?.id_pays || ''}
+                                                            onChange={handleInputChange}
+                                                            disabled={!isEditing}
+                                                        >
+                                                            <option value="">Select Country</option>
+                                                            {countries.map(country => (
+                                                                <option key={country.id_pays} value={country.id_pays}>
+                                                                    {country.libelle_pays}
+                                                                </option>
+                                                            ))}
+                                                        </Form.Control>
+                                                    </Form.Group>
+                                                </div>
+                                            </div>
+                                            <div className="row">
                                                 <div className="col-md-12">
                                                     <Form.Group className="mb-3">
                                                         <Form.Label>Address</Form.Label>
@@ -190,11 +247,6 @@ const ProfilePage = () => {
                                                     </Form.Group>
                                                 </div>
                                             </div>
-                                            {isEditing && (
-                                                <Button variant="primary" type="submit" className="btn-fill mt-3">
-                                                    Update Profile
-                                                </Button>
-                                            )}
                                         </Form>
                                     </div>
                                 </div>
