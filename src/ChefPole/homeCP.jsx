@@ -58,15 +58,19 @@ const HomeCP = () => {
     });
 
     useEffect(() => {
-        if (user && user.id) {
+        if (user && user.id_utilisateur) {
+            console.log('Fetching stats for user:', user.id_utilisateur);
             fetchAffaireStats();
             fetchChartData();
+        } else {
+            console.log('User or user.id_utilisateur is not available');
         }
     }, [user]);
 
     const fetchAffaireStats = async () => {
         try {
-            const response = await axios.get(`/api/affaires/stats/${user.id}`);
+            const response = await axios.get(`/api/affaires/stats/${user.id_utilisateur}`);
+            console.log('Fetched affaire stats:', response.data);
             setAffaireStats(response.data);
         } catch (error) {
             console.error('Error fetching affaire stats:', error);
@@ -75,7 +79,7 @@ const HomeCP = () => {
 
     const fetchChartData = async () => {
         try {
-            const response = await axios.get(`/api/affaires/chart-data/${user.id}`);
+            const response = await axios.get(`/api/affaires/chart-data/${user.id_utilisateur}`);
             setChartData(prevState => ({
                 ...prevState,
                 series: response.data

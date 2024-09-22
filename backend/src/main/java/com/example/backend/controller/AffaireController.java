@@ -1,11 +1,9 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.Affaire;
+import com.example.backend.model.Pole;
 import com.example.backend.model.StatusAffaire;
-import com.example.backend.repository.AffaireRepository;
-import com.example.backend.repository.ClientRepository;
-import com.example.backend.repository.DivisionRepository;
-import com.example.backend.repository.PoleRepository;
+import com.example.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +25,9 @@ public class AffaireController {
 
     @Autowired
     private DivisionRepository divisionRepository;
+
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
     @GetMapping
     public List<Affaire> getAllAffaires() {
@@ -149,5 +150,28 @@ public class AffaireController {
             monthlyStats.add(count);
         }
         return ResponseEntity.ok(monthlyStats);
+    }
+
+    @GetMapping("/stats/{userId}")
+    public ResponseEntity<Map<String, Long>> getAffaireStatsByPole(@PathVariable Long userId) {
+        return utilisateurRepository.findById(userId)
+            .map(user -> {
+                Pole pole = user.getPole();
+                if (pole == null) {
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("error", 0L));
+                }
+
+                Map<String, Long> stats = new HashMap<>();
+                stats.put("total", affaireRepository.countByPolePrincipale(pole));
+                stats.put("enCreation", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.EN_CREATION));
+                stats.put("cdpDecide", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.CDP_DECIDE));
+                stats.put("enProduction", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.EN_PRODUCTION));
+                stats.put("interrompu", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.INTERROMPU));
+                stats.put("termine", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.TERMINE));
+                stats.put("annule", affaireRepository.countByPolePrincipaleAndStatusAffaire(pole, StatusAffaire.ANNULE));
+
+                return ResponseEntity.ok(stats);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }

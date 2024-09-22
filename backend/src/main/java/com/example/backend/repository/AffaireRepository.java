@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.Affaire;
+import com.example.backend.model.Pole;
 import com.example.backend.model.StatusAffaire;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,6 @@ public interface AffaireRepository extends JpaRepository<Affaire, Long> {
     Optional<Affaire> findTopByOrderByIdAffaireDesc();
     long countByStatusAffaire(StatusAffaire statusAffaire);
     long countByStatusAffaireAndDateFinBetween(StatusAffaire statusAffaire, Date startDate, Date endDate);
+    long countByPolePrincipale(Pole pole);
+    long countByPolePrincipaleAndStatusAffaire(Pole pole, StatusAffaire statusAffaire);
 }

@@ -148,10 +148,7 @@ const AfficherAffaire = () => {
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
                                             <h4 className="card-title">Liste des affaires du pôle {userPole?.libelle_pole}</h4>
-                                            <Link to="/AddAffaireCP" className="btn btn-primary btn-round ms-auto">
-                                                <FontAwesomeIcon icon={faPlus} />
-                                                &nbsp;&nbsp;Ajouter une affaire
-                                            </Link>
+                                            
                                         </div>
                                     </div>
                                     <div className="card-body">
