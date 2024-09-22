@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
-const Login = () => {
+function Login() {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -22,20 +22,24 @@ const Login = () => {
                 identifier: trimmedLowercaseIdentifier,
                 password
             });
+            console.log('Login response:', response.data);
             if (response.data.redirectionLink) {
                 // Save user information
+                const userId = response.data.id_utilisateur; // Make sure this matches the field name in your API response
                 setUser({
-                    id: response.data.id,
+                    id_utilisateur: userId,
                     username: response.data.username || trimmedLowercaseIdentifier,
                     email: response.data.email || trimmedLowercaseIdentifier
                 });
                 // Save user ID in local storage
-                localStorage.setItem('userId', response.data.id);
+                localStorage.setItem('userId', userId);
+                console.log('Saved userId to localStorage:', userId);
                 navigate(response.data.redirectionLink);
             } else {
                 setError('Connexion réussie mais aucun lien de redirection fourni.');
             }
         } catch (error) {
+            console.error('Login error:', error);
             setError('Identifiants invalides. Veuillez réessayer.');
         }
     };
@@ -92,6 +96,6 @@ const Login = () => {
             </Card>
         </Container>
     );
-};
+}
 
 export default Login;

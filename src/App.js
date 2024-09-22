@@ -40,14 +40,16 @@ function LogoutComponent() {
   const { setUser } = useUser();
 
   React.useEffect(() => {
-    // Clear user data from context
     setUser(null);
-    // Clear user ID from local storage
     localStorage.removeItem('userId');
   }, [setUser]);
 
-  // Redirect to login page
   return <Navigate to="/login" />;
+}
+
+// Root redirect component
+function RootRedirect() {
+  return <Navigate to="/login" replace />;
 }
 
 // Update the routes array with French titles
@@ -83,7 +85,6 @@ const routes = [
   { path: '/HomeAdmin', element: HomeAdmin, title: 'Accueil - CID' },
   { path: '/profileCA', element: ProfilePageCA, title: 'Profile - CID' },
   { path: '/logout', element: LogoutComponent, title: 'Logout - CID' },
-  { path: '/', element: <Navigate to="/login" replace /> },
 ];
 
 function App() {
@@ -104,7 +105,7 @@ function App() {
                 } 
               />
             ))}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<RootRedirect />} />
           </Routes>
         </Router>
       </AffaireProvider>

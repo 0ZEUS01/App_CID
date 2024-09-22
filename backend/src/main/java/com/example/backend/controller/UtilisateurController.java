@@ -120,14 +120,13 @@ public class UtilisateurController {
         // User authenticated successfully
         Set<Role> roles = utilisateur.getRoles();
         if (roles == null || roles.isEmpty()) {
-            return ResponseEntity.ok().body(new LoginResponse("No role assigned", null));
+            return ResponseEntity.ok().body(new LoginResponse("No role assigned", null, utilisateur.getId_utilisateur()));
         }
 
         // For simplicity, we'll use the first role's redirection link
-        // You might want to implement more complex logic if a user can have multiple roles
         String redirectionLink = roles.iterator().next().getRedirectionLink();
 
-        return ResponseEntity.ok().body(new LoginResponse("Login successful", redirectionLink));
+        return ResponseEntity.ok().body(new LoginResponse("Login successful", redirectionLink, utilisateur.getId_utilisateur()));
     }
 
     @GetMapping("/details")
@@ -160,10 +159,12 @@ class LoginRequest {
 class LoginResponse {
     private String message;
     private String redirectionLink;
+    private Long id_utilisateur;
 
-    public LoginResponse(String message, String redirectionLink) {
+    public LoginResponse(String message, String redirectionLink, Long id_utilisateur) {
         this.message = message;
         this.redirectionLink = redirectionLink;
+        this.id_utilisateur = id_utilisateur;
     }
 }
 

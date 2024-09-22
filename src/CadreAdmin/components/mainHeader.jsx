@@ -31,7 +31,7 @@ const UserDropdown = ({ firstName, lastName, email }) => (
     <li className="nav-item topbar-user dropdown hidden-caret">
         <a className="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
             <span className="profile-username">
-                <span className="op-7">Hi,</span>
+                <span className="op-7">Hi,</span>&nbsp;
                 <span className="fw-bold">{firstName} {lastName}</span>
             </span>
         </a>
@@ -42,14 +42,12 @@ const UserDropdown = ({ firstName, lastName, email }) => (
                         <div className="u-text">
                             <h4>{firstName} {lastName}</h4>
                             <p className="text-muted">{email}</p>
-                            <Link to="/profile" className="btn btn-xs btn-secondary btn-sm">View Profile</Link>
                         </div>
                     </div>
                 </li>
                 <li>
                     <div className="dropdown-divider" />
-                    <Link className="dropdown-item" to="/profile">My Profile</Link>
-                    <div className="dropdown-divider" />
+                    <Link className="dropdown-item" to="/profileCA">My Profile</Link>
                     <Link className="dropdown-item" to="/logout">Logout</Link>
                 </li>
             </div>
@@ -58,25 +56,37 @@ const UserDropdown = ({ firstName, lastName, email }) => (
 );
 
 const MainHeader = ({ onSearch }) => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const [userDetails, setUserDetails] = useState(null);
 
     useEffect(() => {
         const fetchUserDetails = async () => {
-            if (user && (user.email || user.username)) {
+            const userId = localStorage.getItem('userId');
+            console.log('Fetching user details for ID:', userId);
+            if (userId) {
                 try {
-                    const response = await axios.get(`http://localhost:8080/api/utilisateurs/details`, {
-                        params: { identifier: user.email || user.username }
-                    });
+                    const response = await axios.get(`http://localhost:8080/api/utilisateurs/${userId}`);
+                    console.log('User details response:', response.data);
                     setUserDetails(response.data);
+                    setUser({
+                        id_utilisateur: userId,
+                        username: response.data.username,
+                        email: response.data.email
+                    });
                 } catch (error) {
                     console.error('Error fetching user details:', error);
+                    console.error('Error response:', error.response);
+                    // Don't remove userId from localStorage here, as it might be a temporary error
+                    // Instead, you might want to implement a retry mechanism or show an error message
                 }
+            } else {
+                console.log('No userId found in localStorage');
+                // Redirect to login page or show a message that user needs to log in
             }
         };
 
         fetchUserDetails();
-    }, [user]);
+    }, [setUser]);
 
     return (
         <div className="main-header">
@@ -116,8 +126,8 @@ const MainHeader = ({ onSearch }) => {
                         </li>
                         {userDetails && (
                             <UserDropdown 
-                                firstName={userDetails.firstName}
-                                lastName={userDetails.lastName}
+                                firstName={userDetails.prenom}
+                                lastName={userDetails.nom}
                                 email={userDetails.email}
                             />
                         )}
