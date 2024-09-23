@@ -165,6 +165,15 @@ public class UtilisateurController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user details");
         }
     }
+
+    @GetMapping("/chefs-de-projet")
+    public ResponseEntity<List<Utilisateur>> getChefsDeProjet() {
+        List<Utilisateur> chefsDeProjet = utilisateurRepository.findAll().stream()
+                .filter(utilisateur -> utilisateur.getRoles().stream()
+                        .anyMatch(role -> role.getNom_role().equalsIgnoreCase("Chef de Projet")))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(chefsDeProjet);
+    }
 }
 
 @Data
