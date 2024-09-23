@@ -147,7 +147,7 @@ const AfficherMissionCP = () => {
                 </div>
             </div>
 
-            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+            <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Détails de la Mission</Modal.Title>
                 </Modal.Header>

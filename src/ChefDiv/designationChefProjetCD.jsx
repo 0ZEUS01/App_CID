@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FaCheckCircle } from 'react-icons/fa';
 import Sidebar from './components/sideBar';
@@ -10,6 +10,7 @@ import Footer from './components/footer';
 
 const DesignationChefProjetCD = () => {
     const { idAffaire } = useParams(); // Get the affaire ID from the URL
+    const navigate = useNavigate();
     const [availableChefs, setAvailableChefs] = useState([]);
     const [selectedChef, setSelectedChef] = useState('');
     const [currentChef, setCurrentChef] = useState(null);
@@ -62,6 +63,7 @@ const DesignationChefProjetCD = () => {
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
+        navigate('/afficherAffaireCD'); // Redirect to afficherAffaire page
     };
 
     return (

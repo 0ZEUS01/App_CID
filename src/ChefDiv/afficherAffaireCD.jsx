@@ -205,7 +205,7 @@ const AfficherAffaire = () => {
                 </div>
             </div>
 
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showModal} onHide={handleCloseModal} size="lg" c>
                 <Modal.Header closeButton>
                     <Modal.Title>Détails de l'Affaire</Modal.Title>
                 </Modal.Header>
