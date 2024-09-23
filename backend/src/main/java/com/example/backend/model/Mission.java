@@ -68,13 +68,6 @@ public class Mission {
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionDivision> secondaryDivisions = new HashSet<>();
 
-    public Set<MissionDivision> getSecondaryDivisions() {
-        return secondaryDivisions;
-    }
-    public void setSecondaryDivisions(Set<MissionDivision> secondaryDivisions) {
-        this.secondaryDivisions = secondaryDivisions;
-    }
-
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionST> sousTraitants = new HashSet<>();
 

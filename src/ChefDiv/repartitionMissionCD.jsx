@@ -47,7 +47,7 @@ const RepartirMissionCD = () => {
     const [sousTraitants, setSousTraitants] = useState([]);
     const [partenaires, setPartenaires] = useState([]);
     const [repartition, setRepartition] = useState({
-        principalDivision: { id: '', pourcentage: 0 },
+        principalDivision: { id: '', name: '', part: 0 },
         secondaryDivisions: [],
         sousTraitants: [],
         partenaires: []
@@ -67,6 +67,18 @@ const RepartirMissionCD = () => {
                 setDivisions(divisionsRes.data);
                 setSousTraitants(sousTraitantsRes.data);
                 setPartenaires(partenairesRes.data);
+
+                // Set the principal division from the mission data if it exists
+                if (missionRes.data && missionRes.data.principalDivision) {
+                    setRepartition(prev => ({
+                        ...prev,
+                        principalDivision: { 
+                            id: missionRes.data.principalDivision.id_division,
+                            name: missionRes.data.principalDivision.nom_division, // Assuming the division has a 'nom_division' field
+                            part: 0 
+                        }
+                    }));
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -74,30 +86,23 @@ const RepartirMissionCD = () => {
         fetchData();
     }, [idMission]);
 
-    const handlePrincipalDivisionChange = (e) => {
+    const handlePrincipalDivisionPartChange = (e) => {
         setRepartition({
             ...repartition,
-            principalDivision: { ...repartition.principalDivision, id: e.target.value }
-        });
-    };
-
-    const handlePrincipalDivisionPercentageChange = (e) => {
-        setRepartition({
-            ...repartition,
-            principalDivision: { ...repartition.principalDivision, pourcentage: parseFloat(e.target.value) }
+            principalDivision: { ...repartition.principalDivision, part: parseFloat(e.target.value) }
         });
     };
 
     const addSecondaryDivision = () => {
         setRepartition({
             ...repartition,
-            secondaryDivisions: [...repartition.secondaryDivisions, { id: '', pourcentage: 0 }]
+            secondaryDivisions: [...repartition.secondaryDivisions, { id: '', part: 0 }]
         });
     };
 
     const handleSecondaryDivisionChange = (index, field, value) => {
         const updatedDivisions = [...repartition.secondaryDivisions];
-        updatedDivisions[index][field] = field === 'pourcentage' ? parseFloat(value) : value;
+        updatedDivisions[index][field] = field === 'part' ? parseFloat(value) : value;
         setRepartition({ ...repartition, secondaryDivisions: updatedDivisions });
     };
 
@@ -109,13 +114,13 @@ const RepartirMissionCD = () => {
     const addSousTraitant = () => {
         setRepartition({
             ...repartition,
-            sousTraitants: [...repartition.sousTraitants, { id: '', pourcentage: 0 }]
+            sousTraitants: [...repartition.sousTraitants, { id: '', part: 0 }]
         });
     };
 
     const handleSousTraitantChange = (index, field, value) => {
         const updatedSousTraitants = [...repartition.sousTraitants];
-        updatedSousTraitants[index][field] = field === 'pourcentage' ? parseFloat(value) : value;
+        updatedSousTraitants[index][field] = field === 'part' ? parseFloat(value) : value;
         setRepartition({ ...repartition, sousTraitants: updatedSousTraitants });
     };
 
@@ -127,13 +132,13 @@ const RepartirMissionCD = () => {
     const addPartenaire = () => {
         setRepartition({
             ...repartition,
-            partenaires: [...repartition.partenaires, { id: '', pourcentage: 0 }]
+            partenaires: [...repartition.partenaires, { id: '', part: 0 }]
         });
     };
 
     const handlePartenaireChange = (index, field, value) => {
         const updatedPartenaires = [...repartition.partenaires];
-        updatedPartenaires[index][field] = field === 'pourcentage' ? parseFloat(value) : value;
+        updatedPartenaires[index][field] = field === 'part' ? parseFloat(value) : value;
         setRepartition({ ...repartition, partenaires: updatedPartenaires });
     };
 
@@ -193,16 +198,17 @@ const RepartirMissionCD = () => {
                                                         id="principalDivision"
                                                         type="select"
                                                         value={repartition.principalDivision.id}
-                                                        onChange={handlePrincipalDivisionChange}
-                                                        options={divisions.map(div => ({ value: div.id, label: div.nom_division }))}
+                                                        onChange={() => {}} // Empty function as the field is disabled
+                                                        options={[{ value: repartition.principalDivision.id, label: repartition.principalDivision.name }]}
+                                                        disabled={true}
                                                     />
                                                     <FormField
-                                                        label="Pourcentage"
-                                                        id="principalDivisionPercentage"
+                                                        label="Part de cette division dans la mission"
+                                                        id="principalDivisionPart"
                                                         type="number"
-                                                        placeholder="Pourcentage"
-                                                        value={repartition.principalDivision.pourcentage}
-                                                        onChange={handlePrincipalDivisionPercentageChange}
+                                                        placeholder="Part de la division"
+                                                        value={repartition.principalDivision.part}
+                                                        onChange={handlePrincipalDivisionPartChange}
                                                     />
                                                 </div>
 
@@ -218,12 +224,12 @@ const RepartirMissionCD = () => {
                                                             options={divisions.map(d => ({ value: d.id, label: d.nom_division }))}
                                                         />
                                                         <FormField
-                                                            label="Pourcentage"
-                                                            id={`secondaryDivisionPercentage-${index}`}
+                                                            label="Part de cette division dans la mission"
+                                                            id={`secondaryDivisionPart-${index}`}
                                                             type="number"
-                                                            placeholder="Pourcentage"
-                                                            value={div.pourcentage}
-                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'pourcentage', e.target.value)}
+                                                            placeholder="Part de la division"
+                                                            value={div.part}
+                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'part', e.target.value)}
                                                         />
                                                         <div className="col-md-2 d-flex align-items-end">
                                                             <Button variant="danger" onClick={() => removeSecondaryDivision(index)}>
@@ -248,12 +254,12 @@ const RepartirMissionCD = () => {
                                                             options={sousTraitants.map(s => ({ value: s.id, label: s.nom_st }))}
                                                         />
                                                         <FormField
-                                                            label="Pourcentage"
-                                                            id={`sousTraitantPercentage-${index}`}
+                                                            label="Part de ce sous-traitant dans la mission"
+                                                            id={`sousTraitantPart-${index}`}
                                                             type="number"
-                                                            placeholder="Pourcentage"
-                                                            value={st.pourcentage}
-                                                            onChange={(e) => handleSousTraitantChange(index, 'pourcentage', e.target.value)}
+                                                            placeholder="Part du sous-traitant"
+                                                            value={st.part}
+                                                            onChange={(e) => handleSousTraitantChange(index, 'part', e.target.value)}
                                                         />
                                                         <div className="col-md-2 d-flex align-items-end">
                                                             <Button variant="danger" onClick={() => removeSousTraitant(index)}>
@@ -278,12 +284,12 @@ const RepartirMissionCD = () => {
                                                             options={partenaires.map(part => ({ value: part.id, label: part.nom_partenariat }))}
                                                         />
                                                         <FormField
-                                                            label="Pourcentage"
-                                                            id={`partenairePercentage-${index}`}
+                                                            label="Part de ce partenaire dans la mission"
+                                                            id={`partenairePart-${index}`}
                                                             type="number"
-                                                            placeholder="Pourcentage"
-                                                            value={p.pourcentage}
-                                                            onChange={(e) => handlePartenaireChange(index, 'pourcentage', e.target.value)}
+                                                            placeholder="Part du partenaire"
+                                                            value={p.part}
+                                                            onChange={(e) => handlePartenaireChange(index, 'part', e.target.value)}
                                                         />
                                                         <div className="col-md-2 d-flex align-items-end">
                                                             <Button variant="danger" onClick={() => removePartenaire(index)}>
