@@ -6,7 +6,7 @@ import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faUser, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);

@@ -69,7 +69,7 @@ const routes = [
   { path: '/afficherAffaireCD', element: AfficherAffaireCD, title: 'Afficher Affaire - CID' },
   { path: '/AddDivisionsCD', element: AddDivisionsCD, title: 'Ajouter Divisions - CID' },
   { path: '/afficherMissionCD', element: AfficherMissionCD, title: 'Afficher Mission - CID' },
-  { path: '/designationChefProjetCD', element: DesignationChefProjetCD, title: 'Designation de Chef de Projet - CID' },
+  { path: '/designationChefProjetCD/:affaireId', element: DesignationChefProjetCD, title: 'Designation de Chef de Projet - CID' },
   { path: '/HomeCDP', element: HomeCDP, title: 'Accueil - CID' },
   { path: '/afficherAffaireCDP', element: AfficherAffaireCDP, title: 'Afficher Affaire - CID' },
   { path: '/afficherMissionCDP', element: AfficherMissionCDP, title: 'Afficher Mission - CID' },

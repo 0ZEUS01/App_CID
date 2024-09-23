@@ -4,10 +4,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSort, faSortUp, faSortDown, faInfo, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faInfo, faTasks } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';

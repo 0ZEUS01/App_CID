@@ -62,11 +62,9 @@ const MainHeader = ({ onSearch }) => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             const userId = localStorage.getItem('userId');
-            console.log('Fetching user details for ID:', userId);
             if (userId) {
                 try {
                     const response = await axios.get(`http://localhost:8080/api/utilisateurs/${userId}`);
-                    console.log('User details response:', response.data);
                     setUserDetails(response.data);
                     setUser({
                         id_utilisateur: userId,
@@ -80,7 +78,6 @@ const MainHeader = ({ onSearch }) => {
                     // Instead, you might want to implement a retry mechanism or show an error message
                 }
             } else {
-                console.log('No userId found in localStorage');
                 // Redirect to login page or show a message that user needs to log in
             }
         };

@@ -6,7 +6,7 @@ import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUser, faArrowRight, faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
@@ -64,10 +64,8 @@ const ProfilePage = () => {
 
     const handleSaveEdit = async () => {
         try {
-            // Create a copy of formData to modify
             const updatedFormData = { ...formData };
             
-            // If pays is an object, ensure we're just sending the id
             if (updatedFormData.pays && typeof updatedFormData.pays === 'object') {
                 updatedFormData.pays = { id_pays: updatedFormData.pays.id_pays };
             }
@@ -77,7 +75,6 @@ const ProfilePage = () => {
             setIsEditing(false);
             setError('');
         } catch (error) {
-            console.error('Error updating profile:', error);
             setError('Failed to update profile. Please try again.');
         }
     };

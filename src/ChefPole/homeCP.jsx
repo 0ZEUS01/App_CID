@@ -56,15 +56,7 @@ const HomeCP = () => {
         ]
     });
 
-    useEffect(() => {
-        if (user && user.id_utilisateur) {
-            console.log('Fetching stats for user:', user.id_utilisateur);
-            fetchAffaireStats();
-            fetchChartData();
-        } else {
-            console.log('User or user.id_utilisateur is not available');
-        }
-    }, [user]);
+
 
     const fetchAffaireStats = async () => {
         try {
@@ -87,7 +79,15 @@ const HomeCP = () => {
             console.error('Error fetching chart data:', error);
         }
     };
-
+    useEffect(() => {
+        if (user && user.id_utilisateur) {
+            console.log('Fetching stats for user:', user.id_utilisateur);
+            fetchAffaireStats();
+            fetchChartData();
+        } else {
+            console.log('User or user.id_utilisateur is not available');
+        }
+    }, [user]);
     return (
         <div className="wrapper">
             <Sidebar />

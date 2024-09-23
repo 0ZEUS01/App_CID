@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.Affaire;
+import com.example.backend.model.Division;
 import com.example.backend.model.Pole;
 import com.example.backend.model.StatusAffaire;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,16 @@ public interface AffaireRepository extends JpaRepository<Affaire, Long> {
            "AND YEAR(a.dateFin) = :year " +
            "GROUP BY MONTH(a.dateFin), a.statusAffaire")
     List<Object[]> countByPolePrincipaleAndStatusAffaireGroupByMonth(Pole pole, int year);
+    
+    long countByDivisionPrincipale(Division division);
+    long countByDivisionPrincipaleAndStatusAffaire(Division division, StatusAffaire statusAffaire);
+
+    @Query("SELECT MONTH(a.dateFin) as month, a.statusAffaire as status, COUNT(a) as count " +
+           "FROM Affaire a " +
+           "WHERE a.divisionPrincipale = :division " +
+           "AND YEAR(a.dateFin) = :year " +
+           "GROUP BY MONTH(a.dateFin), a.statusAffaire")
+    List<Object[]> countByDivisionPrincipaleAndStatusAffaireGroupByMonth(Division division, int year);
+    
+    List<Affaire> findByDivisionPrincipale(Division divisionPrincipale);
 }
