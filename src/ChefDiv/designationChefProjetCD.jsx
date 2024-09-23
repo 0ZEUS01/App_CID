@@ -63,7 +63,7 @@ const DesignationChefProjetCD = () => {
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        navigate('/afficherAffaireCD'); // Redirect to afficherAffaire page
+        navigate('/afficherAffaireCD');
     };
 
     return (

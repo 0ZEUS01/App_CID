@@ -71,7 +71,6 @@ public class Mission {
     public Set<MissionDivision> getSecondaryDivisions() {
         return secondaryDivisions;
     }
-
     public void setSecondaryDivisions(Set<MissionDivision> secondaryDivisions) {
         this.secondaryDivisions = secondaryDivisions;
     }

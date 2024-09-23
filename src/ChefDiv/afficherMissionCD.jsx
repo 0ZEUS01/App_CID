@@ -80,6 +80,10 @@ const AfficherMissionCD = () => {
 
     const handleCloseModal = () => setShowModal(false);
 
+    const handleRepartitionClick = (missionId) => {
+        window.location.href = `/repartirMissionCD/${missionId}`;
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
@@ -199,7 +203,7 @@ const AfficherMissionCD = () => {
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => window.location.href = '/addDivisionsCD'}>
+                        onClick={() => handleRepartitionClick(selectedMission.id_mission)}>
                         Répartition des tâches
                     </Button>
                 </Modal.Footer>
