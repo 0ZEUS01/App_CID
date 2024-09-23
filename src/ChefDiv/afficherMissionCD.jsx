@@ -2,7 +2,9 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfo, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
@@ -11,19 +13,28 @@ import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 
 const AfficherMission = () => {
+    const { idAffaire } = useParams(); // Get the affaire ID from the URL
+    const [missions, setMissions] = useState([]);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [showModal, setShowModal] = useState(false);
     const [selectedMission, setSelectedMission] = useState(null);
 
-    const data = [
-        { libelle: "Gare LGV Casa Voyageurs", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '70 %' },
-        { libelle: "Gare LGV Rabat Agdal", prix: '342,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '100 %' },
-        { libelle: "Gare LGV Kénitra", prix: '405,000.00', forfait: 'Oui', division: 'ET', Pourcentage: '90 %' },
-        { libelle: "Gare LGV Tanger", prix: '378,000.00', forfait: 'Non', division: 'ET', Pourcentage: '' }
-    ];
+    useEffect(() => {
+        const fetchMissions = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/missions/affaire/${idAffaire}`);
+                console.log('Fetched missions:', response.data); // Debugging log
+                setMissions(response.data);
+            } catch (error) {
+                console.error('Error fetching missions:', error);
+            }
+        };
+
+        fetchMissions();
+    }, [idAffaire]);
 
     const sortedData = useMemo(() => {
-        let sortableData = [...data];
+        let sortableData = [...missions];
         if (sortConfig !== null) {
             sortableData.sort((a, b) => {
                 if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -36,7 +47,7 @@ const AfficherMission = () => {
             });
         }
         return sortableData;
-    }, [data, sortConfig]);
+    }, [missions, sortConfig]);
 
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -68,7 +79,7 @@ const AfficherMission = () => {
                                 <div className="card">
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
-                                            <h4 className="card-title">Liste des missions de l'affaire "Réalisation des études de circulation 4"</h4>
+                                            <h4 className="card-title">Liste des missions de l'affaire "{idAffaire}"</h4>
                                         </div>
                                     </div>
                                     <div className="card-body">
@@ -127,8 +138,8 @@ const AfficherMission = () => {
                             </div>
                         </div>
                     </div>
-                    <Footer />
                 </div>
+                <Footer />
             </div>
 
             <Modal show={showModal} onHide={handleCloseModal} centered>

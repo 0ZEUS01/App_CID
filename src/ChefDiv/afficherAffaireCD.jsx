@@ -7,12 +7,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faInfo, faTasks, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faInfo, faTasks, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 
-const TableRow = ({ item, onShowInfo, onEdit, onDesignateChef }) => (
+const TableRow = ({ item, onShowInfo, onDesignateChef }) => (
     <tr>
         <td>{item.idAffaire}</td>
         <td>{item.libelle_affaire}</td>
@@ -21,9 +21,6 @@ const TableRow = ({ item, onShowInfo, onEdit, onDesignateChef }) => (
         <td>
             <button onClick={() => onShowInfo(item)} className="btn btn-link btn-primary me-2" title="Informations">
                 <FontAwesomeIcon icon={faInfo} />
-            </button>
-            <button onClick={() => onEdit(item)} className="btn btn-link btn-primary me-2" title="Modifier">
-                <FontAwesomeIcon icon={faEdit} />
             </button>
             <button onClick={() => onDesignateChef(item)} className="btn btn-link btn-primary" title="Désigner Chef de Projet">
                 <FontAwesomeIcon icon={faUserPlus} />
@@ -42,7 +39,6 @@ const AfficherAffaire = () => {
     const [userDivision, setUserDivision] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedAffaire, setSelectedAffaire] = useState(null);
-    const [modalType, setModalType] = useState('info'); // 'info' or 'edit'
 
     const fetchUserDivision = async () => {
         const userId = localStorage.getItem('userId');
@@ -126,13 +122,6 @@ const AfficherAffaire = () => {
 
     const handleShowInfo = (affaire) => {
         setSelectedAffaire(affaire);
-        setModalType('info');
-        setShowModal(true);
-    };
-
-    const handleEdit = (affaire) => {
-        setSelectedAffaire(affaire);
-        setModalType('edit');
         setShowModal(true);
     };
 
@@ -148,14 +137,6 @@ const AfficherAffaire = () => {
 
     const handleShowMissions = (affaireId) => {
         navigate(`/afficherMissionCD/${affaireId}`);
-        handleCloseModal();
-    };
-
-    const handleSaveEdit = async (e) => {
-        e.preventDefault();
-        // Implement the logic to save the edited affaire
-        // You may want to make an API call here to update the affaire
-        console.log('Saving edited affaire:', selectedAffaire);
         handleCloseModal();
     };
 
@@ -208,7 +189,6 @@ const AfficherAffaire = () => {
                                                                 key={item.idAffaire} 
                                                                 item={item} 
                                                                 onShowInfo={handleShowInfo} 
-                                                                onEdit={handleEdit}
                                                                 onDesignateChef={handleDesignateChef}
                                                             />
                                                         ))}
@@ -227,10 +207,10 @@ const AfficherAffaire = () => {
 
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{modalType === 'info' ? 'Détails de l\'Affaire' : 'Modifier l\'Affaire'}</Modal.Title>
+                    <Modal.Title>Détails de l'Affaire</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {selectedAffaire && modalType === 'info' && (
+                    {selectedAffaire && (
                         <div>
                             <p><strong>ID Affaire:</strong> {selectedAffaire.idAffaire}</p>
                             <p><strong>Libellé Affaire:</strong> {selectedAffaire.libelle_affaire}</p>
@@ -251,50 +231,18 @@ const AfficherAffaire = () => {
                             <p><strong>Part CID:</strong> {selectedAffaire.partCID} DH</p>
                         </div>
                     )}
-                    {selectedAffaire && modalType === 'edit' && (
-                        <form onSubmit={handleSaveEdit}>
-                            <div className="mb-3">
-                                <label htmlFor="libelle_affaire" className="form-label">Libellé Affaire</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="libelle_affaire"
-                                    value={selectedAffaire.libelle_affaire}
-                                    onChange={(e) => setSelectedAffaire({...selectedAffaire, libelle_affaire: e.target.value})}
-                                />
-                            </div>
-                            <div className="mb-3">
-                                <label htmlFor="prixGlobal" className="form-label">Prix Global (DH)</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    id="prixGlobal"
-                                    value={selectedAffaire.prixGlobal}
-                                    onChange={(e) => setSelectedAffaire({...selectedAffaire, prixGlobal: e.target.value})}
-                                />
-                            </div>
-                            {/* Add more fields as needed */}
-                        </form>
-                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Fermer
                     </Button>
-                    {modalType === 'info' && (
-                        <Button 
-                            variant="primary" 
-                            onClick={() => handleShowMissions(selectedAffaire.idAffaire)}
-                        >
-                            <FontAwesomeIcon icon={faTasks} className="me-2" />
-                            Afficher Missions
-                        </Button>
-                    )}
-                    {modalType === 'edit' && (
-                        <Button variant="primary" onClick={handleSaveEdit}>
-                            Enregistrer les modifications
-                        </Button>
-                    )}
+                    <Button 
+                        variant="primary" 
+                        onClick={() => handleShowMissions(selectedAffaire.idAffaire)}
+                    >
+                        <FontAwesomeIcon icon={faTasks} className="me-2" />
+                        Afficher Missions
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </div>
