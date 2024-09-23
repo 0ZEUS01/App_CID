@@ -47,7 +47,7 @@ const RepartirMissionCD = () => {
     const [sousTraitants, setSousTraitants] = useState([]);
     const [partenaires, setPartenaires] = useState([]);
     const [repartition, setRepartition] = useState({
-        principalDivision: { id: '', name: '', part: 0 },
+        principalDivision: { id: '', part: 0 },
         secondaryDivisions: [],
         sousTraitants: [],
         partenaires: []
@@ -68,13 +68,12 @@ const RepartirMissionCD = () => {
                 setSousTraitants(sousTraitantsRes.data);
                 setPartenaires(partenairesRes.data);
 
-                // Set the principal division from the mission data if it exists
+                // Set the principal division from the mission data
                 if (missionRes.data && missionRes.data.principalDivision) {
                     setRepartition(prev => ({
                         ...prev,
                         principalDivision: { 
                             id: missionRes.data.principalDivision.id_division,
-                            name: missionRes.data.principalDivision.nom_division, // Assuming the division has a 'nom_division' field
                             part: 0 
                         }
                     }));
@@ -87,64 +86,76 @@ const RepartirMissionCD = () => {
     }, [idMission]);
 
     const handlePrincipalDivisionPartChange = (e) => {
-        setRepartition({
-            ...repartition,
-            principalDivision: { ...repartition.principalDivision, part: parseFloat(e.target.value) }
-        });
+        setRepartition(prev => ({
+            ...prev,
+            principalDivision: { ...prev.principalDivision, part: parseFloat(e.target.value) }
+        }));
     };
 
     const addSecondaryDivision = () => {
-        setRepartition({
-            ...repartition,
-            secondaryDivisions: [...repartition.secondaryDivisions, { id: '', part: 0 }]
-        });
+        setRepartition(prev => ({
+            ...prev,
+            secondaryDivisions: [...prev.secondaryDivisions, { id: '', part: 0 }]
+        }));
     };
 
     const handleSecondaryDivisionChange = (index, field, value) => {
-        const updatedDivisions = [...repartition.secondaryDivisions];
-        updatedDivisions[index][field] = field === 'part' ? parseFloat(value) : value;
-        setRepartition({ ...repartition, secondaryDivisions: updatedDivisions });
+        setRepartition(prev => {
+            const updatedDivisions = [...prev.secondaryDivisions];
+            updatedDivisions[index][field] = field === 'part' ? parseFloat(value) : value;
+            return { ...prev, secondaryDivisions: updatedDivisions };
+        });
     };
 
     const removeSecondaryDivision = (index) => {
-        const updatedDivisions = repartition.secondaryDivisions.filter((_, i) => i !== index);
-        setRepartition({ ...repartition, secondaryDivisions: updatedDivisions });
+        setRepartition(prev => ({
+            ...prev,
+            secondaryDivisions: prev.secondaryDivisions.filter((_, i) => i !== index)
+        }));
     };
 
     const addSousTraitant = () => {
-        setRepartition({
-            ...repartition,
-            sousTraitants: [...repartition.sousTraitants, { id: '', part: 0 }]
-        });
+        setRepartition(prev => ({
+            ...prev,
+            sousTraitants: [...prev.sousTraitants, { id: '', part: 0 }]
+        }));
     };
 
     const handleSousTraitantChange = (index, field, value) => {
-        const updatedSousTraitants = [...repartition.sousTraitants];
-        updatedSousTraitants[index][field] = field === 'part' ? parseFloat(value) : value;
-        setRepartition({ ...repartition, sousTraitants: updatedSousTraitants });
-    };
-
-    const removeSousTraitant = (index) => {
-        const updatedSousTraitants = repartition.sousTraitants.filter((_, i) => i !== index);
-        setRepartition({ ...repartition, sousTraitants: updatedSousTraitants });
-    };
-
-    const addPartenaire = () => {
-        setRepartition({
-            ...repartition,
-            partenaires: [...repartition.partenaires, { id: '', part: 0 }]
+        setRepartition(prev => {
+            const updatedSousTraitants = [...prev.sousTraitants];
+            updatedSousTraitants[index][field] = field === 'part' ? parseFloat(value) : value;
+            return { ...prev, sousTraitants: updatedSousTraitants };
         });
     };
 
+    const removeSousTraitant = (index) => {
+        setRepartition(prev => ({
+            ...prev,
+            sousTraitants: prev.sousTraitants.filter((_, i) => i !== index)
+        }));
+    };
+
+    const addPartenaire = () => {
+        setRepartition(prev => ({
+            ...prev,
+            partenaires: [...prev.partenaires, { id: '', part: 0 }]
+        }));
+    };
+
     const handlePartenaireChange = (index, field, value) => {
-        const updatedPartenaires = [...repartition.partenaires];
-        updatedPartenaires[index][field] = field === 'part' ? parseFloat(value) : value;
-        setRepartition({ ...repartition, partenaires: updatedPartenaires });
+        setRepartition(prev => {
+            const updatedPartenaires = [...prev.partenaires];
+            updatedPartenaires[index][field] = field === 'part' ? parseFloat(value) : value;
+            return { ...prev, partenaires: updatedPartenaires };
+        });
     };
 
     const removePartenaire = (index) => {
-        const updatedPartenaires = repartition.partenaires.filter((_, i) => i !== index);
-        setRepartition({ ...repartition, partenaires: updatedPartenaires });
+        setRepartition(prev => ({
+            ...prev,
+            partenaires: prev.partenaires.filter((_, i) => i !== index)
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -199,7 +210,7 @@ const RepartirMissionCD = () => {
                                                         type="select"
                                                         value={repartition.principalDivision.id}
                                                         onChange={() => {}} // Empty function as the field is disabled
-                                                        options={[{ value: repartition.principalDivision.id, label: repartition.principalDivision.name }]}
+                                                        options={divisions.map(div => ({ value: div.id_division, label: div.nom_division }))}
                                                         disabled={true}
                                                     />
                                                     <FormField
@@ -251,7 +262,7 @@ const RepartirMissionCD = () => {
                                                             type="select"
                                                             value={st.id}
                                                             onChange={(e) => handleSousTraitantChange(index, 'id', e.target.value)}
-                                                            options={sousTraitants.map(s => ({ value: s.id, label: s.nom_st }))}
+                                                            options={sousTraitants.map(s => ({ value: s.id_soustrait, label: s.nom_soustrait }))}
                                                         />
                                                         <FormField
                                                             label="Part de ce sous-traitant dans la mission"
@@ -281,7 +292,7 @@ const RepartirMissionCD = () => {
                                                             type="select"
                                                             value={p.id}
                                                             onChange={(e) => handlePartenaireChange(index, 'id', e.target.value)}
-                                                            options={partenaires.map(part => ({ value: part.id, label: part.nom_partenariat }))}
+                                                            options={partenaires.map(part => ({ value: part.id_partenaire, label: part.nom_partenaire }))}
                                                         />
                                                         <FormField
                                                             label="Part de ce partenaire dans la mission"
@@ -332,5 +343,6 @@ const RepartirMissionCD = () => {
         </div>
     );
 };
+
 
 export default RepartirMissionCD;
