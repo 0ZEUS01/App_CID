@@ -235,4 +235,20 @@ public class MissionController {
         }
         return ResponseEntity.ok(missions);
     }
+
+    @PostMapping("/{id}/repartition")
+    public ResponseEntity<?> repartitionTasks(@PathVariable Long id, @RequestBody Set<MissionDivision> newDivisions) {
+        try {
+            return missionRepository.findById(id)
+                .map(existingMission -> {
+                    updateSecondaryDivisions(existingMission, newDivisions);
+                    Mission updatedMission = missionRepository.save(existingMission);
+                    return ResponseEntity.ok().body(updatedMission);
+                })
+                .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error repartitioning tasks: " + e.getMessage());
+        }
+    }
 }
