@@ -12,6 +12,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/missions")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MissionController {
 
     @Autowired
@@ -110,8 +111,6 @@ public class MissionController {
                     existingMission.setLibelle_mission(mission.getLibelle_mission());
                     existingMission.setPrixMissionTotal(mission.getPrixMissionTotal());
                     existingMission.setPartMissionCID(mission.getPartMissionCID());
-                    existingMission.setDateDebut(mission.getDateDebut());
-                    existingMission.setDateFin(mission.getDateFin());
                     
                     // Handle Unite relationship
                     if (mission.getUnite() != null && mission.getUnite().getId_unite() != null) {
@@ -249,6 +248,68 @@ public class MissionController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error repartitioning tasks: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/part-div-principale")
+    public ResponseEntity<?> updateMissionPartDivPrincipale(@PathVariable Long id, @RequestBody PartDivPrincipaleDTO partDivPrincipaleDTO) {
+        try {
+            return missionRepository.findById(id)
+                .map(existingMission -> {
+                    Double newPartDivPrincipale = partDivPrincipaleDTO.getPartDivPrincipale();
+                    
+                    // Validate the newPartDivPrincipale
+                    if (newPartDivPrincipale == null || newPartDivPrincipale < 0) {
+                        return ResponseEntity.badRequest().body("La valeur de partDivPrincipale est invalide. Elle doit être un montant non négatif.");
+                    }
+
+                    // Check if partDivPrincipale exceeds partMissionCID
+                    if (newPartDivPrincipale > existingMission.getPartMissionCID()) {
+                        return ResponseEntity.badRequest().body("partDivPrincipale ne peut pas être supérieur à partMissionCID.");
+                    }
+
+                    existingMission.setPartDivPrincipale(newPartDivPrincipale);
+                    Mission updatedMission = missionRepository.save(existingMission);
+                    return ResponseEntity.ok().body(updatedMission);
+                })
+                .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace(); // Consider using a logger instead
+            return ResponseEntity.badRequest().body("Erreur lors de la mise à jour de la part div principale de la mission : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/sous-traitants")
+    public ResponseEntity<?> addSousTraitant(@PathVariable Long id, @RequestBody MissionST missionST) {
+        return missionRepository.findById(id)
+            .map(mission -> {
+                missionST.setMission(mission);
+                MissionST savedMissionST = missionSTRepository.save(missionST);
+                return ResponseEntity.ok(savedMissionST);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/partenaires")
+    public ResponseEntity<?> addPartenaire(@PathVariable Long id, @RequestBody MissionPartenaire missionPartenaire) {
+        return missionRepository.findById(id)
+            .map(mission -> {
+                missionPartenaire.setMission(mission);
+                MissionPartenaire savedMissionPartenaire = missionPartenaireRepository.save(missionPartenaire);
+                return ResponseEntity.ok(savedMissionPartenaire);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    public static class PartDivPrincipaleDTO {
+        private Double partDivPrincipale;
+
+        public Double getPartDivPrincipale() {
+            return partDivPrincipale;
+        }
+
+        public void setPartDivPrincipale(Double partDivPrincipale) {
+            this.partDivPrincipale = partDivPrincipale;
         }
     }
 }

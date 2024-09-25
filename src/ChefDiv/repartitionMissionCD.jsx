@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
@@ -53,6 +53,8 @@ const RepartirMissionCD = () => {
         partenaires: []
     });
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [partDivPrincipale, setPartDivPrincipale] = useState(0);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,9 +88,21 @@ const RepartirMissionCD = () => {
     }, [idMission]);
 
     const handlePrincipalDivisionPartChange = (e) => {
+        const value = parseFloat(e.target.value);
+        setPartDivPrincipale(value);
+
+        // Real-time validation
+        if (value < 0) {
+            setErrorMessage("La part de cette division doit être un montant non négatif.");
+        } else if (value > mission.partMissionCID) {
+            setErrorMessage("La part de cette division ne peut pas être supérieure à la part de CID.");
+        } else {
+            setErrorMessage(''); // Clear error if valid
+        }
+
         setRepartition(prev => ({
             ...prev,
-            principalDivision: { ...prev.principalDivision, part: parseFloat(e.target.value) }
+            principalDivision: { ...prev.principalDivision, part: value }
         }));
     };
 
@@ -158,19 +172,66 @@ const RepartirMissionCD = () => {
         }));
     };
 
+    const updatePartDivPrincipale = (missionId, newValue) => {
+        return axios.put(`http://localhost:8080/api/missions/${missionId}/part-div-principale`, 
+            { partDivPrincipale: newValue },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Prevent submission if there's an error
+        if (errorMessage) {
+            console.error("Impossible de soumettre en raison d'erreurs de validation.");
+            return;
+        }
+
         try {
-            await axios.post(`http://localhost:8080/api/missions/${idMission}/repartition`, repartition);
+            // First, update the mission with the principal division's part
+            await updatePartDivPrincipale(idMission, repartition.principalDivision.part);
+
+            // Prepare the data for secondary divisions
+            const secondaryDivisionsData = repartition.secondaryDivisions.map(div => ({
+                division: { id_division: div.id },
+                partMission: div.part,
+                isPrincipal: false
+            }));
+
+            // Send the secondary divisions data
+            await axios.post(`http://localhost:8080/api/missions/${idMission}/repartition`, secondaryDivisionsData);
+
+            // Prepare and send sous-traitants data
+            for (const st of repartition.sousTraitants) {
+                await axios.post(`http://localhost:8080/api/missions/${idMission}/sous-traitants`, {
+                    sousTraitant: { id_soustrait: st.id },
+                    partMission: st.part
+                });
+            }
+
+            // Prepare and send partenaires data
+            for (const p of repartition.partenaires) {
+                await axios.post(`http://localhost:8080/api/missions/${idMission}/partenaires`, {
+                    partenaire: { id_partenaire: p.id },
+                    partMission: p.part
+                });
+            }
+
             setShowSuccessModal(true);
         } catch (error) {
             console.error('Error submitting repartition:', error);
+            // You might want to show an error message to the user here
         }
     };
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        navigate('/afficherMissionCD');
+        window.location.href = `/afficherMissionCD/${mission.affaire.idAffaire}`; 
     };
 
     if (!mission) return <div>Loading...</div>;
@@ -220,6 +281,7 @@ const RepartirMissionCD = () => {
                                                         placeholder="Part de la division"
                                                         value={repartition.principalDivision.part}
                                                         onChange={handlePrincipalDivisionPartChange}
+                                                        error={errorMessage}
                                                     />
                                                 </div>
 
@@ -331,7 +393,10 @@ const RepartirMissionCD = () => {
 
             <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Succès</Modal.Title>
+                    <Modal.Title>
+                        <FontAwesomeIcon icon={faCheckCircle} style={{ color: 'green', marginRight: '8px' }} />
+                        Succès
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>La répartition a été enregistrée avec succès.</Modal.Body>
                 <Modal.Footer>
@@ -346,3 +411,4 @@ const RepartirMissionCD = () => {
 
 
 export default RepartirMissionCD;
+

@@ -65,6 +65,9 @@ public class Mission {
     @JoinColumn(name = "principal_division_id", nullable = false)
     private Division principalDivision;
 
+    @Column(name = "part_div_principale")
+    private Double partDivPrincipale;
+
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionDivision> secondaryDivisions = new HashSet<>();
 

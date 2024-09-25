@@ -1,5 +1,14 @@
 --notify CD and CP when a new affaire for their pole is added
 --encryptying password and also do not delete users just hide users and set isDeleted to true
 
-CD pick a CDP to the affaire and split each mission budget to Divs and ST and Partenaire
-fix role issue and picking CDP to affaire
+split each mission budget to Divs and ST and Partenaire
+
+
+okay now let's fix backend with this front we have as you see with the message i metioned all needed fiels in backend to perform this function 
+
+cuz first we need to update mission to put the entered part of principale division in partMissionDivisionPrincipale
+
+and then for each secondary division we add them to table MissionDivision and set the number in part in partMission
+
+same for Sous traitant in MissionST we add id of ST and mission and then partMission
+and also same for partenaire in MissionPartenairec
