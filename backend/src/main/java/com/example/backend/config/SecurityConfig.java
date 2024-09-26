@@ -23,13 +23,8 @@ public class SecurityConfig {
             
             // Authorize requests
             .authorizeHttpRequests(authz -> authz
-                // Permit all PUT requests to /api/missions/**
-                .requestMatchers(HttpMethod.PUT, "/api/missions/**").permitAll()
-                
-                // Permit other HTTP methods to /api/** endpoints as needed
-                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
+                // Permit all HTTP methods to /api/** endpoints
+                .requestMatchers("/api/**").permitAll()
                 
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
