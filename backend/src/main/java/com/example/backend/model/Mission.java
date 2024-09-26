@@ -76,14 +76,4 @@ public class Mission {
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MissionPartenaire> partenaires = new HashSet<>();
-
-    public void addSecondaryDivision(MissionDivision missionDivision) {
-        secondaryDivisions.add(missionDivision);
-        missionDivision.setMission(this);
-    }
-
-    public void removeSecondaryDivision(MissionDivision missionDivision) {
-        secondaryDivisions.remove(missionDivision);
-        missionDivision.setMission(null);
-    }
 }

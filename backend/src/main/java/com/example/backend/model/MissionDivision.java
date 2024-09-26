@@ -23,17 +23,7 @@ public class MissionDivision {
     @JoinColumn(name = "division_id", nullable = false)
     private Division division;
 
-    @Column(name = "is_principal", nullable = false)
-    private boolean isPrincipal;
-
     @Column(name = "part_mission", nullable = true)
     private Double partMission;
 
-    public boolean isPrincipal() {
-        return isPrincipal;
-    }
-
-    public void setPrincipal(boolean principal) {
-        isPrincipal = principal;
-    }
 }

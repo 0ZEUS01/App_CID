@@ -75,25 +75,6 @@ public class MissionController {
                     .orElseThrow(() -> new RuntimeException("Principal Division not found"));
             mission.setPrincipalDivision(principalDivision);
 
-            // Handle Secondary Divisions
-            if (mission.getSecondaryDivisions() != null && !mission.getSecondaryDivisions().isEmpty()) {
-                Set<MissionDivision> newSecondaryDivisions = new HashSet<>();
-                for (MissionDivision md : mission.getSecondaryDivisions()) {
-                    if (md.getDivision() == null || md.getDivision().getId_division() == null) {
-                        return ResponseEntity.badRequest().body("Invalid Secondary Division");
-                    }
-                    Division division = divisionRepository.findById(md.getDivision().getId_division())
-                            .orElseThrow(() -> new RuntimeException("Secondary Division not found"));
-                    
-                    MissionDivision newMd = new MissionDivision();
-                    newMd.setDivision(division);
-                    newMd.setPartMission(md.getPartMission());
-                    newMd.setMission(mission);
-                    newSecondaryDivisions.add(newMd);
-                }
-                mission.setSecondaryDivisions(newSecondaryDivisions);
-            }
-
             Mission savedMission = missionRepository.save(mission);
             return ResponseEntity.ok(savedMission);
         } catch (Exception e) {
@@ -152,70 +133,6 @@ public class MissionController {
         }
     }
 
-    private void updateSecondaryDivisions(Mission existingMission, Set<MissionDivision> newSecondaryDivisions) {
-        // Remove secondary divisions no longer associated with the mission
-        existingMission.getSecondaryDivisions().removeIf(md -> 
-            newSecondaryDivisions.stream().noneMatch(newMd -> 
-                newMd.getDivision() != null && 
-                md.getDivision() != null && 
-                newMd.getDivision().getId_division().equals(md.getDivision().getId_division())
-            )
-        );
-
-        // Update existing secondary divisions and add new ones
-        newSecondaryDivisions.forEach(newMd -> {
-            if (newMd.getDivision() != null && newMd.getDivision().getId_division() != null) {
-                MissionDivision existingMd = existingMission.getSecondaryDivisions().stream()
-                    .filter(md -> md.getDivision() != null && 
-                                  md.getDivision().getId_division().equals(newMd.getDivision().getId_division()))
-                    .findFirst()
-                    .orElse(null);
-
-                if (existingMd == null) {
-                    // This is a new secondary division
-                    MissionDivision md = new MissionDivision();
-                    md.setMission(existingMission);
-                    md.setDivision(newMd.getDivision());
-                    md.setPartMission(newMd.getPartMission());
-                    existingMission.getSecondaryDivisions().add(md);
-                } else {
-                    // Update existing secondary division
-                    existingMd.setPartMission(newMd.getPartMission());
-                }
-            }
-        });
-    }
-
-    private void updateMissionSTs(Mission existingMission, Set<MissionST> newSousTraitants) {
-        // Remove sous-traitants no longer associated with the mission
-        existingMission.getSousTraitants().stream()
-                .filter(st -> !newSousTraitants.contains(st))
-                .forEach(missionSTRepository::delete);
-
-        // Update existing sous-traitants and add new ones
-        newSousTraitants.forEach(st -> {
-            st.setMission(existingMission);
-            missionSTRepository.save(st);
-        });
-
-        existingMission.setSousTraitants(newSousTraitants);
-    }
-
-    private void updateMissionPartenaires(Mission existingMission, Set<MissionPartenaire> newPartenaires) {
-        // Remove partenaires no longer associated with the mission
-        existingMission.getPartenaires().stream()
-                .filter(p -> !newPartenaires.contains(p))
-                .forEach(missionPartenaireRepository::delete);
-
-        // Update existing partenaires and add new ones
-        newPartenaires.forEach(p -> {
-            p.setMission(existingMission);
-            missionPartenaireRepository.save(p);
-        });
-
-        existingMission.setPartenaires(newPartenaires);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteMission(@PathVariable Long id) {
         return missionRepository.findById(id)
@@ -240,7 +157,6 @@ public class MissionController {
         try {
             return missionRepository.findById(id)
                 .map(existingMission -> {
-                    updateSecondaryDivisions(existingMission, newDivisions);
                     Mission updatedMission = missionRepository.save(existingMission);
                     return ResponseEntity.ok().body(updatedMission);
                 })
@@ -277,28 +193,6 @@ public class MissionController {
             e.printStackTrace(); // Consider using a logger instead
             return ResponseEntity.badRequest().body("Erreur lors de la mise à jour de la part div principale de la mission : " + e.getMessage());
         }
-    }
-
-    @PostMapping("/{id}/sous-traitants")
-    public ResponseEntity<?> addSousTraitant(@PathVariable Long id, @RequestBody MissionST missionST) {
-        return missionRepository.findById(id)
-            .map(mission -> {
-                missionST.setMission(mission);
-                MissionST savedMissionST = missionSTRepository.save(missionST);
-                return ResponseEntity.ok(savedMissionST);
-            })
-            .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/{id}/partenaires")
-    public ResponseEntity<?> addPartenaire(@PathVariable Long id, @RequestBody MissionPartenaire missionPartenaire) {
-        return missionRepository.findById(id)
-            .map(mission -> {
-                missionPartenaire.setMission(mission);
-                MissionPartenaire savedMissionPartenaire = missionPartenaireRepository.save(missionPartenaire);
-                return ResponseEntity.ok(savedMissionPartenaire);
-            })
-            .orElse(ResponseEntity.notFound().build());
     }
 
     public static class PartDivPrincipaleDTO {
