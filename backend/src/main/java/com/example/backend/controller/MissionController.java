@@ -174,6 +174,24 @@ public class MissionController {
 
             logger.info("Found mission: {}", existingMission);
 
+            // Calculate total part mission
+            double totalPartMission = repartitionRequest.getPrincipalDivisionPart();
+            totalPartMission += repartitionRequest.getSecondaryDivisions().stream()
+                    .mapToDouble(MissionDivisionDTO::getPartMission)
+                    .sum();
+            totalPartMission += repartitionRequest.getPartenaires().stream()
+                    .mapToDouble(MissionPartenaireDTO::getPartMission)
+                    .sum();
+            totalPartMission += repartitionRequest.getSousTraitants().stream()
+                    .mapToDouble(MissionSTDTO::getPartMission)
+                    .sum();
+
+            // Validate total part mission
+            if (totalPartMission > existingMission.getPartMissionCID()) {
+                return ResponseEntity.badRequest().body("Total part mission (" + totalPartMission + 
+                    ") exceeds partMissionCID (" + existingMission.getPartMissionCID() + ")");
+            }
+
             // Update the principal division's part
             existingMission.setPartDivPrincipale(repartitionRequest.getPrincipalDivisionPart());
             missionRepository.save(existingMission);
