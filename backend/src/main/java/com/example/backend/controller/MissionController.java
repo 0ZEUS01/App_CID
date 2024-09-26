@@ -2,13 +2,14 @@ package com.example.backend.controller;
 
 import com.example.backend.model.*;
 import com.example.backend.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -197,59 +198,67 @@ public class MissionController {
             missionRepository.save(existingMission);
             logger.info("Updated principal division part to: {}", repartitionRequest.getPrincipalDivisionPart());
 
-            // Clear existing secondary divisions
-            missionDivisionRepository.deleteAllByMission(existingMission);
-            logger.info("Cleared existing secondary divisions");
-
-            // Add new secondary divisions
+            // Update or create secondary divisions
+            Set<MissionDivision> updatedSecondaryDivisions = new HashSet<>();
             for (MissionDivisionDTO divisionDTO : repartitionRequest.getSecondaryDivisions()) {
                 Division division = divisionRepository.findById(divisionDTO.getDivisionId())
                         .orElseThrow(() -> new RuntimeException("Division not found: " + divisionDTO.getDivisionId()));
                 
-                MissionDivision missionDivision = new MissionDivision();
+                MissionDivision missionDivision = existingMission.getSecondaryDivisions().stream()
+                        .filter(sd -> sd.getDivision().getId_division().equals(division.getId_division()))
+                        .findFirst()
+                        .orElse(new MissionDivision());
+
                 missionDivision.setMission(existingMission);
                 missionDivision.setDivision(division);
                 missionDivision.setPartMission(divisionDTO.getPartMission());
-                missionDivisionRepository.save(missionDivision);
-                logger.info("Added secondary division: {}", missionDivision);
+                updatedSecondaryDivisions.add(missionDivisionRepository.save(missionDivision));
+                logger.info("Updated/Added secondary division: {}", missionDivision);
             }
+            existingMission.getSecondaryDivisions().retainAll(updatedSecondaryDivisions);
 
-            // Clear existing partners
-            missionPartenaireRepository.deleteAllByMission(existingMission);
-            logger.info("Cleared existing partners");
-
-            // Add new partners
+            // Update or create partners
+            Set<MissionPartenaire> updatedPartenaires = new HashSet<>();
             for (MissionPartenaireDTO partenaireDTO : repartitionRequest.getPartenaires()) {
                 Partenaire partenaire = partenaireRepository.findById(partenaireDTO.getPartenaireId())
                         .orElseThrow(() -> new RuntimeException("Partenaire not found: " + partenaireDTO.getPartenaireId()));
                 
-                MissionPartenaire missionPartenaire = new MissionPartenaire();
+                MissionPartenaire missionPartenaire = existingMission.getPartenaires().stream()
+                        .filter(mp -> mp.getPartenaire().getId_partenaire().equals(partenaire.getId_partenaire()))
+                        .findFirst()
+                        .orElse(new MissionPartenaire());
+
                 missionPartenaire.setMission(existingMission);
                 missionPartenaire.setPartenaire(partenaire);
                 missionPartenaire.setPartMission(partenaireDTO.getPartMission());
-                missionPartenaireRepository.save(missionPartenaire);
-                logger.info("Added partner: {}", missionPartenaire);
+                updatedPartenaires.add(missionPartenaireRepository.save(missionPartenaire));
+                logger.info("Updated/Added partner: {}", missionPartenaire);
             }
+            existingMission.getPartenaires().retainAll(updatedPartenaires);
 
-            // Clear existing subcontractors
-            missionSTRepository.deleteAllByMission(existingMission);
-            logger.info("Cleared existing subcontractors");
-
-            // Add new subcontractors
+            // Update or create subcontractors
+            Set<MissionST> updatedSousTraitants = new HashSet<>();
             for (MissionSTDTO stDTO : repartitionRequest.getSousTraitants()) {
                 SousTraitant sousTraitant = sousTraitantRepository.findById(stDTO.getSousTraitantId())
                         .orElseThrow(() -> new RuntimeException("Sous-traitant not found: " + stDTO.getSousTraitantId()));
                 
-                MissionST missionST = new MissionST();
+                MissionST missionST = existingMission.getSousTraitants().stream()
+                        .filter(st -> st.getSousTraitant().getId_soustrait().equals(sousTraitant.getId_soustrait()))
+                        .findFirst()
+                        .orElse(new MissionST());
+
                 missionST.setMission(existingMission);
                 missionST.setSousTraitant(sousTraitant);
                 missionST.setPartMission(stDTO.getPartMission());
-                missionSTRepository.save(missionST);
-                logger.info("Added subcontractor: {}", missionST);
+                updatedSousTraitants.add(missionSTRepository.save(missionST));
+                logger.info("Updated/Added subcontractor: {}", missionST);
             }
+            existingMission.getSousTraitants().retainAll(updatedSousTraitants);
 
+            // Save the updated mission
+            Mission updatedMission = missionRepository.save(existingMission);
             logger.info("Repartition completed successfully");
-            return ResponseEntity.ok().body(existingMission);
+            return ResponseEntity.ok().body(updatedMission);
         } catch (Exception e) {
             logger.error("Error during repartition", e);
             return ResponseEntity.badRequest().body("Error repartitioning tasks: " + e.getMessage());
