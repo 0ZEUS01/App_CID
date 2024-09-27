@@ -44,32 +44,51 @@ const RepartirMissionCD = () => {
     const navigate = useNavigate();
     const [mission, setMission] = useState(null);
     const [divisions, setDivisions] = useState([]);
+    const [partenaires, setPartenaires] = useState([]);
+    const [sousTraitants, setSousTraitants] = useState([]);
     const [repartition, setRepartition] = useState({
-        principalDivision: { id: '', part: 0 },
+        principalDivisionPart: 0,
         secondaryDivisions: [],
+        partenaires: [],
+        sousTraitants: []
     });
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [partDivPrincipale, setPartDivPrincipale] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
+    const [totalPart, setTotalPart] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [missionRes, divisionsRes] = await Promise.all([
+                const [missionRes, divisionsRes, partenairesRes, sousTraitantsRes] = await Promise.all([
                     axios.get(`http://localhost:8080/api/missions/${idMission}`),
                     axios.get('http://localhost:8080/api/divisions'),
+                    axios.get('http://localhost:8080/api/partenaires'),
+                    axios.get('http://localhost:8080/api/sous-traitants'),
                 ]);
                 setMission(missionRes.data);
                 setDivisions(divisionsRes.data);
-                // Set the principal division from the mission data
-                if (missionRes.data && missionRes.data.principalDivision) {
-                    setRepartition(prev => ({
-                        ...prev,
-                        principalDivision: { 
-                            id: missionRes.data.principalDivision.id_division,
-                            part: missionRes.data.partDivPrincipale
-                        }
-                    }));
+                setPartenaires(partenairesRes.data);
+                setSousTraitants(sousTraitantsRes.data);
+                
+                // Set the repartition data from the mission
+                if (missionRes.data) {
+                    const newRepartition = {
+                        principalDivisionPart: missionRes.data.partDivPrincipale || 0,
+                        secondaryDivisions: missionRes.data.secondaryDivisions.map(sd => ({
+                            divisionId: sd.division.id_division,
+                            partMission: sd.partMission
+                        })),
+                        partenaires: missionRes.data.partenaires.map(p => ({
+                            partenaireId: p.partenaire.id_partenaire,
+                            partMission: p.partMission
+                        })),
+                        sousTraitants: missionRes.data.sousTraitants.map(st => ({
+                            sousTraitantId: st.sousTraitant.id_soustrait,
+                            partMission: st.partMission
+                        }))
+                    };
+                    setRepartition(newRepartition);
+                    calculateTotalPart(newRepartition);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -78,92 +97,121 @@ const RepartirMissionCD = () => {
         fetchData();
     }, [idMission]);
 
-    const handlePrincipalDivisionPartChange = (e) => {
-        const value = parseFloat(e.target.value);
-        setPartDivPrincipale(value);
+    const calculateTotalPart = (repartitionData) => {
+        const total = repartitionData.principalDivisionPart +
+            repartitionData.secondaryDivisions.reduce((sum, div) => sum + (div.partMission || 0), 0) +
+            repartitionData.partenaires.reduce((sum, p) => sum + (p.partMission || 0), 0) +
+            repartitionData.sousTraitants.reduce((sum, st) => sum + (st.partMission || 0), 0);
+        setTotalPart(total);
+        validateTotalPart(total);
+    };
 
-        // Real-time validation
-        if (value < 0) {
-            setErrorMessage("La part de cette division doit être un montant non négatif.");
-        } else if (value > mission.partMissionCID) {
-            setErrorMessage("La part de cette division ne peut pas être supérieure à la part de CID.");
+    const validateTotalPart = (total) => {
+        if (mission && total > mission.partMissionCID) {
+            setErrorMessage(`Le total des parts (${total.toFixed(2)}) dépasse la part CID de la mission (${mission.partMissionCID}).`);
         } else {
-            setErrorMessage(''); // Clear error if valid
+            setErrorMessage('');
         }
+    };
 
-        setRepartition(prev => ({
-            ...prev,
-            principalDivision: { ...prev.principalDivision, part: value }
-        }));
+    const handlePrincipalDivisionPartChange = (e) => {
+        const value = parseFloat(e.target.value) || 0;
+        const newRepartition = { ...repartition, principalDivisionPart: value };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
     };
 
     const addSecondaryDivision = () => {
-        setRepartition(prev => ({
-            ...prev,
-            secondaryDivisions: [...prev.secondaryDivisions, { id: '', part: 0 }]
-        }));
+        const newRepartition = {
+            ...repartition,
+            secondaryDivisions: [...repartition.secondaryDivisions, { divisionId: '', partMission: 0 }]
+        };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
     };
 
     const handleSecondaryDivisionChange = (index, field, value) => {
-        setRepartition(prev => {
-            const updatedDivisions = [...prev.secondaryDivisions];
-            updatedDivisions[index][field] = field === 'part' ? parseFloat(value) : value;
-            return { ...prev, secondaryDivisions: updatedDivisions };
-        });
+        const updatedDivisions = [...repartition.secondaryDivisions];
+        updatedDivisions[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+        const newRepartition = { ...repartition, secondaryDivisions: updatedDivisions };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
     };
 
     const removeSecondaryDivision = (index) => {
-        setRepartition(prev => ({
-            ...prev,
-            secondaryDivisions: prev.secondaryDivisions.filter((_, i) => i !== index)
-        }));
+        const updatedDivisions = repartition.secondaryDivisions.filter((_, i) => i !== index);
+        const newRepartition = { ...repartition, secondaryDivisions: updatedDivisions };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
     };
 
+    const addPartenaire = () => {
+        const newRepartition = {
+            ...repartition,
+            partenaires: [...repartition.partenaires, { partenaireId: '', partMission: 0 }]
+        };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
+    };
 
-    const updatePartDivPrincipale = (missionId, newValue) => {
-        return axios.put(`http://localhost:8080/api/missions/${missionId}/part-div-principale`, 
-            { partDivPrincipale: newValue },
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+    const handlePartenaireChange = (index, field, value) => {
+        const updatedPartenaires = [...repartition.partenaires];
+        updatedPartenaires[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+        const newRepartition = { ...repartition, partenaires: updatedPartenaires };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
+    };
+
+    const removePartenaire = (index) => {
+        const updatedPartenaires = repartition.partenaires.filter((_, i) => i !== index);
+        const newRepartition = { ...repartition, partenaires: updatedPartenaires };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
+    };
+
+    const addSousTraitant = () => {
+        const newRepartition = {
+            ...repartition,
+            sousTraitants: [...repartition.sousTraitants, { sousTraitantId: '', partMission: 0 }]
+        };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
+    };
+
+    const handleSousTraitantChange = (index, field, value) => {
+        const updatedSousTraitants = [...repartition.sousTraitants];
+        updatedSousTraitants[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+        const newRepartition = { ...repartition, sousTraitants: updatedSousTraitants };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
+    };
+
+    const removeSousTraitant = (index) => {
+        const updatedSousTraitants = repartition.sousTraitants.filter((_, i) => i !== index);
+        const newRepartition = { ...repartition, sousTraitants: updatedSousTraitants };
+        setRepartition(newRepartition);
+        calculateTotalPart(newRepartition);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Prevent submission if there's an error
         if (errorMessage) {
             console.error("Impossible de soumettre en raison d'erreurs de validation.");
             return;
         }
 
         try {
-            // First, update the mission with the principal division's part
-            await updatePartDivPrincipale(idMission, repartition.principalDivision.part);
-
-            // Prepare the data for secondary divisions
-            const secondaryDivisionsData = repartition.secondaryDivisions.map(div => ({
-                division: { id_division: div.id },
-                partMission: div.part,
-                isPrincipal: false
-            }));
-
-            // Send the secondary divisions data
-            await axios.post(`http://localhost:8080/api/missions/${idMission}/repartition`, secondaryDivisionsData);
-
+            await axios.post(`http://localhost:8080/api/missions/${idMission}/repartition`, repartition);
             setShowSuccessModal(true);
         } catch (error) {
             console.error('Error submitting repartition:', error);
-            // You might want to show an error message to the user here
+            setErrorMessage('Erreur lors de la soumission de la répartition. Veuillez réessayer.');
         }
     };
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        window.location.href = `/afficherMissionCD/${mission.affaire.idAffaire}`; 
+        navigate(`/afficherMissionCD/${mission.affaire.idAffaire}`);
     };
 
     if (!mission) return <div>Loading...</div>;
@@ -178,15 +226,6 @@ const RepartirMissionCD = () => {
                         <div className="page-inner">
                             <div className="page-header">
                                 <h4 className="page-title">Répartition de la Mission</h4>
-                                <ul className="breadcrumbs">
-                                    <li className="nav-home">
-                                        <a href="#"><i className="flaticon-home"></i></a>
-                                    </li>
-                                    <li className="separator"><i className="flaticon-right-arrow"></i></li>
-                                    <li className="nav-item"><a href="#">Missions</a></li>
-                                    <li className="separator"><i className="flaticon-right-arrow"></i></li>
-                                    <li className="nav-item"><a href="#">Répartition</a></li>
-                                </ul>
                             </div>
                             <div className="row">
                                 <div className="col-md-12">
@@ -201,19 +240,18 @@ const RepartirMissionCD = () => {
                                                         label="Division Principale"
                                                         id="principalDivision"
                                                         type="select"
-                                                        value={repartition.principalDivision.id}
-                                                        onChange={() => {}} // Empty function as the field is disabled
+                                                        value={mission.principalDivision.id_division}
+                                                        onChange={() => {}}
                                                         options={divisions.map(div => ({ value: div.id_division, label: div.nom_division }))}
                                                         disabled={true}
                                                     />
                                                     <FormField
-                                                        label="Part de cette division dans la mission"
+                                                        label="Part de la division principale"
                                                         id="principalDivisionPart"
                                                         type="number"
                                                         placeholder="Part de la division"
-                                                        value={repartition.principalDivision.part}
+                                                        value={repartition.principalDivisionPart}
                                                         onChange={handlePrincipalDivisionPartChange}
-                                                        error={errorMessage}
                                                     />
                                                 </div>
 
@@ -224,17 +262,17 @@ const RepartirMissionCD = () => {
                                                             label="Division"
                                                             id={`secondaryDivision-${index}`}
                                                             type="select"
-                                                            value={div.id}
-                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'id', e.target.value)}
-                                                            options={divisions.map(d => ({ value: d.id, label: d.nom_division }))}
+                                                            value={div.divisionId}
+                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'divisionId', e.target.value)}
+                                                            options={divisions.map(d => ({ value: d.id_division, label: d.nom_division }))}
                                                         />
                                                         <FormField
-                                                            label="Part de cette division dans la mission"
+                                                            label="Part de cette division"
                                                             id={`secondaryDivisionPart-${index}`}
                                                             type="number"
                                                             placeholder="Part de la division"
-                                                            value={div.part}
-                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'part', e.target.value)}
+                                                            value={div.partMission}
+                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'partMission', e.target.value)}
                                                         />
                                                         <div className="col-md-2 d-flex align-items-end">
                                                             <Button variant="danger" onClick={() => removeSecondaryDivision(index)}>
@@ -247,8 +285,75 @@ const RepartirMissionCD = () => {
                                                     <FontAwesomeIcon icon={faPlus} /> Ajouter une division secondaire
                                                 </Button>
 
-                                                <div className="card-action">
-                                                    <Button variant="primary" type="submit">
+                                                <h5 className="mt-4 mb-3">Partenaires</h5>
+                                                {repartition.partenaires.map((p, index) => (
+                                                    <div className="row mb-3" key={index}>
+                                                        <FormField
+                                                            label="Partenaire"
+                                                            id={`partenaire-${index}`}
+                                                            type="select"
+                                                            value={p.partenaireId}
+                                                            onChange={(e) => handlePartenaireChange(index, 'partenaireId', e.target.value)}
+                                                            options={partenaires.map(part => ({ value: part.id_partenaire, label: part.nom_partenaire }))}
+                                                        />
+                                                        <FormField
+                                                            label="Part du partenaire"
+                                                            id={`partenairePart-${index}`}
+                                                            type="number"
+                                                            placeholder="Part du partenaire"
+                                                            value={p.partMission}
+                                                            onChange={(e) => handlePartenaireChange(index, 'partMission', e.target.value)}
+                                                        />
+                                                        <div className="col-md-2 d-flex align-items-end">
+                                                            <Button variant="danger" onClick={() => removePartenaire(index)}>
+                                                                <FontAwesomeIcon icon={faTrash} />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                <Button variant="secondary" onClick={addPartenaire} className="mb-4">
+                                                    <FontAwesomeIcon icon={faPlus} /> Ajouter un partenaire
+                                                </Button>
+
+                                                <h5 className="mt-4 mb-3">Sous-traitants</h5>
+                                                {repartition.sousTraitants.map((st, index) => (
+                                                    <div className="row mb-3" key={index}>
+                                                        <FormField
+                                                            label="Sous-traitant"
+                                                            id={`sousTraitant-${index}`}
+                                                            type="select"
+                                                            value={st.sousTraitantId}
+                                                            onChange={(e) => handleSousTraitantChange(index, 'sousTraitantId', e.target.value)}
+                                                            options={sousTraitants.map(s => ({ value: s.id_soustrait, label: s.nom_soustrait }))}
+                                                        />
+                                                        <FormField
+                                                            label="Part du sous-traitant"
+                                                            id={`sousTraitantPart-${index}`}
+                                                            type="number"
+                                                            placeholder="Part du sous-traitant"
+                                                            value={st.partMission}
+                                                            onChange={(e) => handleSousTraitantChange(index, 'partMission', e.target.value)}
+                                                        />
+                                                        <div className="col-md-2 d-flex align-items-end">
+                                                            <Button variant="danger" onClick={() => removeSousTraitant(index)}>
+                                                                <FontAwesomeIcon icon={faTrash} />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                <Button variant="secondary" onClick={addSousTraitant} className="mb-4">
+                                                    <FontAwesomeIcon icon={faPlus} /> Ajouter un sous-traitant
+                                                </Button>
+
+                                                <div className="mt-4">
+                                                    <strong>Total des parts: {totalPart.toFixed(2)}</strong>
+                                                    {mission && <span> / {mission.partMissionCID} (Part CID de la mission)</span>}
+                                                </div>
+
+                                                {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
+
+                                                <div className="card-action mt-4">
+                                                    <Button variant="primary" type="submit" disabled={!!errorMessage}>
                                                         Soumettre la répartition
                                                     </Button>
                                                 </div>
@@ -280,7 +385,6 @@ const RepartirMissionCD = () => {
         </div>
     );
 };
-
 
 export default RepartirMissionCD;
 

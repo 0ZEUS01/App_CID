@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
+import com.example.backend.DTO.MissionDTO;
 import com.example.backend.model.*;
 import com.example.backend.repository.*;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/missions")
@@ -47,16 +50,50 @@ public class MissionController {
     @Autowired
     private SousTraitantRepository sousTraitantRepository;
 
-    @GetMapping
-    public List<Mission> getAllMissions() {
-        return missionRepository.findAll();
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mission> getMissionById(@PathVariable Long id) {
-        return missionRepository.findById(id)
-                .map(mission -> ResponseEntity.ok().body(mission))
+    public ResponseEntity<MissionDTO> getMissionById(@PathVariable Long id) {
+        return missionRepository.findByIdWithDetails(id)
+                .map(this::convertToDto)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public List<MissionDTO> getAllMissions() {
+        return missionRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private MissionDTO convertToDto(Mission mission) {
+        MissionDTO dto = modelMapper.map(mission, MissionDTO.class);
+        
+        // Set IDs for related entities
+        if (mission.getUnite() != null) {
+            dto.setUniteId(mission.getUnite().getId_unite());
+        }
+        if (mission.getAffaire() != null) {
+            dto.setAffaireId(mission.getAffaire().getIdAffaire());
+        }
+        if (mission.getPrincipalDivision() != null) {
+            dto.setPrincipalDivisionId(mission.getPrincipalDivision().getId_division());
+        }
+        
+        // Set IDs for collections
+        dto.setSecondaryDivisionIds(mission.getSecondaryDivisions().stream()
+                .map(md -> md.getDivision().getId_division())
+                .collect(Collectors.toSet()));
+        dto.setSousTraitantIds(mission.getSousTraitants().stream()
+                .map(st -> st.getSousTraitant().getId_soustrait())
+                .collect(Collectors.toSet()));
+        dto.setPartenaireIds(mission.getPartenaires().stream()
+                .map(mp -> mp.getPartenaire().getId_partenaire())
+                .collect(Collectors.toSet()));
+
+        return dto;
     }
 
     @PostMapping
