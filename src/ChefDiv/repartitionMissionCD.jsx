@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Row, Col } from 'react-bootstrap';
@@ -21,9 +21,17 @@ const FormField = ({ label, id, type = 'text', name, value, onChange, options, d
                 disabled={disabled}
                 required={required}
             >
-                <option value="">Sélectionnez une option</option>
+                {value ? (
+                    <option value={value}>{value}</option>
+                ) : (
+                    <option value="">Sélectionnez une option</option>
+                )}
                 {options && options.map((option, index) => (
-                    <option key={index} value={option.value}>{option.label}</option>
+                    option.label !== value && (
+                        <option key={index} value={option.value}>
+                            {option.label}
+                        </option>
+                    )
                 ))}
             </Form.Control>
         ) : (
@@ -57,6 +65,23 @@ const RepartirMissionCD = () => {
     const [totalPart, setTotalPart] = useState(0);
     const [loading, setLoading] = useState(true);
 
+    const calculateTotalPart = useCallback((repartitionData) => {
+        const total = repartitionData.principalDivisionPart +
+            repartitionData.secondaryDivisions.reduce((sum, div) => sum + (div.partMission || 0), 0) +
+            repartitionData.partenaires.reduce((sum, p) => sum + (p.partMission || 0), 0) +
+            repartitionData.sousTraitants.reduce((sum, st) => sum + (st.partMission || 0), 0);
+        setTotalPart(total);
+        validateTotalPart(total);
+    }, []);
+
+    const validateTotalPart = useCallback((total) => {
+        if (mission && total > mission.partMissionCID) {
+            setErrorMessage(`Le total des parts (${total.toFixed(2)}) dépasse la part CID de la mission (${mission.partMissionCID}).`);
+        } else {
+            setErrorMessage('');
+        }
+    }, [mission]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -71,7 +96,7 @@ const RepartirMissionCD = () => {
                 setDivisions(divisionsRes.data);
                 setPartenaires(partenairesRes.data);
                 setSousTraitants(sousTraitantsRes.data);
-                
+
                 if (missionRes.data) {
                     const newRepartition = {
                         principalDivisionPart: missionRes.data.partDivPrincipale || 0,
@@ -99,24 +124,7 @@ const RepartirMissionCD = () => {
             }
         };
         fetchData();
-    }, [idMission]);
-
-    const calculateTotalPart = (repartitionData) => {
-        const total = repartitionData.principalDivisionPart +
-            repartitionData.secondaryDivisions.reduce((sum, div) => sum + (div.partMission || 0), 0) +
-            repartitionData.partenaires.reduce((sum, p) => sum + (p.partMission || 0), 0) +
-            repartitionData.sousTraitants.reduce((sum, st) => sum + (st.partMission || 0), 0);
-        setTotalPart(total);
-        validateTotalPart(total);
-    };
-
-    const validateTotalPart = (total) => {
-        if (mission && total > mission.partMissionCID) {
-            setErrorMessage(`Le total des parts (${total.toFixed(2)}) dépasse la part CID de la mission (${mission.partMissionCID}).`);
-        } else {
-            setErrorMessage('');
-        }
-    };
+    }, [idMission, calculateTotalPart]);
 
     const handlePrincipalDivisionPartChange = (e) => {
         const value = parseFloat(e.target.value) || 0;
@@ -307,9 +315,12 @@ const RepartirMissionCD = () => {
                                                             id={`secondaryDivision-${index}`}
                                                             type="select"
                                                             name={`secondaryDivision-${index}`}
-                                                            value={div.divisionId}
-                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'divisionId', e.target.value)}
-                                                            options={divisions.map(d => ({ value: d.id_division, label: d.nom_division }))}
+                                                            value={divisions.find(d => d.id_division === div.divisionId)?.nom_division || ''}
+                                                            onChange={(e) => {
+                                                                const selectedDivision = divisions.find(d => d.nom_division === e.target.value);
+                                                                handleSecondaryDivisionChange(index, 'divisionId', selectedDivision ? selectedDivision.id_division : '');
+                                                            }}
+                                                            options={divisions.map(d => ({ value: d.nom_division, label: d.nom_division }))}
                                                             required
                                                         />
                                                     </Col>
