@@ -153,12 +153,47 @@ public class MissionController {
     }
 
     @GetMapping("/affaire/{affaireId}")
-    public ResponseEntity<List<Mission>> getMissionsByAffaireId(@PathVariable Long affaireId) {
+    public ResponseEntity<List<MissionDTO>> getMissionsByAffaireId(@PathVariable Long affaireId) {
         List<Mission> missions = missionRepository.findByAffaireIdAffaire(affaireId);
         if (missions.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(missions);
+        
+        List<MissionDTO> missionDTOs = missions.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(missionDTOs);
+    }
+
+    private MissionDTO convertToDTO(Mission mission) {
+        MissionDTO dto = modelMapper.map(mission, MissionDTO.class);
+        
+        // Set specific fields that might need manual mapping
+        if (mission.getAffaire() != null) {
+            dto.setAffaireId(mission.getAffaire().getIdAffaire());
+        }
+        if (mission.getPrincipalDivision() != null) {
+            dto.setPrincipalDivisionId(mission.getPrincipalDivision().getId_division());
+        }
+        if (mission.getUnite() != null) {
+            dto.setUniteId(mission.getUnite().getId_unite());
+        }
+        
+        // Map nested objects
+        dto.setMissionDivisions(mission.getSecondaryDivisions().stream()
+            .map(div -> modelMapper.map(div, MissionDivisionDTO.class))
+            .collect(Collectors.toList()));
+        
+        dto.setMissionSousTraitants(mission.getSousTraitants().stream()
+            .map(st -> modelMapper.map(st, MissionSTDTO.class))
+            .collect(Collectors.toList()));
+        
+        dto.setMissionPartenaires(mission.getPartenaires().stream()
+            .map(p -> modelMapper.map(p, MissionPartenaireDTO.class))
+            .collect(Collectors.toList()));
+
+        return dto;
     }
 
     @PostMapping("/{id}/repartition")
