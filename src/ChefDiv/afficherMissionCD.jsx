@@ -20,14 +20,19 @@ const AfficherMissionCD = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedMission, setSelectedMission] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchAffaireAndMissions = async () => {
             try {
+                setLoading(true);
+                setError(null);
+
+                // Fetch affaire data
                 const affaireResponse = await axios.get(`http://localhost:8080/api/affaires/${idAffaire}`);
                 setAffaire(affaireResponse.data);
 
+                // Fetch missions data
                 const missionsResponse = await axios.get(`http://localhost:8080/api/missions/affaire/${idAffaire}`);
                 setMissions(missionsResponse.data);
 
@@ -85,7 +90,7 @@ const AfficherMissionCD = () => {
     };
 
     if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className="wrapper">
