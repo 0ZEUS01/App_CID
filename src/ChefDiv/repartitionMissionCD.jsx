@@ -55,6 +55,7 @@ const RepartirMissionCD = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [totalPart, setTotalPart] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -65,6 +66,25 @@ const RepartirMissionCD = () => {
                     axios.get('http://localhost:8080/api/partenaires'),
                     axios.get('http://localhost:8080/api/sous-traitants'),
                 ]);
+
+                console.log('Mission data:', missionRes.data);
+                console.log('Divisions data:', divisionsRes.data);
+                console.log('Partenaires data:', partenairesRes.data);
+                console.log('Sous-traitants data:', sousTraitantsRes.data);
+
+                if (!missionRes.data) {
+                    throw new Error('Mission data is undefined');
+                }
+                if (!Array.isArray(divisionsRes.data)) {
+                    throw new Error('Divisions data is not an array');
+                }
+                if (!Array.isArray(partenairesRes.data)) {
+                    throw new Error('Partenaires data is not an array');
+                }
+                if (!Array.isArray(sousTraitantsRes.data)) {
+                    throw new Error('Sous-traitants data is not an array');
+                }
+
                 setMission(missionRes.data);
                 setDivisions(divisionsRes.data);
                 setPartenaires(partenairesRes.data);
@@ -74,24 +94,27 @@ const RepartirMissionCD = () => {
                 if (missionRes.data) {
                     const newRepartition = {
                         principalDivisionPart: missionRes.data.partDivPrincipale || 0,
-                        secondaryDivisions: missionRes.data.secondaryDivisions.map(sd => ({
-                            divisionId: sd.division.id_division,
+                        secondaryDivisions: missionRes.data.secondaryDivisions?.map(sd => ({
+                            divisionId: sd.division?.id_division,
                             partMission: sd.partMission
-                        })),
-                        partenaires: missionRes.data.partenaires.map(p => ({
-                            partenaireId: p.partenaire.id_partenaire,
+                        })) || [],
+                        partenaires: missionRes.data.partenaires?.map(p => ({
+                            partenaireId: p.partenaire?.id_partenaire,
                             partMission: p.partMission
-                        })),
-                        sousTraitants: missionRes.data.sousTraitants.map(st => ({
-                            sousTraitantId: st.sousTraitant.id_soustrait,
+                        })) || [],
+                        sousTraitants: missionRes.data.sousTraitants?.map(st => ({
+                            sousTraitantId: st.sousTraitant?.id_soustrait,
                             partMission: st.partMission
-                        }))
+                        })) || []
                     };
                     setRepartition(newRepartition);
                     calculateTotalPart(newRepartition);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setErrorMessage(`Error fetching data: ${error.message}`);
+            } finally {
+                setLoading(false);
             }
         };
         fetchData();
@@ -214,7 +237,8 @@ const RepartirMissionCD = () => {
         navigate(`/afficherMissionCD/${mission.affaire.idAffaire}`);
     };
 
-    if (!mission) return <div>Loading...</div>;
+    if (loading) return <div>Loading...</div>;
+    if (!mission) return <div>No mission data available</div>;
 
     return (
         <div className="wrapper">
@@ -240,9 +264,14 @@ const RepartirMissionCD = () => {
                                                         label="Division Principale"
                                                         id="principalDivision"
                                                         type="select"
-                                                        value={mission.principalDivision.id_division}
+                                                        value={mission.principalDivision?.id_division || ''}
                                                         onChange={() => {}}
-                                                        options={divisions.map(div => ({ value: div.id_division, label: div.nom_division }))}
+                                                        options={[
+                                                            { 
+                                                                value: mission.principalDivision?.id_division || '', 
+                                                                label: mission.principalDivision?.nom_division || 'Division non spécifiée' 
+                                                            }
+                                                        ]}
                                                         disabled={true}
                                                     />
                                                     <FormField
@@ -250,7 +279,7 @@ const RepartirMissionCD = () => {
                                                         id="principalDivisionPart"
                                                         type="number"
                                                         placeholder="Part de la division"
-                                                        value={repartition.principalDivisionPart}
+                                                        value={mission.partDivPrincipale || 0}
                                                         onChange={handlePrincipalDivisionPartChange}
                                                     />
                                                 </div>
@@ -387,4 +416,3 @@ const RepartirMissionCD = () => {
 };
 
 export default RepartirMissionCD;
-
