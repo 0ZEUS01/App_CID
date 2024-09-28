@@ -234,7 +234,7 @@ const RepartirMissionCD = () => {
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        navigate(`/afficherMissionCD/${mission.affaire.idAffaire}`);
+        navigate(-1);
     };
 
     if (loading) return <div>Loading...</div>;

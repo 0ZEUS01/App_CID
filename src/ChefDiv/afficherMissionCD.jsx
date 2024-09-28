@@ -12,6 +12,10 @@ import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
 
+// At the top of your file, configure axios
+axios.defaults.withCredentials = true;
+axios.defaults.timeout = 5000; // 5 seconds timeout
+
 const AfficherMissionCD = () => {
     const { idAffaire } = useParams();
     const [missions, setMissions] = useState([]);
@@ -39,7 +43,13 @@ const AfficherMissionCD = () => {
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                setError('Failed to fetch data. Please try again later.');
+                if (error.response) {
+                    setError(`Server error: ${error.response.status}`);
+                } else if (error.request) {
+                    setError('No response received from server. Please check your network connection.');
+                } else {
+                    setError(`Request error: ${error.message}`);
+                }
                 setLoading(false);
             }
         };
