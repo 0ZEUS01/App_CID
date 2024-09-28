@@ -7,6 +7,7 @@ import { faPlus, faTrash, faHome, faArrowRight } from '@fortawesome/free-solid-s
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
+import Select from 'react-select';
 
 const FormField = ({ label, id, type = 'text', name, value, onChange, options, disabled, required }) => (
     <Form.Group className="mb-3">
@@ -21,17 +22,11 @@ const FormField = ({ label, id, type = 'text', name, value, onChange, options, d
                 disabled={disabled}
                 required={required}
             >
-                {value ? (
-                    <option value={value}>{value}</option>
-                ) : (
-                    <option value="">Sélectionnez une option</option>
-                )}
+                <option value="">Sélectionnez une option</option>
                 {options && options.map((option, index) => (
-                    option.label !== value && (
-                        <option key={index} value={option.value}>
-                            {option.label}
-                        </option>
-                    )
+                    <option key={index} value={option.value}>
+                        {option.label}
+                    </option>
                 ))}
             </Form.Control>
         ) : (
@@ -102,15 +97,18 @@ const RepartirMissionCD = () => {
                         principalDivisionPart: missionRes.data.partDivPrincipale || 0,
                         secondaryDivisions: missionRes.data.missionDivisions?.map(sd => ({
                             divisionId: sd.division?.id_division,
-                            partMission: sd.partMission
+                            partMission: sd.partMission,
+                            divisionName: sd.division?.nom_division
                         })) || [],
                         partenaires: missionRes.data.missionPartenaires?.map(p => ({
                             partenaireId: p.partenaire?.id_partenaire,
-                            partMission: p.partMission
+                            partMission: p.partMission,
+                            partenaireName: p.partenaire?.nom_partenaire
                         })) || [],
                         sousTraitants: missionRes.data.missionSousTraitants?.map(st => ({
                             sousTraitantId: st.sousTraitant?.id_soustrait,
-                            partMission: st.partMission
+                            partMission: st.partMission,
+                            sousTraitantName: st.sousTraitant?.nom_soustrait
                         })) || []
                     };
                     setRepartition(newRepartition);
@@ -138,7 +136,16 @@ const RepartirMissionCD = () => {
     const handleSecondaryDivisionChange = (index, field, value) => {
         setRepartition(prev => {
             const updatedDivisions = [...prev.secondaryDivisions];
-            updatedDivisions[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            if (field === 'divisionId') {
+                const selectedDivision = divisions.find(d => d.id_division === value);
+                updatedDivisions[index] = {
+                    ...updatedDivisions[index],
+                    divisionId: value,
+                    divisionName: selectedDivision ? selectedDivision.nom_division : ''
+                };
+            } else {
+                updatedDivisions[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            }
             const newRepartition = { ...prev, secondaryDivisions: updatedDivisions };
             calculateTotalPart(newRepartition);
             return newRepartition;
@@ -170,7 +177,16 @@ const RepartirMissionCD = () => {
     const handlePartenaireChange = (index, field, value) => {
         setRepartition(prev => {
             const updatedPartenaires = [...prev.partenaires];
-            updatedPartenaires[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            if (field === 'partenaireId') {
+                const selectedPartenaire = partenaires.find(p => p.id_partenaire === value);
+                updatedPartenaires[index] = {
+                    ...updatedPartenaires[index],
+                    partenaireId: value,
+                    partenaireName: selectedPartenaire ? selectedPartenaire.nom_partenaire : ''
+                };
+            } else {
+                updatedPartenaires[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            }
             const newRepartition = { ...prev, partenaires: updatedPartenaires };
             calculateTotalPart(newRepartition);
             return newRepartition;
@@ -202,7 +218,16 @@ const RepartirMissionCD = () => {
     const handleSousTraitantChange = (index, field, value) => {
         setRepartition(prev => {
             const updatedSousTraitants = [...prev.sousTraitants];
-            updatedSousTraitants[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            if (field === 'sousTraitantId') {
+                const selectedSousTraitant = sousTraitants.find(st => st.id_soustrait === value);
+                updatedSousTraitants[index] = {
+                    ...updatedSousTraitants[index],
+                    sousTraitantId: value,
+                    sousTraitantName: selectedSousTraitant ? selectedSousTraitant.nom_soustrait : ''
+                };
+            } else {
+                updatedSousTraitants[index][field] = field === 'partMission' ? parseFloat(value) || 0 : value;
+            }
             const newRepartition = { ...prev, sousTraitants: updatedSousTraitants };
             calculateTotalPart(newRepartition);
             return newRepartition;
@@ -282,27 +307,35 @@ const RepartirMissionCD = () => {
                                         <Form onSubmit={handleSubmit}>
                                             <Row>
                                                 <Col md={6}>
-                                                    <FormField
-                                                        label="Division Principale"
-                                                        id="principalDivision"
-                                                        type="select"
-                                                        name="principalDivision"
-                                                        value={mission.principalDivision?.id_division || ''}
-                                                        options={[{ value: mission.principalDivision?.id_division, label: mission.principalDivision?.nom_division }]}
-                                                        disabled={true}
-                                                        required
-                                                    />
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Division Principale</Form.Label>
+                                                        <Select
+                                                            id="principalDivision"
+                                                            name="principalDivision"
+                                                            value={{ 
+                                                                value: mission.principalDivision?.id_division, 
+                                                                label: mission.principalDivision?.nom_division 
+                                                            }}
+                                                            options={[{ 
+                                                                value: mission.principalDivision?.id_division, 
+                                                                label: mission.principalDivision?.nom_division 
+                                                            }]}
+                                                            isDisabled={true}
+                                                        />
+                                                    </Form.Group>
                                                 </Col>
                                                 <Col md={6}>
-                                                    <FormField
-                                                        label="Part de la division principale"
-                                                        id="principalDivisionPart"
-                                                        type="number"
-                                                        name="principalDivisionPart"
-                                                        value={repartition.principalDivisionPart}
-                                                        onChange={handlePrincipalDivisionPartChange}
-                                                        required
-                                                    />
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Part de la division principale</Form.Label>
+                                                        <Form.Control
+                                                            type="number"
+                                                            id="principalDivisionPart"
+                                                            name="principalDivisionPart"
+                                                            value={repartition.principalDivisionPart}
+                                                            onChange={handlePrincipalDivisionPartChange}
+                                                            required
+                                                        />
+                                                    </Form.Group>
                                                 </Col>
                                             </Row>
 
@@ -310,30 +343,33 @@ const RepartirMissionCD = () => {
                                             {repartition.secondaryDivisions.map((div, index) => (
                                                 <Row key={index}>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Division"
-                                                            id={`secondaryDivision-${index}`}
-                                                            type="select"
-                                                            name={`secondaryDivision-${index}`}
-                                                            value={divisions.find(d => d.id_division === div.divisionId)?.nom_division || ''}
-                                                            onChange={(e) => {
-                                                                const selectedDivision = divisions.find(d => d.nom_division === e.target.value);
-                                                                handleSecondaryDivisionChange(index, 'divisionId', selectedDivision ? selectedDivision.id_division : '');
-                                                            }}
-                                                            options={divisions.map(d => ({ value: d.nom_division, label: d.nom_division }))}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Division</Form.Label>
+                                                            <Select
+                                                                id={`secondaryDivision-${index}`}
+                                                                name={`secondaryDivision-${index}`}
+                                                                value={{ value: div.divisionId, label: div.divisionName }}
+                                                                onChange={(selectedOption) => handleSecondaryDivisionChange(index, 'divisionId', selectedOption.value)}
+                                                                options={divisions.map(d => ({ 
+                                                                    value: d.id_division, 
+                                                                    label: d.nom_division 
+                                                                }))}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Part de cette division"
-                                                            id={`secondaryDivisionPart-${index}`}
-                                                            type="number"
-                                                            name={`secondaryDivisionPart-${index}`}
-                                                            value={div.partMission}
-                                                            onChange={(e) => handleSecondaryDivisionChange(index, 'partMission', e.target.value)}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Part de cette division</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id={`secondaryDivisionPart-${index}`}
+                                                                name={`secondaryDivisionPart-${index}`}
+                                                                value={div.partMission}
+                                                                onChange={(e) => handleSecondaryDivisionChange(index, 'partMission', e.target.value)}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={2} className="d-flex align-items-end mb-3">
                                                         <Button variant="danger" onClick={() => removeSecondaryDivision(index)}>
@@ -350,27 +386,33 @@ const RepartirMissionCD = () => {
                                             {repartition.partenaires.map((p, index) => (
                                                 <Row key={index}>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Partenaire"
-                                                            id={`partenaire-${index}`}
-                                                            type="select"
-                                                            name={`partenaire-${index}`}
-                                                            value={p.partenaireId}
-                                                            onChange={(e) => handlePartenaireChange(index, 'partenaireId', e.target.value)}
-                                                            options={partenaires.map(part => ({ value: part.id_partenaire, label: part.nom_partenaire }))}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Partenaire</Form.Label>
+                                                            <Select
+                                                                id={`partenaire-${index}`}
+                                                                name={`partenaire-${index}`}
+                                                                value={{ value: p.partenaireId, label: p.partenaireName }}
+                                                                onChange={(selectedOption) => handlePartenaireChange(index, 'partenaireId', selectedOption.value)}
+                                                                options={partenaires.map(part => ({ 
+                                                                    value: part.id_partenaire, 
+                                                                    label: part.nom_partenaire 
+                                                                }))}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Part du partenaire"
-                                                            id={`partenairePart-${index}`}
-                                                            type="number"
-                                                            name={`partenairePart-${index}`}
-                                                            value={p.partMission}
-                                                            onChange={(e) => handlePartenaireChange(index, 'partMission', e.target.value)}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Part du partenaire</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id={`partenairePart-${index}`}
+                                                                name={`partenairePart-${index}`}
+                                                                value={p.partMission}
+                                                                onChange={(e) => handlePartenaireChange(index, 'partMission', e.target.value)}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={2} className="d-flex align-items-end mb-3">
                                                         <Button variant="danger" onClick={() => removePartenaire(index)}>
@@ -387,27 +429,33 @@ const RepartirMissionCD = () => {
                                             {repartition.sousTraitants.map((st, index) => (
                                                 <Row key={index}>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Sous-traitant"
-                                                            id={`sousTraitant-${index}`}
-                                                            type="select"
-                                                            name={`sousTraitant-${index}`}
-                                                            value={st.sousTraitantId}
-                                                            onChange={(e) => handleSousTraitantChange(index, 'sousTraitantId', e.target.value)}
-                                                            options={sousTraitants.map(s => ({ value: s.id_soustrait, label: s.nom_soustrait }))}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Sous-traitant</Form.Label>
+                                                            <Select
+                                                                id={`sousTraitant-${index}`}
+                                                                name={`sousTraitant-${index}`}
+                                                                value={{ value: st.sousTraitantId, label: st.sousTraitantName }}
+                                                                onChange={(selectedOption) => handleSousTraitantChange(index, 'sousTraitantId', selectedOption.value)}
+                                                                options={sousTraitants.map(s => ({ 
+                                                                    value: s.id_soustrait, 
+                                                                    label: s.nom_soustrait 
+                                                                }))}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={5}>
-                                                        <FormField
-                                                            label="Part du sous-traitant"
-                                                            id={`sousTraitantPart-${index}`}
-                                                            type="number"
-                                                            name={`sousTraitantPart-${index}`}
-                                                            value={st.partMission}
-                                                            onChange={(e) => handleSousTraitantChange(index, 'partMission', e.target.value)}
-                                                            required
-                                                        />
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Part du sous-traitant</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id={`sousTraitantPart-${index}`}
+                                                                name={`sousTraitantPart-${index}`}
+                                                                value={st.partMission}
+                                                                onChange={(e) => handleSousTraitantChange(index, 'partMission', e.target.value)}
+                                                                required
+                                                            />
+                                                        </Form.Group>
                                                     </Col>
                                                     <Col md={2} className="d-flex align-items-end mb-3">
                                                         <Button variant="danger" onClick={() => removeSousTraitant(index)}>
