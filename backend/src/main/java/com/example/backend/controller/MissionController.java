@@ -185,9 +185,8 @@ public class MissionController {
                 MissionDivisionDTO missionDivisionDTO = new MissionDivisionDTO();
                 missionDivisionDTO.setId(div.getId());
                 missionDivisionDTO.setMissionId(div.getMission().getId_mission());
-                DivisionDTO divisionDTO = modelMapper.map(div.getDivision(), DivisionDTO.class);
-                missionDivisionDTO.setDivisionId(divisionDTO.getId_division());
-                missionDivisionDTO.setDivisionName(divisionDTO.getNom_division());
+                missionDivisionDTO.setDivisionId(div.getDivision().getId_division());
+                missionDivisionDTO.setDivision(modelMapper.map(div.getDivision(), DivisionDTO.class));
                 missionDivisionDTO.setPartMission(div.getPartMission());
                 return missionDivisionDTO;
             })
@@ -198,9 +197,8 @@ public class MissionController {
                 MissionSTDTO missionSTDTO = new MissionSTDTO();
                 missionSTDTO.setId(st.getId());
                 missionSTDTO.setMissionId(st.getMission().getId_mission());
-                SousTraitantDTO sousTraitantDTO = modelMapper.map(st.getSousTraitant(), SousTraitantDTO.class);
-                missionSTDTO.setSousTraitantId(sousTraitantDTO.getId_soustrait());
-                missionSTDTO.setSousTraitantName(sousTraitantDTO.getNom_soustrait());
+                missionSTDTO.setSousTraitantId(st.getSousTraitant().getId_soustrait());
+                missionSTDTO.setSousTraitant(modelMapper.map(st.getSousTraitant(), SousTraitantDTO.class));
                 missionSTDTO.setPartMission(st.getPartMission());
                 return missionSTDTO;
             })
@@ -211,9 +209,8 @@ public class MissionController {
                 MissionPartenaireDTO missionPartenaireDTO = new MissionPartenaireDTO();
                 missionPartenaireDTO.setId(p.getId());
                 missionPartenaireDTO.setMissionId(p.getMission().getId_mission());
-                PartenaireDTO partenaireDTO = modelMapper.map(p.getPartenaire(), PartenaireDTO.class);
-                missionPartenaireDTO.setPartenaireId(partenaireDTO.getId_partenaire());
-                missionPartenaireDTO.setPartenaireName(partenaireDTO.getNom_partenaire());
+                missionPartenaireDTO.setPartenaireId(p.getPartenaire().getId_partenaire());
+                missionPartenaireDTO.setPartenaire(modelMapper.map(p.getPartenaire(), PartenaireDTO.class));
                 missionPartenaireDTO.setPartMission(p.getPartMission());
                 return missionPartenaireDTO;
             })

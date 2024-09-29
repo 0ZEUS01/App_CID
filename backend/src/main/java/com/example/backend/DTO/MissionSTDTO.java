@@ -11,6 +11,6 @@ public class MissionSTDTO {
     private Long id;
     private Long missionId;
     private Long sousTraitantId;
-    private String sousTraitantName;  // Add this field
+    private SousTraitantDTO sousTraitant;
     private Double partMission;
 }
