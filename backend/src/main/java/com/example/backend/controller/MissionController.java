@@ -1,9 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.DTO.MissionDTO;
-import com.example.backend.DTO.MissionDivisionDTO;
-import com.example.backend.DTO.MissionPartenaireDTO;
-import com.example.backend.DTO.MissionSTDTO;
+import com.example.backend.DTO.*;
 import com.example.backend.model.*;
 import com.example.backend.repository.*;
 import org.modelmapper.ModelMapper;
@@ -174,7 +171,9 @@ public class MissionController {
             dto.setAffaireId(mission.getAffaire().getIdAffaire());
         }
         if (mission.getPrincipalDivision() != null) {
-            dto.setPrincipalDivisionId(mission.getPrincipalDivision().getId_division());
+            DivisionDTO principalDivisionDTO = modelMapper.map(mission.getPrincipalDivision(), DivisionDTO.class);
+            dto.setPrincipalDivisionId(principalDivisionDTO.getId_division());
+            dto.setPrincipalDivision(principalDivisionDTO);
         }
         if (mission.getUnite() != null) {
             dto.setUniteId(mission.getUnite().getId_unite());
@@ -182,15 +181,42 @@ public class MissionController {
         
         // Map nested objects
         dto.setMissionDivisions(mission.getSecondaryDivisions().stream()
-            .map(div -> modelMapper.map(div, MissionDivisionDTO.class))
+            .map(div -> {
+                MissionDivisionDTO missionDivisionDTO = new MissionDivisionDTO();
+                missionDivisionDTO.setId(div.getId());
+                missionDivisionDTO.setMissionId(div.getMission().getId_mission());
+                DivisionDTO divisionDTO = modelMapper.map(div.getDivision(), DivisionDTO.class);
+                missionDivisionDTO.setDivisionId(divisionDTO.getId_division());
+                missionDivisionDTO.setDivisionName(divisionDTO.getNom_division());
+                missionDivisionDTO.setPartMission(div.getPartMission());
+                return missionDivisionDTO;
+            })
             .collect(Collectors.toList()));
         
         dto.setMissionSousTraitants(mission.getSousTraitants().stream()
-            .map(st -> modelMapper.map(st, MissionSTDTO.class))
+            .map(st -> {
+                MissionSTDTO missionSTDTO = new MissionSTDTO();
+                missionSTDTO.setId(st.getId());
+                missionSTDTO.setMissionId(st.getMission().getId_mission());
+                SousTraitantDTO sousTraitantDTO = modelMapper.map(st.getSousTraitant(), SousTraitantDTO.class);
+                missionSTDTO.setSousTraitantId(sousTraitantDTO.getId_soustrait());
+                missionSTDTO.setSousTraitantName(sousTraitantDTO.getNom_soustrait());
+                missionSTDTO.setPartMission(st.getPartMission());
+                return missionSTDTO;
+            })
             .collect(Collectors.toList()));
         
         dto.setMissionPartenaires(mission.getPartenaires().stream()
-            .map(p -> modelMapper.map(p, MissionPartenaireDTO.class))
+            .map(p -> {
+                MissionPartenaireDTO missionPartenaireDTO = new MissionPartenaireDTO();
+                missionPartenaireDTO.setId(p.getId());
+                missionPartenaireDTO.setMissionId(p.getMission().getId_mission());
+                PartenaireDTO partenaireDTO = modelMapper.map(p.getPartenaire(), PartenaireDTO.class);
+                missionPartenaireDTO.setPartenaireId(partenaireDTO.getId_partenaire());
+                missionPartenaireDTO.setPartenaireName(partenaireDTO.getNom_partenaire());
+                missionPartenaireDTO.setPartMission(p.getPartMission());
+                return missionPartenaireDTO;
+            })
             .collect(Collectors.toList()));
 
         return dto;

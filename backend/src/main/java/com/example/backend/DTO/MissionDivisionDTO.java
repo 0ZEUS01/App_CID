@@ -11,5 +11,6 @@ public class MissionDivisionDTO {
     private Long id;
     private Long missionId;
     private Long divisionId;
+    private String divisionName;  // Add this field
     private Double partMission;
 }

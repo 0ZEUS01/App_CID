@@ -20,23 +20,10 @@ public class MissionPartenaire {
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "partenaire_id", nullable = false)
     private Partenaire partenaire;
 
     @Column(name = "part_mission", nullable = true)
     private Double partMission;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MissionPartenaire)) return false;
-        MissionPartenaire that = (MissionPartenaire) o;
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
-    }
 }
