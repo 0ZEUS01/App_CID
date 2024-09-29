@@ -96,7 +96,7 @@ const HomeCD = () => {
                 <div className="container">
                     <div className="page-inner">
                         <div className="page-header">
-                            <h4 className="page-title">Accueil Chef de Division</h4>
+                            <h4 className="page-title">Accueil Chef de Projet</h4>
                             <ul className="breadcrumbs">
                                 <li className="nav-home">
                                     <Button variant="link" className="nav-link">
@@ -111,7 +111,7 @@ const HomeCD = () => {
                                 </li>
                             </ul>
                         </div>
-                        <h4>Aperçu des Affaires de la Division</h4>
+                        <h4>Aperçu des Affaires </h4>
                         <Row className="mb-4">
                             <Col md={4}>
                                 <Card className="card-stats card-round">
@@ -234,7 +234,7 @@ const HomeCD = () => {
                             <Col lg={12}>
                                 <Card>
                                     <Card.Header>
-                                        <Card.Title as="h4">Performance des Affaires de la Division</Card.Title>
+                                        <Card.Title as="h4">Performance des Affaires</Card.Title>
                                         <p className="card-category">Affaires par statut et par mois</p>
                                     </Card.Header>
                                     <Card.Body>
