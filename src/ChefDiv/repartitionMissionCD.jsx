@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Row, Col } from 'react-bootstrap';
+import { Button, Form, Row, Col, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faHome, faArrowRight, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './components/sideBar';
 import MainHeader from './components/mainHeader';
 import Footer from './components/footer';
@@ -59,6 +59,7 @@ const RepartirMissionCD = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [totalPart, setTotalPart] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const calculateTotalPart = useCallback((repartitionData) => {
         const total = repartitionData.principalDivisionPart +
@@ -265,11 +266,16 @@ const RepartirMissionCD = () => {
 
         try {
             await axios.post(`http://localhost:8080/api/missions/${idMission}/repartition`, repartition);
-            navigate(-1);
+            setShowSuccessModal(true);
         } catch (error) {
             console.error('Error submitting repartition:', error);
             setErrorMessage('Erreur lors de la soumission de la répartition. Veuillez réessayer.');
         }
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        window.location.reload();
     };
 
     if (loading) {
@@ -486,6 +492,20 @@ const RepartirMissionCD = () => {
                 </div>
                 <Footer />
             </div>
+            <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Succès</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                    <FontAwesomeIcon icon={faCheckCircle} size="4x" color="green" className="mb-3" />
+                    <p>La répartition a été soumise avec succès.</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleCloseSuccessModal}>
+                        Fermer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
