@@ -45,7 +45,7 @@ const UserDropdown = ({ firstName, lastName, email }) => (
                 </li>
                 <li>
                     <div className="dropdown-divider" />
-                    <Link className="dropdown-item" to="/profileCA">My Profile</Link>
+                    <Link className="dropdown-item" to="/profileCDP">My Profile</Link>
                     <Link className="dropdown-item" to="/logout">Logout</Link>
                 </li>
             </div>
